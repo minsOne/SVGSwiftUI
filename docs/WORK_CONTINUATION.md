@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package 초기화 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P1 스켈레톤 진행 중
+- 구현 상태: P1 XML tokenization 완료, P2/P4 진행 대기
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -14,15 +14,15 @@
 - v2 확장: style/CSS subset + base64 `data:` URI
 
 ## 바로 다음 실행 순서
-1. DemoApp 생성 후 로컬 패키지 연결
-2. XML tokenization 기반 최소 SVG 파서 구현
-3. Path 파서 명령(`M/L/C/...`) 순차 구현
-4. 스타일 상속 + override 우선순위 로직 구현
-5. 테스트 fixture 추가 후 파서 단위 테스트부터 고정
+1. Path 파서 명령(`M/L/H/V/C/S/Q/T/A/Z`) tokenizer/AST 구현
+2. 스타일 상속 + override 우선순위 로직 구현 (`원본 < map < resolver`)
+3. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
+4. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
+5. 캐시 키(`source + options + schemaVersion`) 해시 고도화
 
 ## 체크리스트 (진행 시 갱신)
 - [ ] P0 부트스트랩 완료 (DemoApp 남음)
-- [ ] P1 모델/파서 골격 완료 (XML tokenization 남음)
+- [x] P1 모델/파서 골격 완료 (XML tokenization 포함)
 - [ ] P2 Path 파서 완료
 - [ ] P3 도형 파서 완료
 - [ ] P4 스타일/노드 제어 완료
@@ -51,3 +51,9 @@
 - 결정: 캐시는 AST only, 노드 제어는 map 기본 + resolver 옵션 유지
 - 리스크: XML 실파서/arc 파서/데모앱은 아직 미구현
 - 다음 액션: DemoApp 생성 및 P1-3 XML tokenization 착수
+
+### 2026-02-15 (Session 02)
+- 작업: P1-3 XML tokenization 파서 구현, 파서 테스트 확장, 로그 동기화
+- 결정: DemoApp은 xcodegen 없이 수동 xcodeproj 방식으로 진행
+- 리스크: path command 파서와 스타일 상속 우선순위는 다음 단계
+- 다음 액션: P2-1 path parser 먼저 구현
