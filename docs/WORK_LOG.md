@@ -116,3 +116,19 @@
   1. style 상속 + `원본 < map < resolver` 우선순위 로직 구현
   2. Path command를 실제 렌더 Path 생성 로직에 연결
   3. DemoApp 수동 xcodeproj 생성 및 패키지 연결
+
+### Session 06
+- Scope:
+  - W3C SVG conformance 테스트 요구사항을 공식 계획에 편입
+- Completed:
+  - `STEP_BY_STEP_PLAN.md`에 W3C 테스트 트랙(A8/A9) 추가
+  - `TASK_BOARD.md`에 W3C 관련 작업 ID 추가(A8-1, A8-2, A9-1, A9-2)
+  - `WORK_CONTINUATION.md`에 v2+ W3C 파이프라인 항목 반영
+  - `W3C_CONFORMANCE_PLAN.md` 신설:
+    - fixture/manifest/자동 생성/coverage/CI 단계 정의
+    - supported vs unsupported 분리 정책 명시
+- Validation:
+  - 계획 문서 간 정합성 점검 완료
+- Next:
+  1. 현재 우선순위(P4, Path->Render, DemoApp) 완료 후 A8/A9 착수
+  2. W3C fixture subset 초기 셋 선정(paths/shapes/coords/styling)

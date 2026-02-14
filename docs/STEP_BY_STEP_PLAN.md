@@ -13,6 +13,7 @@
 - 노드 제어 방식: `NodeID map` 기본 + 선택적 `resolver closure`
 - 캐시 정책: 파싱 결과(AST)만 메모리 LRU 캐시
 - v2 확장 범위: `style` 고급 처리 + `data:`(base64) URI 지원
+- v2 이후 확장: W3C SVG 테스트 스위트 기반 준수 테스트 트랙 추가
 
 ## 3. 단계별 계획 (v1)
 
@@ -40,6 +41,8 @@
 | A5 | embedded SVG 처리 | `data:image/svg+xml` 재귀 파싱 | depth 제한 포함 통합 테스트 통과 |
 | A6 | raster 정책 | `.ignore/.renderRaster/.failOnRaster` | 정책별 동작 테스트 통과 |
 | A7 | 캐시 확장 | v2 키 버전 포함 | 옵션/버전 변경 시 stale hit 없음 |
+| A8 | W3C 테스트 도입(1차) | W3C fixture subset + 자동 테스트 생성 | 지원 범위 카테고리(paths/shapes/coords/styling) 기준 비교 테스트 통과 |
+| A9 | W3C 커버리지 리포트 | coverage markdown + CI 아티팩트 | 현재 지원 범위 대비 pass/fail/unsupported 지표 자동 생성 |
 
 ## 5. API 설계 고정안
 - `SVGSource`: `.string`, `.data`, `.fileURL`
@@ -64,4 +67,5 @@
 ## 7. 최종 완료 기준
 - v1: iOS 15+에서 샘플 SVG 렌더 + 노드 제어 + 캐시 + 단위/UITest 통과
 - v2: style/data URI 고급 기능이 정책 기반으로 안정 동작
+- v2+: W3C 준수 테스트 리포트가 생성되고, 지원 범위 내 회귀가 CI에서 차단됨
 - 문서: 지원/미지원/제약이 명확하게 명시됨

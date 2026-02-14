@@ -39,6 +39,10 @@ Last Updated: 2026-02-15 (UITest scope added)
 | A5-1 | A5 | embedded SVG recursion 제한 처리 | todo |  |
 | A6-1 | A6 | raster image policy 처리 | todo |  |
 | A7-1 | A7 | v2 cache key versioning | todo |  |
+| A8-1 | A8 | W3C fixture subset 도입(1.1F2/1.2T) | todo | 지원 요소 기준(paths/shapes/coords/styling 우선) |
+| A8-2 | A8 | W3C 테스트케이스 자동 생성 스크립트 | todo | fixture manifest -> XCTest 코드 생성 |
+| A9-1 | A9 | W3C coverage 리포트 생성 스크립트 | todo | pass/fail/unsupported 카테고리별 집계 |
+| A9-2 | A9 | CI에 W3C conformance 단계 추가 | todo | 회귀 시 fail, 리포트 아티팩트 업로드 |
 
 ## Anti-Duplication Rules
 1. 작업 시작 전 해당 Task ID를 `in_progress`로 먼저 바꾼다.

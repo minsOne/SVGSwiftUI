@@ -13,6 +13,7 @@
 - 캐시: 파싱 결과(AST) 전용
 - v2 확장: style/CSS subset + base64 `data:` URI
 - DemoApp 단계에서 UITest + 기준 이미지 비교를 포함
+- v2+ 확장: W3C SVG conformance 테스트(coverage 리포트 포함) 도입
 
 ## 바로 다음 실행 순서
 1. 스타일 상속 + override 우선순위 로직 구현 (`원본 < map < resolver`)
@@ -22,6 +23,7 @@
 5. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
 6. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
 7. 캐시 키(`source + options + schemaVersion`) 해시 고도화
+8. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
 - [ ] P0 부트스트랩 완료 (DemoApp 남음)
