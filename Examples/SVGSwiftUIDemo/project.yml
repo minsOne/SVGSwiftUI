@@ -1,0 +1,50 @@
+name: SVGSwiftUIDemo
+options:
+  bundleIdPrefix: com.minsone
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    IPHONEOS_DEPLOYMENT_TARGET: 15.0
+packages:
+  SVGSwiftUI:
+    path: ../..
+targets:
+  SVGSwiftUIDemo:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.minsone.SVGSwiftUIDemo
+        PRODUCT_NAME: SVGSwiftUIDemo
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - package: SVGSwiftUI
+        product: SVGSwiftUI
+
+  SVGSwiftUIDemoUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: UITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.minsone.SVGSwiftUIDemoUITests
+        TEST_TARGET_NAME: SVGSwiftUIDemo
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: SVGSwiftUIDemo
+
+schemes:
+  SVGSwiftUIDemo:
+    build:
+      targets:
+        SVGSwiftUIDemo: all
+        SVGSwiftUIDemoUITests: [test]
+    test:
+      targets:
+        - name: SVGSwiftUIDemoUITests

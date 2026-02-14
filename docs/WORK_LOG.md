@@ -183,3 +183,28 @@
   1. DemoApp 수동 xcodeproj 생성 및 패키지 연결
   2. Demo UITest + baseline 비교 파이프라인 구축
   3. transform 누적/정교한 렌더 규칙 보강
+
+### Session 09
+- Scope:
+  - `P0-3` DemoApp 생성/패키지 연결 완료
+  - `P7-2` UITest 구현 및 안정화
+  - 작업 로그/보드 동기화
+- Completed:
+  - `Examples/SVGSwiftUIDemo` 추가:
+    - `project.yml`, `SVGSwiftUIDemo.xcodeproj`, `Sources/*`, `UITests/*`
+  - Demo 화면 구현:
+    - 샘플 전환, node id 입력, fill/stroke toggle, scale/offset slider
+    - 접근성 식별자 고정(`demo.canvas`, `demo.controls`, `demo.nodeIDField` 등)
+  - UITest 4개 구현/보강:
+    - launch + 핵심 UI 존재
+    - sample 전환 + node id 입력 반영
+    - toggle 조작 회귀
+    - offset slider 조작 회귀
+  - 초기 플래키 이슈(컨테이너/텍스트필드 식별자, switch value 비교) 수정
+- Validation:
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test` 통과 (4 tests, 0 failures)
+  - `swift test` 통과 (50 tests, 0 failures)
+- Next:
+  1. `P7-3` baseline 캡처/비교 유틸 추가
+  2. `P7-1` cache 통계 UI 추가(hit/miss/size)
+  3. `P5-1` cache key 고도화(`source + options + schemaVersion`)

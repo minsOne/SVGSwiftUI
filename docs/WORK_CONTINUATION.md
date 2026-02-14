@@ -1,9 +1,9 @@
 # 작업 연속성 문서
 
 ## 현재 상태 (2026-02-15)
-- 저장소 상태: Swift Package 초기화 완료
+- 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P1/P2/P4 핵심 완료, `SVGView` 기본 렌더 연결 완료, 테스트 50개 통과
+- 구현 상태: P0/P1/P2/P3/P4 핵심 완료, `SVGView` 기본 렌더 연결 완료, 패키지 테스트 50개 + Demo UITest 4개 통과
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -16,20 +16,19 @@
 - v2+ 확장: W3C SVG conformance 테스트(coverage 리포트 포함) 도입
 
 ## 바로 다음 실행 순서
-1. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
-2. Demo UITest 타깃 생성 + 샘플 화면 launch/assert 테스트
-3. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
-4. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
-5. 캐시 키(`source + options + schemaVersion`) 해시 고도화
-6. transform/고급 렌더 보강
-7. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+1. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가(`P7-3`, `P8-2`)
+2. Demo UI에 cache 통계 패널 추가(`P7-1`)
+3. 캐시 키(`source + options + schemaVersion`) 해시 고도화(`P5-1`)
+4. transform/고급 렌더 보강(`P6-1`)
+5. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
+6. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
-- [ ] P0 부트스트랩 완료 (DemoApp 남음)
+- [x] P0 부트스트랩 완료
 - [x] P1 모델/파서 골격 완료 (XML tokenization 포함)
-- [ ] P2 Path 파서 완료
-- [ ] P3 도형 파서 완료
-- [ ] P4 스타일/노드 제어 완료
+- [x] P2 Path 파서 완료
+- [x] P3 도형 파서 완료
+- [x] P4 스타일/노드 제어 완료
 - [ ] P5 캐시 완료
 - [ ] P6 렌더러 완료
 - [ ] P7 Demo 앱 완료
@@ -85,3 +84,9 @@
 - 결정: `SVGView`는 Canvas 기반으로 fill/stroke/opacity/linecap/linejoin을 적용
 - 리스크: transform matrix 누적 및 일부 고급 SVG 렌더 규칙은 추가 보강 필요
 - 다음 액션: DemoApp 생성 + UITest baseline 흐름 구축
+
+### 2026-02-15 (Session 09)
+- 작업: DemoApp 생성, 접근성 식별자 정리, UITest 4개 구현/안정화
+- 결정: UITest는 플래키를 줄이기 위해 switch value 문자열 비교 대신 실제 조작 가능성 검증 중심으로 구성
+- 리스크: snapshot baseline 비교/시각 diff 유틸은 아직 미구현
+- 다음 액션: baseline 캡처/비교 파이프라인 추가 + cache 통계 UI 구현

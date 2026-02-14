@@ -4,6 +4,16 @@
 - DemoApp 렌더 결과가 기대 결과와 일치하는지 자동 검증한다.
 - 수동 눈검사를 줄이고 회귀를 조기에 탐지한다.
 
+## 현재 구현 상태 (2026-02-15)
+- `Examples/SVGSwiftUIDemo/UITests/SVGSwiftUIDemoUITests.swift` 구현 완료
+- 현재 자동화 범위:
+  - launch + 핵심 접근성 요소 존재 확인
+  - sample 전환 + node id 입력 반영 확인
+  - fill/stroke toggle 조작
+  - offset slider 조작
+- 검증 커맨드:
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
+
 ## 범위
 1. DemoApp launch 및 샘플 SVG 화면 진입 테스트
 2. 노드 제어 UI 변경 후 렌더 결과 반영 검증
@@ -20,7 +30,7 @@
    - 캡처 이미지 crop(캔버스 영역만 비교)
 4. baseline 저장 규칙
    - 경로: `Tests/UITestBaselines/<device>/<test_name>.png`
-   - 기기/OS 고정: iPhone 16, iOS 18.x (CI 고정)
+   - 기기/OS 고정: iPhone 17, iOS 26.2 (CI 고정)
 5. 비교 방식
    - 1차: 픽셀 완전 일치
    - 2차(옵션): 허용오차(예: <=0.5%) 비교
@@ -34,10 +44,10 @@
 3. 테스트 실패 시 먼저 렌더 로직 변경 여부를 확인하고 baseline을 바로 갱신하지 않는다
 
 ## 초기 테스트 케이스
-1. `testDemoLaunchRendersDefaultSample`
-2. `testSelectingSampleUpdatesCanvas`
-3. `testNodeFillControlChangesRender`
-4. `testNodeOffsetControlChangesRender`
+1. `testLaunchShowsCanvasAndControls`
+2. `testSampleSwitcherAndNodeFieldAreAccessible`
+3. `testTogglesCanBeChanged`
+4. `testOffsetSlidersExist`
 
 ## 리스크/주의사항
 - 안티앨리어싱 차이로 기기별 픽셀 오차가 발생할 수 있음
