@@ -75,3 +75,26 @@
 - Next:
   1. `P2-1` Path parser 구현 계속
   2. DemoApp 생성 직후 `P7-2` UITest 타깃부터 연결
+
+### Session 04
+- Scope:
+  - 테스트 보강(파서/캐시 경계 케이스)
+  - 다음 작업으로 `P2-1` path parser 착수
+- Completed:
+  - 테스트 대폭 확장:
+    - `SVGParserTests`: malformed XML, namespace, unsupported/nested svg 무시, synthetic ID, paint/transform/numeric edge 등 추가
+    - `SVGParseCacheTests`: cost eviction, touch LRU, replace key, negative cost clamp, removeAll 추가
+  - 신규 path parser 구현:
+    - `SVGPathDataParser`, `SVGPathCommand`, `SVGPathDataParserError`
+    - 지원 명령: `M/L/H/V/C/S/Q/T/A/Z` (대소문자)
+    - 명령별 파라미터 개수 검증 + unsupported/missing command 검증
+  - 신규 테스트:
+    - `SVGPathDataParserTests` 9개
+  - 캐시 보강:
+    - `SVGParseCache.insert`에서 cost 음수 입력 정규화
+- Validation:
+  - `swift test` 통과 (33 tests, 0 failures)
+- Next:
+  1. `SVGParser`의 `<path d>`에 `SVGPathDataParser` 연결 (AST 레벨 command 저장)
+  2. 스타일 상속 + `원본 < map < resolver` 우선순위 구현
+  3. DemoApp 수동 xcodeproj 생성 및 패키지 연결

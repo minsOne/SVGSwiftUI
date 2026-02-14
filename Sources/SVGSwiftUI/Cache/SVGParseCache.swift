@@ -36,11 +36,12 @@ public actor SVGParseCache {
     }
 
     public func insert(_ document: SVGDocument, for key: SVGParseCacheKey, cost: Int) {
+        let normalizedCost = max(0, cost)
         if let existing = entries[key] {
             totalCost -= existing.cost
         }
-        entries[key] = Entry(document: document, cost: cost)
-        totalCost += max(0, cost)
+        entries[key] = Entry(document: document, cost: normalizedCost)
+        totalCost += normalizedCost
         touch(key)
         evictIfNeeded()
     }
