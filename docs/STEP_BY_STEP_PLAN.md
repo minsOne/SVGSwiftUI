@@ -5,6 +5,7 @@
 - 노드 단위 제어(색상/크기/offset)를 제공한다.
 - 파싱 결과(AST) 캐시를 통해 성능을 개선한다.
 - Demo 앱과 테스트 코드를 포함해 개발/검증 루프를 완성한다.
+- Demo 앱에 UITest를 추가해 실제 렌더 결과를 기준 이미지와 비교 검증한다.
 
 ## 2. 확정된 기본 결정
 - 프로젝트 형태: `Swift Package + iOS DemoApp`
@@ -24,8 +25,8 @@
 | P4 | 스타일/노드 제어 | 상속 스타일 + override(`map/resolver`) | 우선순위 테스트 통과 (`원본 < map < resolver`) |
 | P5 | 캐시 | `SVGParseCache` actor, LRU 정책 | hit/miss/eviction 테스트 통과 |
 | P6 | 렌더러 | `SVGView` + transform 적용 | 샘플 SVG 시각 확인 가능 |
-| P7 | Demo 앱 | 노드 제어 UI + 캐시 통계 화면 | 인터랙션으로 색/크기/offset 반영 |
-| P8 | 테스트 강화 | 파서/렌더/캐시/통합 테스트 | `swift test` 전체 통과 |
+| P7 | Demo 앱 | 노드 제어 UI + 캐시 통계 화면 + UITest 타깃 | 인터랙션 반영 + 샘플 화면 UITest 실행 가능 |
+| P8 | 테스트 강화 | 파서/렌더/캐시/통합 테스트 + 시각 회귀 비교 | `swift test` 통과 + UITest 기준 비교 통과 |
 | P9 | 문서화 | README, 지원 범위, 제한 사항 | 신규 사용자가 예제로 실행 가능 |
 
 ## 4. 단계별 계획 (v2 고급 기능)
@@ -61,6 +62,6 @@
 - CSS 과범위 확장: v2는 subset으로 제한하고 미지원은 로그 처리
 
 ## 7. 최종 완료 기준
-- v1: iOS 15+에서 샘플 SVG 렌더 + 노드 제어 + 캐시 + 테스트 통과
+- v1: iOS 15+에서 샘플 SVG 렌더 + 노드 제어 + 캐시 + 단위/UITest 통과
 - v2: style/data URI 고급 기능이 정책 기반으로 안정 동작
 - 문서: 지원/미지원/제약이 명확하게 명시됨

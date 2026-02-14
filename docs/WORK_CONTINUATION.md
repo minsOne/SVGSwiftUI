@@ -12,13 +12,16 @@
 - 노드 제어: `NodeID map` 기본 + 선택적 closure
 - 캐시: 파싱 결과(AST) 전용
 - v2 확장: style/CSS subset + base64 `data:` URI
+- DemoApp 단계에서 UITest + 기준 이미지 비교를 포함
 
 ## 바로 다음 실행 순서
 1. Path 파서 명령(`M/L/H/V/C/S/Q/T/A/Z`) tokenizer/AST 구현
 2. 스타일 상속 + override 우선순위 로직 구현 (`원본 < map < resolver`)
 3. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
-4. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
-5. 캐시 키(`source + options + schemaVersion`) 해시 고도화
+4. Demo UITest 타깃 생성 + 샘플 화면 launch/assert 테스트
+5. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
+6. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
+7. 캐시 키(`source + options + schemaVersion`) 해시 고도화
 
 ## 체크리스트 (진행 시 갱신)
 - [ ] P0 부트스트랩 완료 (DemoApp 남음)

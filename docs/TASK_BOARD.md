@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15
+Last Updated: 2026-02-15 (UITest scope added)
 
 ## Status Legend
 - `todo`: not started
@@ -23,7 +23,10 @@ Last Updated: 2026-02-15
 | P5-1 | P5 | AST LRU 캐시 구현/테스트 | in_progress | actor LRU 기본 구현, key/hash 고도화 필요 |
 | P6-1 | P6 | SwiftUI 렌더러 구현 | in_progress | placeholder view 상태 |
 | P7-1 | P7 | Demo 앱 UI(노드 제어/캐시 통계) | todo | 미시작 |
+| P7-2 | P7 | Demo UITest 타깃 구성 | todo | DemoApp launch/기본 화면 접근 테스트 |
+| P7-3 | P7 | 기준 이미지(snapshot baseline) 수집 | todo | 샘플 SVG별 baseline 확정 |
 | P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | 파서/캐시 테스트 8개 통과 |
+| P8-2 | P8 | UITest 결과 비교(시각 회귀) | todo | baseline 대비 픽셀/허용오차 비교 |
 | P9-1 | P9 | README/가이드 문서 | todo | 미시작 |
 
 ## v2 Milestones

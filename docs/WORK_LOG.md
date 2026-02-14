@@ -60,3 +60,18 @@
   1. `P2-1` Path command parser 구현
   2. `P4-1` 스타일 상속 + map/resolver 우선순위 로직 구현
   3. `P0-3` DemoApp 수동 프로젝트 생성 및 패키지 연결
+
+### Session 03
+- Scope:
+  - DemoApp 단계에 UITest + 결과 비교 요구사항 반영
+  - 문서/작업보드 업데이트
+- Completed:
+  - `STEP_BY_STEP_PLAN.md`에 UITest/시각 회귀 비교를 공식 완료 기준으로 추가
+  - `TASK_BOARD.md`에 `P7-2`, `P7-3`, `P8-2` 작업 항목 추가
+  - `WORK_CONTINUATION.md` 다음 순서에 UITest/baseline 단계 반영
+  - `DEMO_UITEST_STRATEGY.md` 신설 (타깃 구성, baseline 규칙, 비교 방식)
+- Validation:
+  - 문서 교차 검토 완료 (계획/보드/연속성 간 항목 정합성 확인)
+- Next:
+  1. `P2-1` Path parser 구현 계속
+  2. DemoApp 생성 직후 `P7-2` UITest 타깃부터 연결
