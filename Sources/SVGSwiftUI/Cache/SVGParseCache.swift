@@ -3,10 +3,30 @@ import Foundation
 public struct SVGParseCacheKey: Hashable, Sendable {
     public var sourceHash: String
     public var options: SVGParserOptions
+    public var schemaVersion: Int
 
-    public init(sourceHash: String, options: SVGParserOptions) {
+    public init(sourceHash: String, options: SVGParserOptions, schemaVersion: Int = 1) {
         self.sourceHash = sourceHash
         self.options = options
+        self.schemaVersion = schemaVersion
+    }
+
+    public static func from(sourceData: Data, options: SVGParserOptions, schemaVersion: Int? = nil) -> Self {
+        let version = schemaVersion ?? options.parserSchemaVersion
+        return .init(
+            sourceHash: stableHash(for: sourceData),
+            options: options,
+            schemaVersion: version
+        )
+    }
+
+    private static func stableHash(for data: Data) -> String {
+        var hash: UInt64 = 1469598103934665603
+        for byte in data {
+            hash ^= UInt64(byte)
+            hash &*= 1099511628211
+        }
+        return "\(data.count)-" + String(hash, radix: 16)
     }
 }
 

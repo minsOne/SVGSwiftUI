@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4 핵심 완료, `SVGView` 기본 렌더 연결 완료, 패키지 테스트 50개 + Demo UITest 4개 통과
+- 구현 상태: P0/P1/P2/P3/P4/P5 핵심 완료, `SVGView` 캐시 연동 렌더까지 완료, 패키지 테스트 53개 + Demo UITest 4개 통과
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -18,10 +18,9 @@
 ## 바로 다음 실행 순서
 1. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가(`P7-3`, `P8-2`)
 2. Demo UI에 cache 통계 패널 추가(`P7-1`)
-3. 캐시 키(`source + options + schemaVersion`) 해시 고도화(`P5-1`)
-4. transform/고급 렌더 보강(`P6-1`)
-5. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
-6. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+3. transform/고급 렌더 보강(`P6-1`)
+4. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
+5. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
 - [x] P0 부트스트랩 완료
@@ -29,7 +28,7 @@
 - [x] P2 Path 파서 완료
 - [x] P3 도형 파서 완료
 - [x] P4 스타일/노드 제어 완료
-- [ ] P5 캐시 완료
+- [x] P5 캐시 완료
 - [ ] P6 렌더러 완료
 - [ ] P7 Demo 앱 완료
 - [ ] P8 테스트 강화 완료
@@ -90,3 +89,9 @@
 - 결정: UITest는 플래키를 줄이기 위해 switch value 문자열 비교 대신 실제 조작 가능성 검증 중심으로 구성
 - 리스크: snapshot baseline 비교/시각 diff 유틸은 아직 미구현
 - 다음 액션: baseline 캡처/비교 파이프라인 추가 + cache 통계 UI 구현
+
+### 2026-02-15 (Session 10)
+- 작업: `SVGView` 파싱 경로에 `SVGParseCache` 실연동, cache key schemaVersion 반영, 관련 테스트 보강
+- 결정: cache key는 `sourceData stable hash + options + schemaVersion` 조합으로 고정
+- 리스크: cache hit/miss를 Demo UI에서 직접 확인하는 통계 패널은 아직 미구현
+- 다음 액션: baseline 비교 유틸과 cache 통계 패널 구현

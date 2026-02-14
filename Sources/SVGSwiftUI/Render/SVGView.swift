@@ -5,40 +5,57 @@ import SwiftUI
 public struct SVGView: View {
     private let source: SVGSource
     private let parser: SVGParser
+    private let cache: SVGParseCache?
     private let configuration: SVGRenderConfiguration
     private let options: SVGParserOptions
 
     public init(
         source: SVGSource,
         parser: SVGParser = .init(),
+        cache: SVGParseCache? = nil,
         options: SVGParserOptions = .init(),
         configuration: SVGRenderConfiguration = .init()
     ) {
         self.source = source
         self.parser = parser
+        self.cache = cache
         self.options = options
         self.configuration = configuration
     }
 
     public var body: some View {
-        SVGStaticPlaceholderView(source: source, parser: parser, options: options, configuration: configuration)
+        SVGStaticPlaceholderView(source: source, parser: parser, cache: cache, options: options, configuration: configuration)
     }
 }
 
 private struct SVGStaticPlaceholderView: View {
+    struct ParseTaskID: Equatable {
+        let source: SVGSource
+        let options: SVGParserOptions
+    }
+
     let source: SVGSource
     let parser: SVGParser
+    let cache: SVGParseCache?
     let options: SVGParserOptions
     let configuration: SVGRenderConfiguration
 
     @State private var parsingFailed = false
-    @State private var drawNodes: [SVGDrawNode] = []
+    @State private var document: SVGDocument?
 
     private let styleResolver = SVGStyleResolver()
     private let nodePathBuilder = SVGNodePathBuilder()
 
+    private var drawNodes: [SVGDrawNode] {
+        guard let document else {
+            return []
+        }
+        let resolved = styleResolver.resolve(document: document, configuration: configuration)
+        return buildDrawNodes(from: document.nodes, resolved: resolved)
+    }
+
     var body: some View {
-        GeometryReader { proxy in
+        GeometryReader { _ in
             Canvas { context, _ in
                 for node in drawNodes {
                     let opacity = node.opacity
@@ -62,17 +79,33 @@ private struct SVGStaticPlaceholderView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .task(id: proxy.size) {
-                do {
-                    let document = try parser.parse(source: source, options: options)
-                    let resolved = styleResolver.resolve(document: document, configuration: configuration)
-                    drawNodes = buildDrawNodes(from: document.nodes, resolved: resolved)
-                    parsingFailed = false
-                } catch {
-                    parsingFailed = true
-                    drawNodes = []
-                }
+            .task(id: ParseTaskID(source: source, options: options)) {
+                await loadDocument()
             }
+        }
+    }
+
+    @MainActor
+    private func loadDocument() async {
+        do {
+            let data = try source.loadData()
+            if let cache {
+                let key = SVGParseCacheKey.from(sourceData: data, options: options)
+                if let cached = await cache.document(for: key) {
+                    document = cached
+                    parsingFailed = false
+                    return
+                }
+                let parsed = try parser.parse(data: data, options: options)
+                await cache.insert(parsed, for: key, cost: data.count)
+                document = parsed
+            } else {
+                document = try parser.parse(data: data, options: options)
+            }
+            parsingFailed = false
+        } catch {
+            parsingFailed = true
+            document = nil
         }
     }
 

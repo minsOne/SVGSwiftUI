@@ -208,3 +208,31 @@
   1. `P7-3` baseline 캡처/비교 유틸 추가
   2. `P7-1` cache 통계 UI 추가(hit/miss/size)
   3. `P5-1` cache key 고도화(`source + options + schemaVersion`)
+
+### Session 10
+- Scope:
+  - `P5-1` 캐시 고도화 및 렌더 경로 실연동
+  - 캐시/파서 테스트 보강
+- Completed:
+  - `SVGParseCacheKey` 확장:
+    - `schemaVersion` 필드 추가
+    - `SVGParseCacheKey.from(sourceData:options:schemaVersion:)` 추가
+    - stable hash(FNV-1a 기반) 적용
+  - `SVGParser` API 확장:
+    - `parse(data:options:)` 추가
+    - `parse(source:options:)`는 내부에서 `parse(data:)` 재사용
+  - `SVGView` 캐시 연동:
+    - `cache: SVGParseCache?` 주입 가능
+    - parse task에서 cache hit/miss 처리 후 문서 재사용
+  - DemoApp 연동:
+    - `ContentView`에 공유 `SVGParseCache` 인스턴스 전달
+  - 테스트 추가:
+    - `SVGParseCacheTests` 2개(스키마 버전 key 검증)
+    - `SVGParserTests` 1개(`parse(data:)` 동등성 검증)
+- Validation:
+  - `swift test` 통과 (53 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test` 통과 (4 tests, 0 failures)
+- Next:
+  1. `P7-3` snapshot baseline 비교 유틸 추가
+  2. `P7-1` cache 통계 패널(hit/miss/cost) 구현
+  3. `P8-2` 시각 회귀 자동화 연결

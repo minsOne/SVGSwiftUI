@@ -31,6 +31,13 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(document.viewBox, SVGRect(x: 0, y: 0, width: 24, height: 32))
     }
 
+    func testParseDataMatchesParseSource() throws {
+        let svg = "<svg width='24' height='32'><path d='M0 0 L2 2'/></svg>"
+        let sourceDocument = try parser.parse(source: .string(svg))
+        let dataDocument = try parser.parse(data: Data(svg.utf8))
+        XCTAssertEqual(dataDocument, sourceDocument)
+    }
+
     func testParseSetsRootSizeNilForPercentageUnits() throws {
         let document = try parser.parse(source: .string("<svg width='100%' height='100%'></svg>"))
         XCTAssertNil(document.size)

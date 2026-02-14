@@ -9,6 +9,10 @@ public struct SVGParser: SVGDocumentParsing, Sendable {
 
     public func parse(source: SVGSource, options: SVGParserOptions = .init()) throws -> SVGDocument {
         let data = try source.loadData()
+        return try parse(data: data, options: options)
+    }
+
+    public func parse(data: Data, options: SVGParserOptions = .init()) throws -> SVGDocument {
         guard !data.isEmpty else {
             throw SVGParserError.emptyInput
         }

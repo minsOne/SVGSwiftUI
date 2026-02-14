@@ -2,6 +2,21 @@ import XCTest
 @testable import SVGSwiftUI
 
 final class SVGParseCacheTests: XCTestCase {
+    func testCacheKeyFromSourceDataIncludesSchemaVersion() {
+        let data = Data("abc".utf8)
+        let options = SVGParserOptions(parserSchemaVersion: 7)
+        let key = SVGParseCacheKey.from(sourceData: data, options: options)
+        XCTAssertEqual(key.schemaVersion, 7)
+    }
+
+    func testCacheKeyFromSourceDataChangesWithSchemaVersion() {
+        let data = Data("abc".utf8)
+        let options = SVGParserOptions(parserSchemaVersion: 1)
+        let keyA = SVGParseCacheKey.from(sourceData: data, options: options, schemaVersion: 1)
+        let keyB = SVGParseCacheKey.from(sourceData: data, options: options, schemaVersion: 2)
+        XCTAssertNotEqual(keyA, keyB)
+    }
+
     func testCacheStoresAndFetchesDocument() async throws {
         let cache = SVGParseCache(maxCost: 100, maxEntries: 5)
         let key = SVGParseCacheKey(sourceHash: "a", options: .init())
