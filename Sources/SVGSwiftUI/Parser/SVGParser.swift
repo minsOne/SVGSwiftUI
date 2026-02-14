@@ -43,6 +43,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     }
 
     private let options: SVGParserOptions
+    private let pathDataParser = SVGPathDataParser()
     private var frames: [Frame] = []
     private var ignoreDepth: Int = 0
     private var parseError: SVGParserError?
@@ -160,7 +161,13 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             appendNode(.group(.init(base: frame.base, children: frame.children)), parser: parser)
         case .path:
             let pathData = frame.attributes["d"] ?? ""
-            appendNode(.path(.init(base: frame.base, pathData: pathData)), parser: parser)
+            do {
+                let commands = try pathDataParser.parse(pathData)
+                appendNode(.path(.init(base: frame.base, pathData: pathData, commands: commands)), parser: parser)
+            } catch {
+                parseError = .malformedDocument(reason: "Invalid path data: \(pathData)")
+                parser.abortParsing()
+            }
         case .shape(let kind):
             appendNode(buildShapeNode(kind: kind, frame: frame), parser: parser)
         }

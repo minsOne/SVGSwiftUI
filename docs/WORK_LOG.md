@@ -98,3 +98,21 @@
   1. `SVGParser`의 `<path d>`에 `SVGPathDataParser` 연결 (AST 레벨 command 저장)
   2. 스타일 상속 + `원본 < map < resolver` 우선순위 구현
   3. DemoApp 수동 xcodeproj 생성 및 패키지 연결
+
+### Session 05
+- Scope:
+  - `P2-1` path parser를 `SVGParser` path 노드에 실제 연결
+  - 관련 회귀 테스트 보강
+- Completed:
+  - `SVGPathNode`에 `commands: [SVGPathCommand]` 필드 추가
+  - `SVGParser`에서 `<path d>` 파싱 시 `SVGPathDataParser` 실행 후 command 저장
+  - 잘못된 path data(`R ...` 등)는 `malformedDocument`로 실패 처리
+  - parser 테스트 추가:
+    - path command 저장 검증
+    - invalid path data 에러 검증
+- Validation:
+  - `swift test` 통과 (34 tests, 0 failures)
+- Next:
+  1. style 상속 + `원본 < map < resolver` 우선순위 로직 구현
+  2. Path command를 실제 렌더 Path 생성 로직에 연결
+  3. DemoApp 수동 xcodeproj 생성 및 패키지 연결

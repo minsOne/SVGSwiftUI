@@ -45,10 +45,12 @@ public struct SVGGroupNode: Sendable, Equatable {
 public struct SVGPathNode: Sendable, Equatable {
     public var base: SVGBaseNode
     public var pathData: String
+    public var commands: [SVGPathCommand]
 
-    public init(base: SVGBaseNode, pathData: String) {
+    public init(base: SVGBaseNode, pathData: String, commands: [SVGPathCommand] = []) {
         self.base = base
         self.pathData = pathData
+        self.commands = commands
     }
 }
 

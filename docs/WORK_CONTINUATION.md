@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package 초기화 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P1 완료, P2 path parser 독립 구현 완료(연결 대기), 테스트 33개 통과
+- 구현 상태: P1 완료, P2 path parser 구현 + SVGParser 연결 완료(렌더 적용 대기), 테스트 34개 통과
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -15,8 +15,8 @@
 - DemoApp 단계에서 UITest + 기준 이미지 비교를 포함
 
 ## 바로 다음 실행 순서
-1. `SVGParser`의 path 노드에 `SVGPathDataParser` 결과를 연결해 command AST 저장
-2. 스타일 상속 + override 우선순위 로직 구현 (`원본 < map < resolver`)
+1. 스타일 상속 + override 우선순위 로직 구현 (`원본 < map < resolver`)
+2. Path command를 실제 SwiftUI `Path` 생성 로직에 연결
 3. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
 4. Demo UITest 타깃 생성 + 샘플 화면 launch/assert 테스트
 5. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
@@ -66,3 +66,9 @@
 - 결정: P2는 parser 독립 구현 후 SVGParser AST 연결 순으로 진행
 - 리스크: path command 결과가 아직 SVGNode에 연결되지 않음
 - 다음 액션: path AST 연결 및 스타일 상속 로직 착수
+
+### 2026-02-15 (Session 05)
+- 작업: path parser를 SVGParser path 노드에 연결, invalid path 실패 처리 추가
+- 결정: invalid path data는 조용히 무시하지 않고 malformedDocument로 명확히 실패
+- 리스크: command 결과가 실제 렌더 Path 생성에는 아직 미연결
+- 다음 액션: style 상속 우선순위 + render path builder 구현

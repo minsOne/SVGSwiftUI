@@ -115,6 +115,10 @@ final class SVGParserTests: XCTestCase {
         }
         XCTAssertEqual(pathNode.base.id, "main-path")
         XCTAssertEqual(pathNode.pathData, "M0 0 L10 10")
+        XCTAssertEqual(pathNode.commands, [
+            .init(symbol: "M", values: [0, 0]),
+            .init(symbol: "L", values: [10, 10]),
+        ])
 
         guard case .shape(let rectNode) = group.children[1] else {
             return XCTFail("Expected shape node")
@@ -216,6 +220,16 @@ final class SVGParserTests: XCTestCase {
     func testParsePathWithoutDUsesEmptyString() throws {
         let document = try parser.parse(source: .string("<svg><path id='empty'/></svg>"))
         XCTAssertEqual(pathNode(id: "empty", in: document)?.pathData, "")
+        XCTAssertEqual(pathNode(id: "empty", in: document)?.commands, [])
+    }
+
+    func testParseThrowsMalformedDocumentForInvalidPathData() {
+        let svg = "<svg><path d='R 10 10'/></svg>"
+        XCTAssertThrowsError(try parser.parse(source: .string(svg))) { error in
+            guard case .malformedDocument = (error as? SVGParserError) else {
+                return XCTFail("Expected malformedDocument, got \(error)")
+            }
+        }
     }
 
     func testParseNumericAcceptsPxValuesForShapeAttributes() throws {
