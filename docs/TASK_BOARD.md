@@ -17,15 +17,15 @@ Last Updated: 2026-02-15 (UITest scope added)
 | P1-1 | P1 | 모델 타입 정의(`SVGDocument`, `SVGNode`, style/transform) | done | 스켈레톤 구현 |
 | P1-2 | P1 | 파서 옵션/에러/인터페이스 정의 | done | 스켈레톤 구현 |
 | P1-3 | P1 | 실제 XML tokenization 파서 구현 | done | 지원 요소 트리 파싱 + root/style 기본 파싱 완료 |
-| P2-1 | P2 | Path command parser 구현 | in_progress | parser/AST 연결 완료, SwiftUI Path 빌더 연결 남음 |
+| P2-1 | P2 | Path command parser 구현 | done | parser/AST 연결 + `SVGPathCommandBuilder` 완료 |
 | P3-1 | P3 | 도형 요소 파싱/Path 변환 | todo | rect/circle/ellipse/line/polyline/polygon |
-| P4-1 | P4 | 스타일 상속 + override 우선순위 구현 | in_progress | `SVGStyleResolver` 엔진 및 테스트 완료, 렌더 통합 남음 |
+| P4-1 | P4 | 스타일 상속 + override 우선순위 구현 | done | `SVGStyleResolver` 엔진 구현 및 `SVGView` 연동 완료 |
 | P5-1 | P5 | AST LRU 캐시 구현/테스트 | in_progress | actor LRU 기본 구현, key/hash 고도화 필요 |
-| P6-1 | P6 | SwiftUI 렌더러 구현 | in_progress | placeholder view 상태 |
+| P6-1 | P6 | SwiftUI 렌더러 구현 | in_progress | path/shape 렌더 및 style 적용 완료, transform/고급 렌더 보강 필요 |
 | P7-1 | P7 | Demo 앱 UI(노드 제어/캐시 통계) | todo | 미시작 |
 | P7-2 | P7 | Demo UITest 타깃 구성 | todo | DemoApp launch/기본 화면 접근 테스트 |
 | P7-3 | P7 | 기준 이미지(snapshot baseline) 수집 | todo | 샘플 SVG별 baseline 확정 |
-| P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | parser/cache/path/style resolver 테스트 40개 통과 |
+| P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | parser/cache/path/style/view 지원 로직 테스트 50개 통과 |
 | P8-2 | P8 | UITest 결과 비교(시각 회귀) | todo | baseline 대비 픽셀/허용오차 비교 |
 | P9-1 | P9 | README/가이드 문서 | todo | 미시작 |
 

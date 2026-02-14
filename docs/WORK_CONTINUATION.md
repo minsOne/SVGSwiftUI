@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package 초기화 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P1 완료, P2 parser/AST 연결 완료, P4 스타일 resolver 엔진 완료(렌더 통합 대기), 테스트 40개 통과
+- 구현 상태: P1/P2/P4 핵심 완료, `SVGView` 기본 렌더 연결 완료, 테스트 50개 통과
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -16,14 +16,13 @@
 - v2+ 확장: W3C SVG conformance 테스트(coverage 리포트 포함) 도입
 
 ## 바로 다음 실행 순서
-1. Path command를 실제 SwiftUI `Path` 생성 로직에 연결
-2. `SVGStyleResolver` 결과를 렌더 단계에 연결
-3. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
-4. Demo UITest 타깃 생성 + 샘플 화면 launch/assert 테스트
-5. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
-6. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
-7. 캐시 키(`source + options + schemaVersion`) 해시 고도화
-8. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+1. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
+2. Demo UITest 타깃 생성 + 샘플 화면 launch/assert 테스트
+3. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
+4. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
+5. 캐시 키(`source + options + schemaVersion`) 해시 고도화
+6. transform/고급 렌더 보강
+7. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
 - [ ] P0 부트스트랩 완료 (DemoApp 남음)
@@ -80,3 +79,9 @@
 - 결정: 우선순위는 `원본(inheritance 포함) < idOverrides < resolver`로 고정
 - 리스크: 현재 엔진 결과가 `SVGView` 실제 렌더에는 아직 미연결
 - 다음 액션: path builder + style resolver를 `SVGView`에 통합
+
+### 2026-02-15 (Session 08)
+- 작업: `SVGPathCommandBuilder`/`SVGNodePathBuilder` 구현 및 `SVGView` 렌더 통합
+- 결정: `SVGView`는 Canvas 기반으로 fill/stroke/opacity/linecap/linejoin을 적용
+- 리스크: transform matrix 누적 및 일부 고급 SVG 렌더 규칙은 추가 보강 필요
+- 다음 액션: DemoApp 생성 + UITest baseline 흐름 구축

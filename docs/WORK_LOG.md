@@ -159,3 +159,27 @@
   1. path command -> SwiftUI Path builder 연결
   2. `SVGStyleResolver`를 `SVGView` 렌더 파이프라인에 통합
   3. DemoApp 생성 및 UITest 기반 baseline 비교 단계 진행
+
+### Session 08
+- Scope:
+  - path command를 실제 렌더 path로 변환
+  - style resolver 결과를 `SVGView`에 통합
+- Completed:
+  - 신규 `SVGPathCommandBuilder` 구현:
+    - 명령 처리: `M/L/H/V/C/S/Q/T/A/Z` (상대/절대)
+    - arc endpoint 파라미터 -> cubic segment 변환 지원
+  - 신규 `SVGNodePathBuilder` 구현:
+    - path/rect/circle/ellipse/line/polyline/polygon -> `CGPath`
+  - `SVGView`를 placeholder에서 Canvas 렌더러로 교체:
+    - 파싱 결과 + style resolver 결과를 바탕으로 실제 path/shape 렌더
+    - fill/stroke/strokeWidth/opacity/lineCap/lineJoin 반영
+    - node override의 scale/offset 반영
+  - 테스트 추가:
+    - `SVGPathCommandBuilderTests` 5개
+    - `SVGNodePathBuilderTests` 5개
+- Validation:
+  - `swift test` 통과 (50 tests, 0 failures)
+- Next:
+  1. DemoApp 수동 xcodeproj 생성 및 패키지 연결
+  2. Demo UITest + baseline 비교 파이프라인 구축
+  3. transform 누적/정교한 렌더 규칙 보강

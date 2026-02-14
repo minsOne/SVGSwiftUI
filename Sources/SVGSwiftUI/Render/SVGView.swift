@@ -1,4 +1,5 @@
 #if canImport(SwiftUI)
+import CoreGraphics
 import SwiftUI
 
 public struct SVGView: View {
@@ -31,15 +32,30 @@ private struct SVGStaticPlaceholderView: View {
     let configuration: SVGRenderConfiguration
 
     @State private var parsingFailed = false
+    @State private var drawNodes: [SVGDrawNode] = []
+
+    private let styleResolver = SVGStyleResolver()
+    private let nodePathBuilder = SVGNodePathBuilder()
 
     var body: some View {
         GeometryReader { proxy in
-            ZStack {
-                Path { path in
-                    path.addRect(CGRect(origin: .zero, size: proxy.size))
+            Canvas { context, _ in
+                for node in drawNodes {
+                    let opacity = node.opacity
+                    if let fill = node.fillColor {
+                        context.fill(node.path, with: .color(fill.opacity(opacity)))
+                    }
+                    if let stroke = node.strokeColor, node.strokeWidth > 0 {
+                        let strokeStyle = StrokeStyle(
+                            lineWidth: node.strokeWidth,
+                            lineCap: node.lineCap,
+                            lineJoin: node.lineJoin
+                        )
+                        context.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
+                    }
                 }
-                .fill(.clear)
-
+            }
+            .overlay(alignment: .center) {
                 if parsingFailed {
                     Text("Invalid SVG")
                         .font(.caption)
@@ -47,15 +63,125 @@ private struct SVGStaticPlaceholderView: View {
                 }
             }
             .task(id: proxy.size) {
-                _ = configuration
                 do {
-                    _ = try parser.parse(source: source, options: options)
+                    let document = try parser.parse(source: source, options: options)
+                    let resolved = styleResolver.resolve(document: document, configuration: configuration)
+                    drawNodes = buildDrawNodes(from: document.nodes, resolved: resolved)
                     parsingFailed = false
                 } catch {
                     parsingFailed = true
+                    drawNodes = []
                 }
             }
         }
     }
+
+    private func buildDrawNodes(
+        from nodes: [SVGNode],
+        resolved: [String: SVGResolvedNodeStyle]
+    ) -> [SVGDrawNode] {
+        var output: [SVGDrawNode] = []
+        for node in nodes {
+            if let built = makeDrawNode(for: node, resolved: resolved[node.nodeID]) {
+                output.append(built)
+            }
+            if !node.children.isEmpty {
+                output.append(contentsOf: buildDrawNodes(from: node.children, resolved: resolved))
+            }
+        }
+        return output
+    }
+
+    private func makeDrawNode(for node: SVGNode, resolved: SVGResolvedNodeStyle?) -> SVGDrawNode? {
+        guard let resolved else {
+            return nil
+        }
+        guard var cgPath = nodePathBuilder.buildPath(for: node) else {
+            return nil
+        }
+        cgPath = applyGeometryOverrides(cgPath, scale: resolved.scale, offset: resolved.offset)
+        let path = Path(cgPath)
+
+        return SVGDrawNode(
+            id: resolved.nodeID,
+            path: path,
+            fillColor: color(from: resolved.style.fill),
+            strokeColor: color(from: resolved.style.stroke),
+            strokeWidth: CGFloat(resolved.style.strokeWidth),
+            lineCap: lineCap(from: resolved.style.strokeLineCap),
+            lineJoin: lineJoin(from: resolved.style.strokeLineJoin),
+            opacity: resolved.style.opacity
+        )
+    }
+
+    private func applyGeometryOverrides(_ path: CGPath, scale: SVGSize?, offset: SVGPoint?) -> CGPath {
+        var transform = CGAffineTransform.identity
+        if let scale {
+            let bounds = path.boundingBoxOfPath
+            let cx = bounds.midX
+            let cy = bounds.midY
+            transform = transform
+                .translatedBy(x: cx, y: cy)
+                .scaledBy(x: CGFloat(scale.width), y: CGFloat(scale.height))
+                .translatedBy(x: -cx, y: -cy)
+        }
+        if let offset {
+            transform = transform.translatedBy(x: CGFloat(offset.x), y: CGFloat(offset.y))
+        }
+        if transform == .identity {
+            return path
+        }
+        return path.copy(using: &transform) ?? path
+    }
+
+    private func color(from paint: SVGPaint) -> Color? {
+        switch paint {
+        case .none:
+            return nil
+        case .currentColor:
+            return .primary
+        case .color(let color):
+            return Color(
+                .sRGB,
+                red: color.red,
+                green: color.green,
+                blue: color.blue,
+                opacity: color.alpha
+            )
+        }
+    }
+
+    private func lineCap(from lineCap: SVGLineCap) -> CGLineCap {
+        switch lineCap {
+        case .butt:
+            return .butt
+        case .round:
+            return .round
+        case .square:
+            return .square
+        }
+    }
+
+    private func lineJoin(from lineJoin: SVGLineJoin) -> CGLineJoin {
+        switch lineJoin {
+        case .miter:
+            return .miter
+        case .round:
+            return .round
+        case .bevel:
+            return .bevel
+        }
+    }
+}
+
+private struct SVGDrawNode: Identifiable {
+    let id: String
+    let path: Path
+    let fillColor: Color?
+    let strokeColor: Color?
+    let strokeWidth: CGFloat
+    let lineCap: CGLineCap
+    let lineJoin: CGLineJoin
+    let opacity: Double
 }
 #endif
