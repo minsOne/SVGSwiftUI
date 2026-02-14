@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (DemoApp + UITest implemented)
+Last Updated: 2026-02-15 (Access control cleanup + API boundary policy)
 
 ## Status Legend
 - `todo`: not started
@@ -28,6 +28,7 @@ Last Updated: 2026-02-15 (DemoApp + UITest implemented)
 | P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | parser/cache/path/style/view 지원 로직 테스트 53개 통과 |
 | P8-2 | P8 | UITest 결과 비교(시각 회귀) | todo | baseline 대비 픽셀/허용오차 비교 |
 | P9-1 | P9 | README/가이드 문서 | todo | 미시작 |
+| P9-2 | P9 | 공개 API 캡슐화 정책 수립/적용 | done | 내부 엔진(parser/model/cache/render helper) `internal` 전환 + 정책 문서화 |
 
 ## v2 Milestones
 | ID | Phase | Task | Status | Notes |

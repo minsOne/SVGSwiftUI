@@ -45,11 +45,18 @@
 | A9 | W3C 커버리지 리포트 | coverage markdown + CI 아티팩트 | 현재 지원 범위 대비 pass/fail/unsupported 지표 자동 생성 |
 
 ## 5. API 설계 고정안
-- `SVGSource`: `.string`, `.data`, `.fileURL`
-- `NodeOverrideMap`: `[String: NodeOverride]`
-- `NodeStyleResolver`: `(NodeContext) -> NodeOverride?`
-- `SVGRenderConfiguration`: `idOverrides`, `resolver`
-- `SVGParseCache`(actor): `document(for:)`, `insert`, `removeAll`
+- 공개 API(외부 사용 대상):
+  - `SVGView`
+  - `SVGSource`: `.string`, `.data`, `.fileURL`
+  - `SVGParserOptions`
+  - `SVGRenderConfiguration`: `idOverrides`, `resolver`
+  - `NodeOverrideMap`: `[String: NodeOverride]`
+  - `NodeStyleResolver`: `(NodeContext) -> NodeOverride?`
+  - 렌더 override 타입: `NodeOverride`, `NodeContext`, `SVGPaint`, `SVGColor`, `SVGSize`, `SVGPoint`, `SVGElementKind`
+- 내부 API(패키지 내부 전용):
+  - 파서/AST 모델(`SVGDocument`, `SVGNode*`, `SVGStyle*`, `SVGTransform`)
+  - 렌더 내부 엔진(`SVGStyleResolver`, `SVGNodePathBuilder`, `SVGPathCommandBuilder`)
+  - 캐시 구현(`SVGParseCache`, `SVGParseCacheKey`)
 - v2 옵션:
   - `enableStyleTag`
   - `enableDataURI`

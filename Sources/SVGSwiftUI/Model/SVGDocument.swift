@@ -1,9 +1,9 @@
-public struct SVGDocument: Sendable, Equatable {
-    public var size: SVGSize?
-    public var viewBox: SVGRect?
-    public var nodes: [SVGNode]
+struct SVGDocument: Sendable, Equatable {
+    var size: SVGSize?
+    var viewBox: SVGRect?
+    var nodes: [SVGNode]
 
-    public init(size: SVGSize? = nil, viewBox: SVGRect? = nil, nodes: [SVGNode] = []) {
+    init(size: SVGSize? = nil, viewBox: SVGRect? = nil, nodes: [SVGNode] = []) {
         self.size = size
         self.viewBox = viewBox
         self.nodes = nodes

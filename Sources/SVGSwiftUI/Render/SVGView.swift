@@ -3,28 +3,31 @@ import CoreGraphics
 import SwiftUI
 
 public struct SVGView: View {
+    private static let parser = SVGParser()
+    private static let parseCache = SVGParseCache()
+
     private let source: SVGSource
-    private let parser: SVGParser
-    private let cache: SVGParseCache?
     private let configuration: SVGRenderConfiguration
     private let options: SVGParserOptions
 
     public init(
         source: SVGSource,
-        parser: SVGParser = .init(),
-        cache: SVGParseCache? = nil,
         options: SVGParserOptions = .init(),
         configuration: SVGRenderConfiguration = .init()
     ) {
         self.source = source
-        self.parser = parser
-        self.cache = cache
         self.options = options
         self.configuration = configuration
     }
 
     public var body: some View {
-        SVGStaticPlaceholderView(source: source, parser: parser, cache: cache, options: options, configuration: configuration)
+        SVGStaticPlaceholderView(
+            source: source,
+            parser: Self.parser,
+            cache: Self.parseCache,
+            options: options,
+            configuration: configuration
+        )
     }
 }
 
@@ -36,7 +39,7 @@ private struct SVGStaticPlaceholderView: View {
 
     let source: SVGSource
     let parser: SVGParser
-    let cache: SVGParseCache?
+    let cache: SVGParseCache
     let options: SVGParserOptions
     let configuration: SVGRenderConfiguration
 
@@ -89,19 +92,16 @@ private struct SVGStaticPlaceholderView: View {
     private func loadDocument() async {
         do {
             let data = try source.loadData()
-            if let cache {
-                let key = SVGParseCacheKey.from(sourceData: data, options: options)
-                if let cached = await cache.document(for: key) {
-                    document = cached
-                    parsingFailed = false
-                    return
-                }
-                let parsed = try parser.parse(data: data, options: options)
-                await cache.insert(parsed, for: key, cost: data.count)
-                document = parsed
-            } else {
-                document = try parser.parse(data: data, options: options)
+            let key = SVGParseCacheKey.from(sourceData: data, options: options)
+            if let cached = await cache.document(for: key) {
+                document = cached
+                parsingFailed = false
+                return
             }
+
+            let parsed = try parser.parse(data: data, options: options)
+            await cache.insert(parsed, for: key, cost: data.count)
+            document = parsed
             parsingFailed = false
         } catch {
             parsingFailed = true

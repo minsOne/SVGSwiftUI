@@ -1,12 +1,12 @@
 import CoreGraphics
 
-public struct SVGNodePathBuilder: Sendable {
+struct SVGNodePathBuilder: Sendable {
     private let commandBuilder = SVGPathCommandBuilder()
     private let pathDataParser = SVGPathDataParser()
 
-    public init() {}
+    init() {}
 
-    public func buildPath(for node: SVGNode) -> CGPath? {
+    func buildPath(for node: SVGNode) -> CGPath? {
         switch node {
         case .group:
             return nil

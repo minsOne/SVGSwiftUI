@@ -6,7 +6,7 @@ public enum SVGSource: Sendable, Equatable {
     case fileURL(URL)
 }
 
-public extension SVGSource {
+extension SVGSource {
     func loadData() throws -> Data {
         switch self {
         case .string(let value):

@@ -1,17 +1,17 @@
 import Foundation
 
-public struct SVGParseCacheKey: Hashable, Sendable {
-    public var sourceHash: String
-    public var options: SVGParserOptions
-    public var schemaVersion: Int
+struct SVGParseCacheKey: Hashable, Sendable {
+    var sourceHash: String
+    var options: SVGParserOptions
+    var schemaVersion: Int
 
-    public init(sourceHash: String, options: SVGParserOptions, schemaVersion: Int = 1) {
+    init(sourceHash: String, options: SVGParserOptions, schemaVersion: Int = 1) {
         self.sourceHash = sourceHash
         self.options = options
         self.schemaVersion = schemaVersion
     }
 
-    public static func from(sourceData: Data, options: SVGParserOptions, schemaVersion: Int? = nil) -> Self {
+    static func from(sourceData: Data, options: SVGParserOptions, schemaVersion: Int? = nil) -> Self {
         let version = schemaVersion ?? options.parserSchemaVersion
         return .init(
             sourceHash: stableHash(for: sourceData),
@@ -30,7 +30,7 @@ public struct SVGParseCacheKey: Hashable, Sendable {
     }
 }
 
-public actor SVGParseCache {
+actor SVGParseCache {
     private struct Entry {
         var document: SVGDocument
         var cost: Int
@@ -42,12 +42,12 @@ public actor SVGParseCache {
     private let maxEntries: Int
     private var totalCost: Int = 0
 
-    public init(maxCost: Int = 10_000_000, maxEntries: Int = 256) {
+    init(maxCost: Int = 10_000_000, maxEntries: Int = 256) {
         self.maxCost = maxCost
         self.maxEntries = maxEntries
     }
 
-    public func document(for key: SVGParseCacheKey) -> SVGDocument? {
+    func document(for key: SVGParseCacheKey) -> SVGDocument? {
         guard let entry = entries[key] else {
             return nil
         }
@@ -55,7 +55,7 @@ public actor SVGParseCache {
         return entry.document
     }
 
-    public func insert(_ document: SVGDocument, for key: SVGParseCacheKey, cost: Int) {
+    func insert(_ document: SVGDocument, for key: SVGParseCacheKey, cost: Int) {
         let normalizedCost = max(0, cost)
         if let existing = entries[key] {
             totalCost -= existing.cost
@@ -66,17 +66,17 @@ public actor SVGParseCache {
         evictIfNeeded()
     }
 
-    public func removeAll() {
+    func removeAll() {
         entries.removeAll()
         order.removeAll()
         totalCost = 0
     }
 
-    public var count: Int {
+    var count: Int {
         entries.count
     }
 
-    public var currentCost: Int {
+    var currentCost: Int {
         totalCost
     }
 

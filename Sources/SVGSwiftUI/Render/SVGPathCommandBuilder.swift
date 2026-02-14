@@ -1,10 +1,10 @@
 import CoreGraphics
 import Foundation
 
-public struct SVGPathCommandBuilder: Sendable {
-    public init() {}
+struct SVGPathCommandBuilder: Sendable {
+    init() {}
 
-    public func buildPath(commands: [SVGPathCommand]) -> CGPath {
+    func buildPath(commands: [SVGPathCommand]) -> CGPath {
         let path = CGMutablePath()
 
         var currentPoint = CGPoint.zero

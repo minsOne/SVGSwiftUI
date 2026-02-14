@@ -1,6 +1,6 @@
 import Foundation
 
-public enum SVGParserError: Error, Sendable, Equatable {
+enum SVGParserError: Error, Sendable, Equatable {
     case emptyInput
     case invalidUTF8Input
     case invalidSVGRoot

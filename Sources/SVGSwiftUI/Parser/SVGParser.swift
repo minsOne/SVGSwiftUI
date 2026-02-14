@@ -1,18 +1,18 @@
 import Foundation
 
-public protocol SVGDocumentParsing: Sendable {
+protocol SVGDocumentParsing: Sendable {
     func parse(source: SVGSource, options: SVGParserOptions) throws -> SVGDocument
 }
 
-public struct SVGParser: SVGDocumentParsing, Sendable {
-    public init() {}
+struct SVGParser: SVGDocumentParsing, Sendable {
+    init() {}
 
-    public func parse(source: SVGSource, options: SVGParserOptions = .init()) throws -> SVGDocument {
+    func parse(source: SVGSource, options: SVGParserOptions = .init()) throws -> SVGDocument {
         let data = try source.loadData()
         return try parse(data: data, options: options)
     }
 
-    public func parse(data: Data, options: SVGParserOptions = .init()) throws -> SVGDocument {
+    func parse(data: Data, options: SVGParserOptions = .init()) throws -> SVGDocument {
         guard !data.isEmpty else {
             throw SVGParserError.emptyInput
         }

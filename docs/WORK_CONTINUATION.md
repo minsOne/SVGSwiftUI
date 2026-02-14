@@ -4,6 +4,7 @@
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5 핵심 완료, `SVGView` 캐시 연동 렌더까지 완료, 패키지 테스트 53개 + Demo UITest 4개 통과
+- API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -15,6 +16,7 @@
 - DemoApp 단계에서 UITest + 기준 이미지 비교를 포함
 - v2+ 확장: W3C SVG conformance 테스트(coverage 리포트 포함) 도입
 - 연산식 코딩 규칙: 타입 혼합 연산 금지, 선변환 후 계산(`docs/CODING_STYLE.md`)
+- 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
 1. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가(`P7-3`, `P8-2`)
@@ -96,3 +98,9 @@
 - 결정: cache key는 `sourceData stable hash + options + schemaVersion` 조합으로 고정
 - 리스크: cache hit/miss를 Demo UI에서 직접 확인하는 통계 패널은 아직 미구현
 - 다음 액션: baseline 비교 유틸과 cache 통계 패널 구현
+
+### 2026-02-15 (Session 12)
+- 작업: 접근제어 일괄 정리(`public` 축소), Demo에서 내부 캐시 직접 주입 제거, 공개 API 경계 정책 문서화
+- 결정: 외부 계약은 `SVGView` + 렌더 설정/오버라이드 타입 중심으로 제한하고 파서/AST/캐시 구현은 내부 캡슐화
+- 리스크: Demo cache 통계 UI는 내부 캐시 접근 대신 별도 통계 노출 API 설계가 필요
+- 다음 액션: `P7-1` 착수 시 cache metric read-only 노출 방식(예: snapshot struct) 추가

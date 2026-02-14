@@ -1,11 +1,11 @@
-public struct SVGResolvedNodeStyle: Sendable, Equatable {
-    public var nodeID: String
-    public var element: SVGElementKind
-    public var style: SVGResolvedStyle
-    public var scale: SVGSize?
-    public var offset: SVGPoint?
+struct SVGResolvedNodeStyle: Sendable, Equatable {
+    var nodeID: String
+    var element: SVGElementKind
+    var style: SVGResolvedStyle
+    var scale: SVGSize?
+    var offset: SVGPoint?
 
-    public init(
+    init(
         nodeID: String,
         element: SVGElementKind,
         style: SVGResolvedStyle,
@@ -20,10 +20,10 @@ public struct SVGResolvedNodeStyle: Sendable, Equatable {
     }
 }
 
-public struct SVGStyleResolver: Sendable {
-    public init() {}
+struct SVGStyleResolver: Sendable {
+    init() {}
 
-    public func resolve(
+    func resolve(
         document: SVGDocument,
         configuration: SVGRenderConfiguration = .init()
     ) -> [String: SVGResolvedNodeStyle] {

@@ -28,10 +28,10 @@ public struct NodeContext: Sendable, Equatable {
     public var syntheticID: String
     public var element: SVGElementKind
     public var attributes: [String: String]
-    public var inheritedStyle: SVGResolvedStyle
+    var inheritedStyle: SVGResolvedStyle
     public var viewport: SVGSize
 
-    public init(
+    init(
         id: String?,
         syntheticID: String,
         element: SVGElementKind,

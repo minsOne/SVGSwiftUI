@@ -1,25 +1,25 @@
 import Foundation
 
-public struct SVGPathCommand: Sendable, Equatable {
-    public var symbol: Character
-    public var values: [Double]
+struct SVGPathCommand: Sendable, Equatable {
+    var symbol: Character
+    var values: [Double]
 
-    public init(symbol: Character, values: [Double]) {
+    init(symbol: Character, values: [Double]) {
         self.symbol = symbol
         self.values = values
     }
 }
 
-public enum SVGPathDataParserError: Error, Sendable, Equatable {
+enum SVGPathDataParserError: Error, Sendable, Equatable {
     case missingCommand
     case unsupportedCommand(Character)
     case invalidParameterCount(command: Character, count: Int)
 }
 
-public struct SVGPathDataParser: Sendable {
-    public init() {}
+struct SVGPathDataParser: Sendable {
+    init() {}
 
-    public func parse(_ pathData: String) throws -> [SVGPathCommand] {
+    func parse(_ pathData: String) throws -> [SVGPathCommand] {
         var commands: [SVGPathCommand] = []
         var currentSymbol: Character?
         var buffer = ""

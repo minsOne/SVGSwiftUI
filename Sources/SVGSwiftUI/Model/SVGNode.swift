@@ -10,14 +10,14 @@ public enum SVGElementKind: String, Sendable, Equatable {
     case polygon
 }
 
-public struct SVGBaseNode: Sendable, Equatable {
-    public var id: String?
-    public var syntheticID: String
-    public var style: SVGStyle
-    public var transform: SVGTransform
-    public var attributes: [String: String]
+struct SVGBaseNode: Sendable, Equatable {
+    var id: String?
+    var syntheticID: String
+    var style: SVGStyle
+    var transform: SVGTransform
+    var attributes: [String: String]
 
-    public init(
+    init(
         id: String? = nil,
         syntheticID: String,
         style: SVGStyle = .init(),
@@ -32,35 +32,35 @@ public struct SVGBaseNode: Sendable, Equatable {
     }
 }
 
-public struct SVGGroupNode: Sendable, Equatable {
-    public var base: SVGBaseNode
-    public var children: [SVGNode]
+struct SVGGroupNode: Sendable, Equatable {
+    var base: SVGBaseNode
+    var children: [SVGNode]
 
-    public init(base: SVGBaseNode, children: [SVGNode]) {
+    init(base: SVGBaseNode, children: [SVGNode]) {
         self.base = base
         self.children = children
     }
 }
 
-public struct SVGPathNode: Sendable, Equatable {
-    public var base: SVGBaseNode
-    public var pathData: String
-    public var commands: [SVGPathCommand]
+struct SVGPathNode: Sendable, Equatable {
+    var base: SVGBaseNode
+    var pathData: String
+    var commands: [SVGPathCommand]
 
-    public init(base: SVGBaseNode, pathData: String, commands: [SVGPathCommand] = []) {
+    init(base: SVGBaseNode, pathData: String, commands: [SVGPathCommand] = []) {
         self.base = base
         self.pathData = pathData
         self.commands = commands
     }
 }
 
-public struct SVGShapeNode: Sendable, Equatable {
-    public var base: SVGBaseNode
-    public var kind: SVGElementKind
-    public var values: [String: Double]
-    public var points: [SVGPoint]
+struct SVGShapeNode: Sendable, Equatable {
+    var base: SVGBaseNode
+    var kind: SVGElementKind
+    var values: [String: Double]
+    var points: [SVGPoint]
 
-    public init(
+    init(
         base: SVGBaseNode,
         kind: SVGElementKind,
         values: [String: Double] = [:],
@@ -73,12 +73,12 @@ public struct SVGShapeNode: Sendable, Equatable {
     }
 }
 
-public enum SVGNode: Sendable, Equatable {
+enum SVGNode: Sendable, Equatable {
     case group(SVGGroupNode)
     case path(SVGPathNode)
     case shape(SVGShapeNode)
 
-    public var elementKind: SVGElementKind {
+    var elementKind: SVGElementKind {
         switch self {
         case .group:
             return .group
@@ -89,7 +89,7 @@ public enum SVGNode: Sendable, Equatable {
         }
     }
 
-    public var nodeID: String {
+    var nodeID: String {
         switch self {
         case .group(let node):
             return node.base.id ?? node.base.syntheticID
@@ -100,7 +100,7 @@ public enum SVGNode: Sendable, Equatable {
         }
     }
 
-    public var base: SVGBaseNode {
+    var base: SVGBaseNode {
         switch self {
         case .group(let node):
             return node.base
@@ -111,7 +111,7 @@ public enum SVGNode: Sendable, Equatable {
         }
     }
 
-    public var children: [SVGNode] {
+    var children: [SVGNode] {
         switch self {
         case .group(let node):
             return node.children

@@ -20,13 +20,13 @@ public struct SVGPoint: Sendable, Equatable {
     }
 }
 
-public struct SVGRect: Sendable, Equatable {
-    public var x: Double
-    public var y: Double
-    public var width: Double
-    public var height: Double
+struct SVGRect: Sendable, Equatable {
+    var x: Double
+    var y: Double
+    var width: Double
+    var height: Double
 
-    public init(x: Double, y: Double, width: Double, height: Double) {
+    init(x: Double, y: Double, width: Double, height: Double) {
         self.x = x
         self.y = y
         self.width = width
@@ -34,7 +34,7 @@ public struct SVGRect: Sendable, Equatable {
     }
 }
 
-public extension SVGRect {
+extension SVGRect {
     var cgRect: CGRect {
         CGRect(x: x, y: y, width: width, height: height)
     }

@@ -256,3 +256,25 @@
 - Next:
   1. 동일 규칙을 다른 렌더 수식 파일로 점진 확장
   2. snapshot baseline 작업(`P7-3`) 진행
+
+### Session 12
+- Scope:
+  - 전반 접근제어 정리(`public` 최소화)
+  - 외부 API 경계 고정 및 문서 정합성 반영
+- Completed:
+  - 내부 전환:
+    - 파서/AST/캐시/렌더 내부 엔진 타입을 `internal`로 축소
+    - `SVGView`에서 내부 캐시/파서 캡슐화, 외부 `cache` 주입 제거
+  - 공개 API 유지:
+    - `SVGView`, `SVGSource`, `SVGParserOptions`
+    - 렌더 오버라이드 API(`NodeOverride`, `NodeContext`, `SVGRenderConfiguration` 등)
+  - 문서 정리:
+    - `STEP_BY_STEP_PLAN.md` API 섹션을 실제 공개 표면 기준으로 갱신
+    - `WORK_CONTINUATION.md`에 접근제어 잠금 규칙 반영
+    - `API_SURFACE_POLICY.md` 신규 추가
+- Validation:
+  - `swift test` 통과 (53 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test` 통과 (4 tests, 0 failures)
+- Next:
+  1. `P7-1` cache 통계 노출 API(read-only) 설계 후 Demo 통계 패널 구현
+  2. `P7-3` baseline 캡처/비교 파이프라인 진행

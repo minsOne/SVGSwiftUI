@@ -11,7 +11,6 @@ struct ContentView: View {
     @State private var scale = 1.0
     @State private var offsetX = 0.0
     @State private var offsetY = 0.0
-    @State private var parseCache = SVGParseCache(maxCost: 4_000_000, maxEntries: 32)
 
     private var selectedSample: SampleSVG {
         samples[selectedIndex]
@@ -93,7 +92,6 @@ struct ContentView: View {
 
             SVGView(
                 source: .string(selectedSample.svg),
-                cache: parseCache,
                 configuration: renderConfiguration
             )
             .frame(height: 300)

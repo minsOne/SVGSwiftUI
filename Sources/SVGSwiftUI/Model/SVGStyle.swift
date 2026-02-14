@@ -18,29 +18,29 @@ public enum SVGPaint: Sendable, Equatable {
     case currentColor
 }
 
-public enum SVGLineCap: Sendable, Equatable {
+enum SVGLineCap: Sendable, Equatable {
     case butt
     case round
     case square
 }
 
-public enum SVGLineJoin: Sendable, Equatable {
+enum SVGLineJoin: Sendable, Equatable {
     case miter
     case round
     case bevel
 }
 
-public struct SVGStyle: Sendable, Equatable {
-    public var fill: SVGPaint?
-    public var fillOpacity: Double?
-    public var stroke: SVGPaint?
-    public var strokeOpacity: Double?
-    public var strokeWidth: Double?
-    public var strokeLineCap: SVGLineCap?
-    public var strokeLineJoin: SVGLineJoin?
-    public var opacity: Double?
+struct SVGStyle: Sendable, Equatable {
+    var fill: SVGPaint?
+    var fillOpacity: Double?
+    var stroke: SVGPaint?
+    var strokeOpacity: Double?
+    var strokeWidth: Double?
+    var strokeLineCap: SVGLineCap?
+    var strokeLineJoin: SVGLineJoin?
+    var opacity: Double?
 
-    public init(
+    init(
         fill: SVGPaint? = nil,
         fillOpacity: Double? = nil,
         stroke: SVGPaint? = nil,
@@ -61,17 +61,17 @@ public struct SVGStyle: Sendable, Equatable {
     }
 }
 
-public struct SVGResolvedStyle: Sendable, Equatable {
-    public var fill: SVGPaint
-    public var fillOpacity: Double
-    public var stroke: SVGPaint
-    public var strokeOpacity: Double
-    public var strokeWidth: Double
-    public var strokeLineCap: SVGLineCap
-    public var strokeLineJoin: SVGLineJoin
-    public var opacity: Double
+struct SVGResolvedStyle: Sendable, Equatable {
+    var fill: SVGPaint
+    var fillOpacity: Double
+    var stroke: SVGPaint
+    var strokeOpacity: Double
+    var strokeWidth: Double
+    var strokeLineCap: SVGLineCap
+    var strokeLineJoin: SVGLineJoin
+    var opacity: Double
 
-    public init(
+    init(
         fill: SVGPaint = .color(SVGColor(red: 0, green: 0, blue: 0, alpha: 1)),
         fillOpacity: Double = 1.0,
         stroke: SVGPaint = .none,
@@ -92,7 +92,7 @@ public struct SVGResolvedStyle: Sendable, Equatable {
     }
 }
 
-public extension SVGResolvedStyle {
+extension SVGResolvedStyle {
     func applying(style: SVGStyle) -> SVGResolvedStyle {
         SVGResolvedStyle(
             fill: style.fill ?? fill,
