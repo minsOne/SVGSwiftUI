@@ -99,4 +99,24 @@ public enum SVGNode: Sendable, Equatable {
             return node.base.id ?? node.base.syntheticID
         }
     }
+
+    public var base: SVGBaseNode {
+        switch self {
+        case .group(let node):
+            return node.base
+        case .path(let node):
+            return node.base
+        case .shape(let node):
+            return node.base
+        }
+    }
+
+    public var children: [SVGNode] {
+        switch self {
+        case .group(let node):
+            return node.children
+        case .path, .shape:
+            return []
+        }
+    }
 }

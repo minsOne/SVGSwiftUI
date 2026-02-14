@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package 초기화 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P1 완료, P2 path parser 구현 + SVGParser 연결 완료(렌더 적용 대기), 테스트 34개 통과
+- 구현 상태: P1 완료, P2 parser/AST 연결 완료, P4 스타일 resolver 엔진 완료(렌더 통합 대기), 테스트 40개 통과
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -16,8 +16,8 @@
 - v2+ 확장: W3C SVG conformance 테스트(coverage 리포트 포함) 도입
 
 ## 바로 다음 실행 순서
-1. 스타일 상속 + override 우선순위 로직 구현 (`원본 < map < resolver`)
-2. Path command를 실제 SwiftUI `Path` 생성 로직에 연결
+1. Path command를 실제 SwiftUI `Path` 생성 로직에 연결
+2. `SVGStyleResolver` 결과를 렌더 단계에 연결
 3. DemoApp 수동 xcodeproj 생성 및 로컬 패키지 연결
 4. Demo UITest 타깃 생성 + 샘플 화면 launch/assert 테스트
 5. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가
@@ -74,3 +74,9 @@
 - 결정: invalid path data는 조용히 무시하지 않고 malformedDocument로 명확히 실패
 - 리스크: command 결과가 실제 렌더 Path 생성에는 아직 미연결
 - 다음 액션: style 상속 우선순위 + render path builder 구현
+
+### 2026-02-15 (Session 07)
+- 작업: 스타일 상속/override 우선순위 엔진(`SVGStyleResolver`) 구현 및 테스트 추가
+- 결정: 우선순위는 `원본(inheritance 포함) < idOverrides < resolver`로 고정
+- 리스크: 현재 엔진 결과가 `SVGView` 실제 렌더에는 아직 미연결
+- 다음 액션: path builder + style resolver를 `SVGView`에 통합

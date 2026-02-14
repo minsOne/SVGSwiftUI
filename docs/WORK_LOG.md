@@ -132,3 +132,30 @@
 - Next:
   1. 현재 우선순위(P4, Path->Render, DemoApp) 완료 후 A8/A9 착수
   2. W3C fixture subset 초기 셋 선정(paths/shapes/coords/styling)
+
+### Session 07
+- Scope:
+  - `P4-1` 스타일 상속 + override 우선순위 로직 구현
+- Completed:
+  - `SVGResolvedStyle.applying(style:)` 추가 (상속 병합 기준 고정)
+  - `SVGNode` 공통 접근자 추가:
+    - `base`
+    - `children`
+  - 신규 엔진 `SVGStyleResolver` 추가:
+    - 상속 체인 계산
+    - 우선순위 적용: `inherited/original < idOverrides < resolver`
+    - geometry override(`scale`, `offset`) 병합
+    - viewport(size/viewBox fallback) 주입
+  - 신규 테스트 `SVGStyleResolverTests` 6개 추가:
+    - 부모 상속
+    - map override
+    - resolver 우선
+    - group override cascade
+    - synthetic ID override
+    - resolver context viewport 검증
+- Validation:
+  - `swift test` 통과 (40 tests, 0 failures)
+- Next:
+  1. path command -> SwiftUI Path builder 연결
+  2. `SVGStyleResolver`를 `SVGView` 렌더 파이프라인에 통합
+  3. DemoApp 생성 및 UITest 기반 baseline 비교 단계 진행

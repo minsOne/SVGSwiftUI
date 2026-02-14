@@ -91,3 +91,18 @@ public struct SVGResolvedStyle: Sendable, Equatable {
         self.opacity = opacity
     }
 }
+
+public extension SVGResolvedStyle {
+    func applying(style: SVGStyle) -> SVGResolvedStyle {
+        SVGResolvedStyle(
+            fill: style.fill ?? fill,
+            fillOpacity: style.fillOpacity ?? fillOpacity,
+            stroke: style.stroke ?? stroke,
+            strokeOpacity: style.strokeOpacity ?? strokeOpacity,
+            strokeWidth: style.strokeWidth ?? strokeWidth,
+            strokeLineCap: style.strokeLineCap ?? strokeLineCap,
+            strokeLineJoin: style.strokeLineJoin ?? strokeLineJoin,
+            opacity: style.opacity ?? opacity
+        )
+    }
+}
