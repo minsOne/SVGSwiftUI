@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (Access control cleanup + API boundary policy)
+Last Updated: 2026-02-15 (Baseline snapshots + visual regression checks)
 
 ## Status Legend
 - `todo`: not started
@@ -23,10 +23,10 @@ Last Updated: 2026-02-15 (Access control cleanup + API boundary policy)
 | P5-1 | P5 | AST LRU 캐시 구현/테스트 | done | actor LRU + schemaVersion 포함 cache key + `SVGView` 연동 완료 |
 | P6-1 | P6 | SwiftUI 렌더러 구현 | in_progress | Canvas 렌더/스타일 적용 완료, transform 누적/고급 렌더 보강 필요 |
 | P7-1 | P7 | Demo 앱 UI(노드 제어/캐시 통계) | in_progress | 노드 제어 UI 완료, cache 통계 패널 미구현 |
-| P7-2 | P7 | Demo UITest 타깃 구성 | done | UITest 4개 작성 및 `xcodebuild test` 통과 |
-| P7-3 | P7 | 기준 이미지(snapshot baseline) 수집 | todo | 샘플 SVG별 baseline 확정 |
+| P7-2 | P7 | Demo UITest 타깃 구성 | done | UITest 5개(시각 회귀 포함) 작성 및 `xcodebuild test` 통과 |
+| P7-3 | P7 | 기준 이미지(snapshot baseline) 수집 | done | `UITests/Baselines/iPhone_17/26.2/*.png` 생성 및 저장 |
 | P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | parser/cache/path/style/view 지원 로직 테스트 53개 통과 |
-| P8-2 | P8 | UITest 결과 비교(시각 회귀) | todo | baseline 대비 픽셀/허용오차 비교 |
+| P8-2 | P8 | UITest 결과 비교(시각 회귀) | done | `testCanvasMatchesBaselines` + diff artifact 출력 + 허용오차 비교 구현 |
 | P9-1 | P9 | README/가이드 문서 | todo | 미시작 |
 | P9-2 | P9 | 공개 API 캡슐화 정책 수립/적용 | done | 내부 엔진(parser/model/cache/render helper) `internal` 전환 + 정책 문서화 |
 

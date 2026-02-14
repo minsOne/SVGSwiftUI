@@ -11,6 +11,7 @@
   - sample 전환 + node id 입력 반영 확인
   - fill/stroke toggle 조작
   - offset slider 조작
+  - canvas baseline 시각 회귀 비교(`testCanvasMatchesBaselines`)
 - 검증 커맨드:
   - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
 
@@ -26,17 +27,22 @@
    - 샘플 선택 리스트: `demo.sampleList`
    - 노드 제어 패널: `demo.controls`
 3. 화면 캡처 유틸 작성
-   - `XCUIScreen.main.screenshot()` 사용
-   - 캡처 이미지 crop(캔버스 영역만 비교)
+   - `demo.canvas` 요소 스크린샷 사용(화면 전체 crop 불필요)
 4. baseline 저장 규칙
-   - 경로: `Tests/UITestBaselines/<device>/<test_name>.png`
-   - 기기/OS 고정: iPhone 17, iOS 26.2 (CI 고정)
+   - 경로: `Examples/SVGSwiftUIDemo/UITests/Baselines/<device>/<runtime>/<name>.png`
+   - 현재 baseline: `iPhone_17/26.2/{badge_default,panel_stroke,route_offset}.png`
 5. 비교 방식
-   - 1차: 픽셀 완전 일치
-   - 2차(옵션): 허용오차(예: <=0.5%) 비교
+   - 픽셀 mismatch ratio 계산 후 허용오차 비교
+   - 현재 허용오차: `0.35%` (`0.0035`)
 6. 실패 시 산출물
    - actual, expected, diff 이미지 저장
-   - 로그에 mismatch 비율 출력
+   - 로그에 mismatch 비율 + artifact 경로 출력
+
+## Baseline 갱신 절차
+1. `touch Examples/SVGSwiftUIDemo/UITests/Baselines/.record`
+2. UITest 실행:
+   - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
+3. `.record` 파일 삭제 후 재실행해 compare 모드 통과 확인
 
 ## 중복 작업 방지 규칙
 1. baseline 갱신은 UI 변경 PR에서만 수행
@@ -44,10 +50,11 @@
 3. 테스트 실패 시 먼저 렌더 로직 변경 여부를 확인하고 baseline을 바로 갱신하지 않는다
 
 ## 초기 테스트 케이스
-1. `testLaunchShowsCanvasAndControls`
-2. `testSampleSwitcherAndNodeFieldAreAccessible`
-3. `testTogglesCanBeChanged`
-4. `testOffsetSlidersExist`
+1. `testCanvasMatchesBaselines`
+2. `testLaunchShowsCanvasAndControls`
+3. `testSampleSwitcherAndNodeFieldAreAccessible`
+4. `testTogglesCanBeChanged`
+5. `testOffsetSlidersExist`
 
 ## 리스크/주의사항
 - 안티앨리어싱 차이로 기기별 픽셀 오차가 발생할 수 있음

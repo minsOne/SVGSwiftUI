@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5 핵심 완료, `SVGView` 캐시 연동 렌더까지 완료, 패키지 테스트 53개 + Demo UITest 4개 통과
+- 구현 상태: P0/P1/P2/P3/P4/P5 핵심 완료, `SVGView` 캐시 연동 렌더까지 완료, 패키지 테스트 53개 + Demo UITest 5개(시각 회귀 포함) 통과
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 
 ## 잠금된 의사결정
@@ -19,11 +19,10 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가(`P7-3`, `P8-2`)
-2. Demo UI에 cache 통계 패널 추가(`P7-1`)
-3. transform/고급 렌더 보강(`P6-1`)
-4. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강
-5. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+1. Demo UI에 cache 통계 패널 추가(`P7-1`)
+2. transform/고급 렌더 보강(`P6-1`)
+3. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강(`P8-1`)
+4. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
 - [x] P0 부트스트랩 완료
@@ -104,3 +103,9 @@
 - 결정: 외부 계약은 `SVGView` + 렌더 설정/오버라이드 타입 중심으로 제한하고 파서/AST/캐시 구현은 내부 캡슐화
 - 리스크: Demo cache 통계 UI는 내부 캐시 접근 대신 별도 통계 노출 API 설계가 필요
 - 다음 액션: `P7-1` 착수 시 cache metric read-only 노출 방식(예: snapshot struct) 추가
+
+### 2026-02-15 (Session 13)
+- 작업: `P7-3` baseline 캡처 + `P8-2` 시각 회귀 비교 유틸 구현
+- 결정: baseline은 `UITests/Baselines/<device>/<runtime>/<name>.png` 구조로 저장하고, 캡처는 `demo.canvas` 요소 스크린샷 기준으로 비교
+- 리스크: anti-aliasing 미세 오차로 완전일치가 불안정해 허용오차(0.35%)를 적용
+- 다음 액션: `P7-1` cache 통계 패널 구현으로 이동

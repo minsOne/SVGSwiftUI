@@ -278,3 +278,28 @@
 - Next:
   1. `P7-1` cache 통계 노출 API(read-only) 설계 후 Demo 통계 패널 구현
   2. `P7-3` baseline 캡처/비교 파이프라인 진행
+
+### Session 13
+- Scope:
+  - `P7-3` baseline 수집
+  - `P8-2` 시각 회귀 비교 자동화
+- Completed:
+  - `SVGSwiftUIDemoUITests` 확장:
+    - 신규 `testCanvasMatchesBaselines` 추가
+    - 시나리오 3종 baseline 비교(`badge_default`, `panel_stroke`, `route_offset`)
+  - 스냅샷 비교 유틸 구현:
+    - `demo.canvas` 요소 단위 캡처
+    - baseline 로드/비교 및 픽셀 mismatch ratio 계산
+    - 실패 시 `expected/actual/diff` artifact 출력
+  - baseline 관리 모드 추가:
+    - `UITests/Baselines/.record` 파일 존재 시 baseline 기록 모드
+  - baseline 파일 생성:
+    - `Examples/SVGSwiftUIDemo/UITests/Baselines/iPhone_17/26.2/*.png`
+  - 허용오차 조정:
+    - anti-aliasing 편차 대응 위해 허용오차 `0.35%` 적용
+- Validation:
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test` 통과 (5 tests, 0 failures)
+  - `swift test` 통과 (53 tests, 0 failures)
+- Next:
+  1. `P7-1` cache 통계 패널 구현
+  2. `P6-1` transform 누적/고급 렌더 보강
