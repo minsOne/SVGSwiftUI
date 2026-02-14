@@ -14,6 +14,7 @@
 - v2 확장: style/CSS subset + base64 `data:` URI
 - DemoApp 단계에서 UITest + 기준 이미지 비교를 포함
 - v2+ 확장: W3C SVG conformance 테스트(coverage 리포트 포함) 도입
+- 연산식 코딩 규칙: 타입 혼합 연산 금지, 선변환 후 계산(`docs/CODING_STYLE.md`)
 
 ## 바로 다음 실행 순서
 1. baseline 이미지 저장 및 시각 회귀 비교 유틸 추가(`P7-3`, `P8-2`)

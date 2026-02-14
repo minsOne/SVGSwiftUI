@@ -236,3 +236,23 @@
   1. `P7-3` snapshot baseline 비교 유틸 추가
   2. `P7-1` cache 통계 패널(hit/miss/cost) 구현
   3. `P8-2` 시각 회귀 자동화 연결
+
+### Session 11
+- Scope:
+  - 연산식 타입 추론 최소화 코딩 스타일 반영
+  - `SVGPathCommandBuilder` 타입 명시 리팩터링
+- Completed:
+  - `docs/CODING_STYLE.md` 추가:
+    - 타입 혼합 연산 금지
+    - 선변환 후 계산 규칙
+    - 긴 식 분해/리터럴 타입 명시 규칙
+  - `SVGPathCommandBuilder` 리팩터링:
+    - `CGFloat`/`Double` 혼합 계산 분리
+    - 보조 함수 `makePoint(x:y)` 추가로 명시 변환 일원화
+    - arc/angle 계산식에 중간 변수와 타입 명시 적용
+  - `WORK_CONTINUATION.md` 잠금 규칙에 스타일 규칙 추가
+- Validation:
+  - `swift test` 통과
+- Next:
+  1. 동일 규칙을 다른 렌더 수식 파일로 점진 확장
+  2. snapshot baseline 작업(`P7-3`) 진행

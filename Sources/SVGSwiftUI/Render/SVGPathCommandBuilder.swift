@@ -182,7 +182,10 @@ public struct SVGPathCommandBuilder: Sendable {
         guard let control else {
             return origin
         }
-        return CGPoint(x: 2 * origin.x - control.x, y: 2 * origin.y - control.y)
+        let two: CGFloat = 2
+        let reflectedX: CGFloat = (two * origin.x) - control.x
+        let reflectedY: CGFloat = (two * origin.y) - control.y
+        return CGPoint(x: reflectedX, y: reflectedY)
     }
 
     private func addArc(
@@ -205,35 +208,40 @@ public struct SVGPathCommandBuilder: Sendable {
             return
         }
 
-        let phi = xAxisRotation * .pi / 180
-        let cosPhi = cos(phi)
-        let sinPhi = sin(phi)
+        let startX: Double = Double(start.x)
+        let startY: Double = Double(start.y)
+        let endX: Double = Double(end.x)
+        let endY: Double = Double(end.y)
 
-        let dx2 = Double(start.x - end.x) / 2
-        let dy2 = Double(start.y - end.y) / 2
+        let phi: Double = xAxisRotation * (.pi / 180.0)
+        let cosPhi: Double = cos(phi)
+        let sinPhi: Double = sin(phi)
+
+        let dx2: Double = (startX - endX) / 2.0
+        let dy2: Double = (startY - endY) / 2.0
         let x1p = cosPhi * dx2 + sinPhi * dy2
         let y1p = -sinPhi * dx2 + cosPhi * dy2
 
-        var lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry)
+        var lambda: Double = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry)
         if lambda > 1 {
-            let scale = sqrt(lambda)
+            let scale: Double = sqrt(lambda)
             rx *= scale
             ry *= scale
             lambda = 1
         }
 
-        let sign = (largeArc == sweep) ? -1.0 : 1.0
-        let numerator = max(0, rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p)
-        let denominator = max(Double.leastNonzeroMagnitude, rx * rx * y1p * y1p + ry * ry * x1p * x1p)
-        let coefficient = sign * sqrt(numerator / denominator)
-        let cxp = coefficient * (rx * y1p / ry)
-        let cyp = coefficient * (-ry * x1p / rx)
+        let sign: Double = (largeArc == sweep) ? -1.0 : 1.0
+        let numerator: Double = max(0.0, rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p)
+        let denominator: Double = max(Double.leastNonzeroMagnitude, rx * rx * y1p * y1p + ry * ry * x1p * x1p)
+        let coefficient: Double = sign * sqrt(numerator / denominator)
+        let cxp: Double = coefficient * (rx * y1p / ry)
+        let cyp: Double = coefficient * (-ry * x1p / rx)
 
-        let cx = cosPhi * cxp - sinPhi * cyp + Double(start.x + end.x) / 2
-        let cy = sinPhi * cxp + cosPhi * cyp + Double(start.y + end.y) / 2
+        let cx: Double = cosPhi * cxp - sinPhi * cyp + ((startX + endX) / 2.0)
+        let cy: Double = sinPhi * cxp + cosPhi * cyp + ((startY + endY) / 2.0)
 
-        let u = CGPoint(x: (x1p - cxp) / rx, y: (y1p - cyp) / ry)
-        let v = CGPoint(x: (-x1p - cxp) / rx, y: (-y1p - cyp) / ry)
+        let u = makePoint(x: (x1p - cxp) / rx, y: (y1p - cyp) / ry)
+        let v = makePoint(x: (-x1p - cxp) / rx, y: (-y1p - cyp) / ry)
 
         var theta1 = angle(from: CGPoint(x: 1, y: 0), to: u)
         var deltaTheta = angle(from: u, to: v)
@@ -244,8 +252,9 @@ public struct SVGPathCommandBuilder: Sendable {
             deltaTheta += 2 * .pi
         }
 
-        let segments = max(1, Int(ceil(abs(deltaTheta) / (.pi / 2))))
-        let delta = deltaTheta / Double(segments)
+        let segmentDivisor: Double = .pi / 2.0
+        let segments: Int = max(1, Int(ceil(abs(deltaTheta) / segmentDivisor)))
+        let delta: Double = deltaTheta / Double(segments)
 
         for _ in 0..<segments {
             let t1 = theta1
@@ -276,11 +285,17 @@ public struct SVGPathCommandBuilder: Sendable {
         t1: Double,
         t2: Double
     ) {
-        let alpha = 4.0 / 3.0 * tan((t2 - t1) / 4.0)
-        let p0 = CGPoint(x: cos(t1), y: sin(t1))
-        let p1 = CGPoint(x: cos(t1) - alpha * sin(t1), y: sin(t1) + alpha * cos(t1))
-        let p2 = CGPoint(x: cos(t2) + alpha * sin(t2), y: sin(t2) - alpha * cos(t2))
-        let p3 = CGPoint(x: cos(t2), y: sin(t2))
+        let alpha: Double = (4.0 / 3.0) * tan((t2 - t1) / 4.0)
+
+        let cosT1: Double = cos(t1)
+        let sinT1: Double = sin(t1)
+        let cosT2: Double = cos(t2)
+        let sinT2: Double = sin(t2)
+
+        let p0 = makePoint(x: cosT1, y: sinT1)
+        let p1 = makePoint(x: cosT1 - alpha * sinT1, y: sinT1 + alpha * cosT1)
+        let p2 = makePoint(x: cosT2 + alpha * sinT2, y: sinT2 - alpha * cosT2)
+        let p3 = makePoint(x: cosT2, y: sinT2)
 
         let c1 = mapEllipsePoint(p1, cx: cx, cy: cy, rx: rx, ry: ry, cosPhi: cosPhi, sinPhi: sinPhi)
         let c2 = mapEllipsePoint(p2, cx: cx, cy: cy, rx: rx, ry: ry, cosPhi: cosPhi, sinPhi: sinPhi)
@@ -299,16 +314,24 @@ public struct SVGPathCommandBuilder: Sendable {
         cosPhi: Double,
         sinPhi: Double
     ) -> CGPoint {
-        let x = Double(point.x)
-        let y = Double(point.y)
-        let transformedX = cx + rx * x * cosPhi - ry * y * sinPhi
-        let transformedY = cy + rx * x * sinPhi + ry * y * cosPhi
-        return CGPoint(x: transformedX, y: transformedY)
+        let x: Double = Double(point.x)
+        let y: Double = Double(point.y)
+        let transformedX: Double = cx + rx * x * cosPhi - ry * y * sinPhi
+        let transformedY: Double = cy + rx * x * sinPhi + ry * y * cosPhi
+        return makePoint(x: transformedX, y: transformedY)
     }
 
     private func angle(from u: CGPoint, to v: CGPoint) -> Double {
-        let dot = Double(u.x * v.x + u.y * v.y)
-        let cross = Double(u.x * v.y - u.y * v.x)
+        let ux: Double = Double(u.x)
+        let uy: Double = Double(u.y)
+        let vx: Double = Double(v.x)
+        let vy: Double = Double(v.y)
+        let dot: Double = ux * vx + uy * vy
+        let cross: Double = ux * vy - uy * vx
         return atan2(cross, dot)
+    }
+
+    private func makePoint(x: Double, y: Double) -> CGPoint {
+        CGPoint(x: CGFloat(x), y: CGFloat(y))
     }
 }
