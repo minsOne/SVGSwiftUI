@@ -2,6 +2,25 @@
 
 ## 2026-02-16
 
+### Session 52
+- 작업: `A15-2` 오프스크린 블렌드 정밀도 보강
+- 완료:
+  - `SourceAlpha` 추출을 `CIMaskToAlpha`에서 `CIColorMatrix` 기반 추출로 전환해 `SourceAlpha` 블렌드 경로를 예측 가능한 값으로 정합화
+  - `feBlend` 모드 매핑을 보강해 미인식 `mode`를 `normal`(source-over)로 폴백 처리, `source-over` 키워드 별칭 허용, `plus` 매핑 추가
+  - `blend`/`colorMatrix` 적용 시 `in`/`in2` 소스명을 정규화하고 소스 조회 경로를 단일화
+  - `SVGFilterImageRendererTests`에 unknown blend + 체인 전달, `SourceAlpha` 블렌드 입력 검증 테스트 2건 추가
+  - `SourceAlpha`가 포함된 렌더 경로 검증을 포함해 전체 테스트를 재실행
+- 검증:
+  - `swift test --filter SVGFilterImageRendererTests --no-parallel`
+  - `swift test --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+- 리스크:
+  - `feBlend`의 정밀도는 여전히 `GraphicsContext` 경로를 우회한 CI 필터 매핑 품질에 의존
+  - 고급 모드(`hue/saturation/color/luminosity`)는 오프스크린에서만 정확하게 지원되며, 향후 수치 허용오차 기반 회귀 추가가 필요
+- 다음 액션:
+  - `CI` 경로에서 추가 blend mode 조합을 fixture 레벨로 정밀 비교하는 W3C/WebKit 하이브리드 케이스를 1개 이상 추가
+
 ### Session 51
 - 작업: `A15-1` 후속 안정화 (오프스크린 필터 체인 결합)
 - 완료:

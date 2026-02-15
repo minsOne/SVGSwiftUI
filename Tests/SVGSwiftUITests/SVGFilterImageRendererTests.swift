@@ -83,6 +83,86 @@ final class SVGFilterImageRendererTests: XCTestCase {
         XCTAssertEqual(pixel.a, 255)
     }
 
+    func testRenderFilteredImageFallsBackUnknownBlendModeAndPreservesChain() throws {
+        let sourceColor: Color = Color(red: 0, green: 0, blue: 1, opacity: 1)
+        let imageSize: CGSize = CGSize(width: 24, height: 24)
+        let primitives: [SVGFilterPrimitive] = [
+            .blend(
+                mode: "not-a-mode",
+                inSource: "SourceGraphic",
+                inSourceTwo: "SourceGraphic",
+                result: "unknown"
+            ),
+            .blend(
+                mode: "screen",
+                inSource: "unknown",
+                inSourceTwo: "SourceAlpha",
+                result: nil
+            )
+        ]
+        guard let renderedImage = SVGFilterImageRenderer.renderFilteredImage(
+            path: Path(CGRect(origin: .zero, size: imageSize)),
+            fillColor: sourceColor,
+            fillStyle: FillStyle(eoFill: false),
+            strokeColor: nil,
+            strokeWidth: 0,
+            lineCap: .round,
+            lineJoin: .miter,
+            miterLimit: 10,
+            dash: [],
+            dashPhase: 0,
+            opacity: 1.0,
+            size: imageSize,
+            primitives: primitives
+        ) else {
+            XCTFail("Expected rendered image")
+            return
+        }
+
+        let center = CGPoint(x: 12, y: 12)
+        guard let pixel = pixel(from: renderedImage, at: center) else {
+            XCTFail("Expected non-nil pixel")
+            return
+        }
+        XCTAssertGreaterThan(pixel.r, 245)
+        XCTAssertGreaterThan(pixel.g, 245)
+        XCTAssertGreaterThan(pixel.b, 245)
+        XCTAssertEqual(pixel.a, 255)
+    }
+
+    func testRenderFilteredImageUsesSourceAlphaBlendInput() throws {
+        let sourceColor: Color = Color(red: 1, green: 0, blue: 0, opacity: 1)
+        let imageSize: CGSize = CGSize(width: 18, height: 18)
+        guard let renderedImage = SVGFilterImageRenderer.renderFilteredImage(
+            path: Path(CGRect(origin: .zero, size: imageSize)),
+            fillColor: sourceColor,
+            fillStyle: FillStyle(eoFill: false),
+            strokeColor: nil,
+            strokeWidth: 0,
+            lineCap: .round,
+            lineJoin: .miter,
+            miterLimit: 10,
+            dash: [],
+            dashPhase: 0,
+            opacity: 1.0,
+            size: imageSize,
+            primitives: [.blend(mode: "screen", inSource: "SourceAlpha", inSourceTwo: "SourceGraphic", result: nil)]
+        ) else {
+            XCTFail("Expected rendered image")
+            return
+        }
+
+        let center = CGPoint(x: 9, y: 9)
+        guard let pixel = pixel(from: renderedImage, at: center) else {
+            XCTFail("Expected non-nil pixel")
+            return
+        }
+        XCTAssertGreaterThan(pixel.r, 200)
+        XCTAssertGreaterThan(pixel.g, 200)
+        XCTAssertGreaterThan(pixel.b, 200)
+        XCTAssertEqual(pixel.a, 255)
+    }
+
     func testRenderFilteredImageResolvesResultInChain() {
         let sourceColor: Color = Color(red: 1, green: 0, blue: 0, opacity: 1)
         let imageSize: CGSize = CGSize(width: 50, height: 50)

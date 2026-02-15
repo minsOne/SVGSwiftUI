@@ -177,11 +177,22 @@ internal enum SVGFilterImageRenderer {
         from sourceImage: CIImage,
         extent: CGRect
     ) -> CIImage? {
-        guard let maskFilter: CIFilter = CIFilter(name: "CIMaskToAlpha") else {
+        guard let alphaFilter: CIFilter = CIFilter(name: "CIColorMatrix") else {
             return nil
         }
-        maskFilter.setValue(sourceImage, forKey: kCIInputImageKey)
-        guard let output: CIImage = maskFilter.outputImage?.cropped(to: extent) else {
+        let alphaVector = CIVector(
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 1
+        )
+        alphaFilter.setValue(sourceImage, forKey: kCIInputImageKey)
+        alphaFilter.setValue(alphaVector, forKey: "inputRVector")
+        alphaFilter.setValue(alphaVector, forKey: "inputGVector")
+        alphaFilter.setValue(alphaVector, forKey: "inputBVector")
+        alphaFilter.setValue(alphaVector, forKey: "inputAVector")
+        let output: CIImage? = alphaFilter.outputImage?.cropped(to: extent)
+        guard let output else {
             return nil
         }
         return output
@@ -194,8 +205,11 @@ internal enum SVGFilterImageRenderer {
     ) -> CIImage? {
         switch primitive {
         case .gaussianBlur(let stdDeviationX, let stdDeviationY, let inSource, _):
-            let sourceName: String = inSource ?? sourceGraphicName
-            let source: CIImage = availableSources[sourceName] ?? availableSources[sourceGraphicName] ?? fallbackSource(availableSources)
+            let normalizedSourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
+            let source: CIImage = sourceImage(
+                name: normalizedSourceName,
+                availableSources: availableSources
+            )
             let radius: Double = max(stdDeviationX, stdDeviationY)
             let radiusValue: Double = max(radius, 0)
             guard let blurFilter: CIFilter = CIFilter(name: "CIGaussianBlur") else {
@@ -206,8 +220,11 @@ internal enum SVGFilterImageRenderer {
             let filtered: CIImage? = blurFilter.outputImage?.cropped(to: fallbackExtent)
             return filtered
         case .offset(let dx, let dy, let inSource, _):
-            let sourceName: String = inSource ?? sourceGraphicName
-            let source: CIImage = availableSources[sourceName] ?? availableSources[sourceGraphicName] ?? fallbackSource(availableSources)
+            let sourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
+            let source: CIImage = sourceImage(
+                name: sourceName,
+                availableSources: availableSources
+            )
             let transform = CGAffineTransform(
                 translationX: CGFloat(dx),
                 y: CGFloat(dy)
@@ -219,14 +236,18 @@ internal enum SVGFilterImageRenderer {
             transformFilter.setValue(transform, forKey: kCIInputTransformKey)
             return transformFilter.outputImage?.cropped(to: fallbackExtent)
         case .blend(let mode, let inSource, let inSourceTwo, _):
-            let firstSourceName: String = inSource ?? sourceGraphicName
-            let secondSourceName: String = inSourceTwo ?? sourceGraphicName
-            guard
-                let firstSource: CIImage = availableSources[firstSourceName] ?? availableSources[sourceGraphicName],
-                let secondSource: CIImage = availableSources[secondSourceName] ?? availableSources[sourceGraphicName],
-                let filterName: String = blendFilterName(for: mode),
-                let blendFilter: CIFilter = CIFilter(name: filterName)
-            else {
+            let firstSourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
+            let secondSourceName: String = normalizedFilterSourceName(inSourceTwo, default: sourceGraphicName)
+            let firstSource: CIImage = sourceImage(
+                name: firstSourceName,
+                availableSources: availableSources
+            )
+            let secondSource: CIImage = sourceImage(
+                name: secondSourceName,
+                availableSources: availableSources
+            )
+            let filterName: String = blendFilterName(for: mode)
+            guard let blendFilter: CIFilter = CIFilter(name: filterName) else {
                 return nil
             }
             blendFilter.setValue(firstSource, forKey: kCIInputImageKey)
@@ -234,8 +255,11 @@ internal enum SVGFilterImageRenderer {
             let filtered: CIImage? = blendFilter.outputImage?.cropped(to: fallbackExtent)
             return filtered
         case .colorMatrix(let values, let inSource, _):
-            let sourceName: String = inSource ?? sourceGraphicName
-            let source: CIImage = availableSources[sourceName] ?? availableSources[sourceGraphicName] ?? fallbackSource(availableSources)
+            let normalizedSourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
+            let source: CIImage = sourceImage(
+                name: normalizedSourceName,
+                availableSources: availableSources
+            )
             return applyColorMatrix(
                 source: source,
                 values: values,
@@ -256,10 +280,39 @@ internal enum SVGFilterImageRenderer {
         return CIImage(color: CIColor(red: 0, green: 0, blue: 0, alpha: 0))
     }
 
-    private static func blendFilterName(for mode: String) -> String? {
+    private static func normalizedFilterSourceName(
+        _ source: String?,
+        default defaultName: String
+    ) -> String {
+        let normalizedSource: String = source?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if normalizedSource.isEmpty {
+            return defaultName
+        }
+        return normalizedSource
+    }
+
+    private static func sourceImage(
+        name sourceName: String,
+        availableSources: [String: CIImage]
+    ) -> CIImage {
+        if let image = availableSources[sourceName] {
+            return image
+        }
+        if let sourceGraphic: CIImage = availableSources[sourceGraphicName] {
+            return sourceGraphic
+        }
+        if let sourceAlpha: CIImage = availableSources[sourceAlphaName] {
+            return sourceAlpha
+        }
+        return fallbackSource(availableSources)
+    }
+
+    private static func blendFilterName(for mode: String) -> String {
         let normalizedMode: String = mode.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         switch normalizedMode {
         case "", "normal":
+            return "CISourceOverCompositing"
+        case "source-over":
             return "CISourceOverCompositing"
         case "multiply":
             return "CIMultiplyBlendMode"
@@ -289,8 +342,10 @@ internal enum SVGFilterImageRenderer {
             return "CIColorBlendMode"
         case "luminosity":
             return "CILuminosityBlendMode"
+        case "plus":
+            return "CIAdditionCompositing"
         default:
-            return nil
+            return "CISourceOverCompositing"
         }
     }
 
