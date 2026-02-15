@@ -5,7 +5,7 @@
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3/A16-4 완료
 - 추가 진행: Demo UITest 브라우저 기준 비교 파이프라인 추가
-- 다음 단계: A16-4 완료로 `unsupported` 집계 데이터를 conformance `unsupported` 카테고리와 연동
+- 다음 단계: `unsupported` 집계 데이터를 `conformance unsupported` 카테고리와 연동해 검증 강화
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 
@@ -24,6 +24,24 @@
 ## 바로 다음 실행 순서
 1. `A16-4` 결과를 conformance manifest strict 규칙에 반영 및 `unsupported` 분포 추적 리포트 보강
 2. 브라우저 오라클 manifest(`demo oracle`)을 WebKit/W3C 후보군과 매핑해 미지원 경로 정합성 비교를 강화
+
+### 2026-02-16 (Session 59)
+- 작업: `A16-4` strict 보강 적용
+- 완료:
+  - W3C/WebKit 자동 생성기(`generate-w3c-tests.sh`, `generate-webkit-tests.sh`)를 `unsupportedFeatures` 매니페스트 필드 입력과 일치하도록 확장
+  - `FixtureExpectation`에 `unsupportedFeatureKeys: [String]` 추가
+  - `unsupported` 기대치일 때 `unsupportedFeatures` 카운트 존재 및 지정 키 존재 여부를 테스트로 검증
+  - W3C/WebKit generated 테스트 재생성 및 strict coverage 재실행
+- 리스크:
+  - 현재 `unsupportedFeatures`는 매니페스트가 빈 필드일 때 존재 여부만 체크하므로, 키 정밀 정합은 `unsupportedFeatures` 항목을 추가한 fixture에서만 수행됨
+- 검증:
+  - `./Scripts/w3c/generate-w3c-tests.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json Tests/SVGSwiftUITests/W3CGeneratedTests.swift`
+  - `./Scripts/webkit/generate-webkit-tests.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json Tests/SVGSwiftUITests/WebKitGeneratedTests.swift`
+  - `swift test --filter W3CGeneratedTests --no-parallel`
+  - `swift test --filter WebKitGeneratedTests --no-parallel`
+  - `swift test --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
 
 ### 2026-02-16 (Session 58)
 - 작업: `A16-4` unsupported 정책 고도화

@@ -55,9 +55,26 @@ def normalize_expected(value: str) -> str:
     return normalized
 
 
+def normalize_unsupported_features(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+
+    output: list[str] = []
+    for item in value:
+        text = str(item).strip()
+        if text:
+            output.append(text)
+    return output
+
+
 def quote(value: str) -> str:
     escaped = value.replace("\\", "\\\\").replace('"', '\\"')
     return f"\"{escaped}\""
+
+
+def quote_string_list(values: list[str]) -> str:
+    items = ", ".join(quote(value) for value in values)
+    return f"[{items}]"
 
 
 fixtures = sorted(fixtures, key=lambda item: (str(item.get("suite", "")), str(item.get("id", ""))))
@@ -87,6 +104,7 @@ lines.append("        let mode: FixtureMode\n")
 lines.append("        let expected: ExpectedResult\n")
 lines.append("        let svgPath: String\n")
 lines.append("        let referencePath: String\n")
+lines.append("        let unsupportedFeatureKeys: [String]\n")
 lines.append("    }\n")
 lines.append("\n")
 lines.append("    private enum FixtureError: Error {\n")
@@ -109,12 +127,18 @@ for index, item in enumerate(fixtures):
     expected = normalize_expected(item.get("expected", "pass"))
     svg = str(item.get("svg", ""))
     reference = str(item.get("reference", ""))
+    unsupported_feature_keys = normalize_unsupported_features(
+        item.get("unsupportedFeatures", [])
+    )
     lines.append("            FixtureExpectation(\n")
     lines.append(f"                id: {quote(fixture_id)},\n")
     lines.append(f"                mode: .{mode},\n")
     lines.append(f"                expected: .{expected},\n")
     lines.append(f"                svgPath: {quote(svg)},\n")
-    lines.append(f"                referencePath: {quote(reference)}\n")
+    lines.append(f"                referencePath: {quote(reference)},\n")
+    lines.append(
+        f"                unsupportedFeatureKeys: {quote_string_list(unsupported_feature_keys)}\n"
+    )
     lines.append("            ),\n")
 
 lines.append("        ]\n")
@@ -144,6 +168,13 @@ lines.append("                XCTAssertEqual(expectedMode, fixture.mode.rawValue
 lines.append("            }\n")
 lines.append("            if let expectedNodeCount {\n")
 lines.append("                XCTAssertEqual(document.nodes.count, expectedNodeCount)\n")
+lines.append("            }\n")
+lines.append("            if fixture.unsupportedFeatureKeys.isEmpty {\n")
+lines.append("                XCTAssertFalse(document.unsupportedFeatures.isEmpty)\n")
+lines.append("            } else {\n")
+lines.append("                for key in fixture.unsupportedFeatureKeys {\n")
+lines.append("                    XCTAssertGreaterThan(document.unsupportedFeatures[key, default: 0], 0)\n")
+lines.append("                }\n")
 lines.append("            }\n")
 lines.append("        case .fail:\n")
 lines.append("            XCTAssertThrowsError(try parser.parse(data: data))\n")

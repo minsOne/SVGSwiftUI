@@ -60,7 +60,7 @@
 | A16-1 | feComposite 지원 | `feComposite` 파서/그래프/오프스크린 렌더 지원 | `feComposite` 기본 연산(`over`, `in`)과 체인 결과 처리 검증 |
 | A16-2 | feComposite arithmetic 지원 | `arithmetic` 수식(`k1~k4`) 계산 경로 추가 | 수식 연산(`arithmetic`)과 체인/기대값 분기 검증 |
 | A16-3 | feComposite 경계 시각 회귀 | `in`/`in2` 경계 조합과 unsupported fallback | 경계/시각 시나리오 회귀 검증 |
-| A16-4 | unsupported 추적 정책 고도화 | 파서에서 미지원 요소/primitive 카운트 집계 | `SVGDocument.unsupportedFeatures` 집계 및 테스트 커버리지 정합성 검증 |
+| A16-4 | unsupported 추적 정책 고도화 | 파서/생성기에서 미지원 요소/primitive 카운트 집계와 strict 정합성 연계 | `SVGDocument.unsupportedFeatures` 집계, `unsupportedFeatures` 필드 반영한 generated test strict 검증 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

@@ -22,6 +22,7 @@ final class W3CGeneratedTests: XCTestCase {
         let expected: ExpectedResult
         let svgPath: String
         let referencePath: String
+        let unsupportedFeatureKeys: [String]
     }
 
     private enum FixtureError: Error {
@@ -42,84 +43,96 @@ final class W3CGeneratedTests: XCTestCase {
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/coords-skew-transform.svg",
-                referencePath: "fixtures/1.1F2/ref/coords-skew-transform.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/coords-skew-transform.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-filters-blend-01-b-min",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/filters-blend-01-b-min.svg",
-                referencePath: "fixtures/1.1F2/ref/filters-blend-01-b-min.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/filters-blend-01-b-min.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-filters-chain-01-b-min",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/filters-chain-01-b-min.svg",
-                referencePath: "fixtures/1.1F2/ref/filters-chain-01-b-min.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/filters-chain-01-b-min.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-filters-colormatrix-01-b-min",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/filters-colormatrix-01-b-min.svg",
-                referencePath: "fixtures/1.1F2/ref/filters-colormatrix-01-b-min.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/filters-colormatrix-01-b-min.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-filters-composite-arithmetic-01-b-min",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/filters-composite-arithmetic-01-b-min.svg",
-                referencePath: "fixtures/1.1F2/ref/filters-composite-arithmetic-01-b-min.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/filters-composite-arithmetic-01-b-min.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-paths-move-line",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/paths-move-line.svg",
-                referencePath: "fixtures/1.1F2/ref/paths-move-line.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/paths-move-line.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-shapes-rect-circle",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/shapes-rect-circle.svg",
-                referencePath: "fixtures/1.1F2/ref/shapes-rect-circle.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/shapes-rect-circle.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-shapes-rounded-rect",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/shapes-rounded-rect.svg",
-                referencePath: "fixtures/1.1F2/ref/shapes-rounded-rect.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/shapes-rounded-rect.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-styling-fillrule-dash",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/styling-fillrule-dash.svg",
-                referencePath: "fixtures/1.1F2/ref/styling-fillrule-dash.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/styling-fillrule-dash.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.1F2-styling-stroke-capjoin",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.1F2/svg/styling-stroke-capjoin.svg",
-                referencePath: "fixtures/1.1F2/ref/styling-stroke-capjoin.expected.txt"
+                referencePath: "fixtures/1.1F2/ref/styling-stroke-capjoin.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.2T-coords-relative-transform",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.2T/svg/coords-relative-transform.svg",
-                referencePath: "fixtures/1.2T/ref/coords-relative-transform.expected.txt"
+                referencePath: "fixtures/1.2T/ref/coords-relative-transform.expected.txt",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "w3c-1.2T-styling-fill-stroke",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/1.2T/svg/styling-fill-stroke.svg",
-                referencePath: "fixtures/1.2T/ref/styling-fill-stroke.expected.txt"
+                referencePath: "fixtures/1.2T/ref/styling-fill-stroke.expected.txt",
+                unsupportedFeatureKeys: []
             ),
         ]
     }
@@ -148,6 +161,13 @@ final class W3CGeneratedTests: XCTestCase {
             }
             if let expectedNodeCount {
                 XCTAssertEqual(document.nodes.count, expectedNodeCount)
+            }
+            if fixture.unsupportedFeatureKeys.isEmpty {
+                XCTAssertFalse(document.unsupportedFeatures.isEmpty)
+            } else {
+                for key in fixture.unsupportedFeatureKeys {
+                    XCTAssertGreaterThan(document.unsupportedFeatures[key, default: 0], 0)
+                }
             }
         case .fail:
             XCTAssertThrowsError(try parser.parse(data: data))

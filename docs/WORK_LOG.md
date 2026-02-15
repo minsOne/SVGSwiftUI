@@ -2,6 +2,23 @@
 
 ## 2026-02-16
 
+### Session 59
+- 작업: `A16-4` strict 보강 적용
+- 완료:
+  - W3C/WebKit generated 테스트 생성기에 `unsupportedFeatures` 지원을 추가
+  - `FixtureExpectation`에 `unsupportedFeatureKeys`를 추가해 expected unsupported fixture가 구체 키를 검증하도록 정합성 강화
+  - W3C/WebKit generated 테스트, 커버리지 strict 모드 재생성
+- 리스크:
+  - 현재 `unsupportedFeatures`는 매니페스트가 비워진 케이스에서 존재 여부만 검증하므로, 키 정밀 정합은 manifest에 키 목록을 보강한 fixture에서만 수행됨
+- 검증:
+  - `./Scripts/w3c/generate-w3c-tests.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json Tests/SVGSwiftUITests/W3CGeneratedTests.swift`
+  - `./Scripts/webkit/generate-webkit-tests.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json Tests/SVGSwiftUITests/WebKitGeneratedTests.swift`
+  - `swift test --filter W3CGeneratedTests --no-parallel`
+  - `swift test --filter WebKitGeneratedTests --no-parallel`
+  - `swift test --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
 ### Session 58
 - 작업: `A16-4` unsupported 추적 정책 고도화
 - 완료:

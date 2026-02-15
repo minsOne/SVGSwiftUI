@@ -22,6 +22,7 @@ final class WebKitGeneratedTests: XCTestCase {
         let expected: ExpectedResult
         let svgPath: String
         let referencePath: String
+        let unsupportedFeatureKeys: [String]
     }
 
     private enum FixtureError: Error {
@@ -42,378 +43,432 @@ final class WebKitGeneratedTests: XCTestCase {
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-color-prof-01-f.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-color-prop-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-color-prop-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-color-prop-02-f",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-color-prop-02-f.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-coord-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-coord-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-coord-02-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-coord-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-trans-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-trans-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-trans-02-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-trans-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-trans-03-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-trans-03-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-trans-04-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-trans-04-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-trans-05-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-trans-05-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-trans-06-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-trans-06-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-units-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-units-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-units-02-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-units-02-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-units-03-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-units-03-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-viewattr-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-viewattr-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-viewattr-02-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-viewattr-02-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-coords-viewattr-03-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-coords-viewattr-03-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-filters-blend-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-filters-blend-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-filters-chain-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-filters-chain-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-filters-composite-02-b",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-filters-composite-02-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-filters-gauss-01-b",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-filters-gauss-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-fonts-elem-01-t",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-fonts-elem-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-fonts-glyph-02-t",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-fonts-glyph-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-masking-intro-01-f",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-masking-intro-01-f.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-masking-mask-01-b",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-masking-mask-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-painting-marker-01-f",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-painting-marker-01-f.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-painting-marker-02-f",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-painting-marker-02-f.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-02-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-03-f",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-03-f.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-04-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-04-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-05-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-05-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-06-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-06-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-07-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-07-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-08-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-08-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-09-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-09-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-10-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-10-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-12-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-12-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-13-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-13-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-14-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-14-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-paths-data-15-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-paths-data-15-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-circle-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-circle-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-circle-02-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-circle-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-ellipse-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-ellipse-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-ellipse-02-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-ellipse-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-intro-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-intro-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-line-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-line-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-polygon-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-polygon-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-polyline-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-polyline-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-rect-01-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-rect-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-shapes-rect-02-t",
                 mode: .parse,
                 expected: .pass,
                 svgPath: "fixtures/webkit-shapes-rect-02-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-struct-image-01-t",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-struct-image-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-text-align-01-b",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-text-align-01-b.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
             FixtureExpectation(
                 id: "webkit-1.1-text-fonts-01-t",
                 mode: .parse,
                 expected: .unsupported,
                 svgPath: "fixtures/webkit-text-fonts-01-t.svg",
-                referencePath: ""
+                referencePath: "",
+                unsupportedFeatureKeys: []
             ),
         ]
     }
@@ -442,6 +497,13 @@ final class WebKitGeneratedTests: XCTestCase {
             }
             if let expectedNodeCount {
                 XCTAssertEqual(document.nodes.count, expectedNodeCount)
+            }
+            if fixture.unsupportedFeatureKeys.isEmpty {
+                XCTAssertFalse(document.unsupportedFeatures.isEmpty)
+            } else {
+                for key in fixture.unsupportedFeatureKeys {
+                    XCTAssertGreaterThan(document.unsupportedFeatures[key, default: 0], 0)
+                }
             }
         case .fail:
             XCTAssertThrowsError(try parser.parse(data: data))
