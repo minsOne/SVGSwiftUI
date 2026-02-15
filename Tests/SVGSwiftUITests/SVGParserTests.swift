@@ -169,6 +169,155 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(foreground.base.attributes["clip-path"], "url(#inline)")
     }
 
+    func testParseReadsFilterDefinitionAndFilterAttribute() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="blur" x="0" y="0" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2.5"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            filter="url(#blur)"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let filterDefinition = document.filterDefinitions["blur"] else {
+            return XCTFail("Expected filter definition for id 'blur'")
+        }
+        XCTAssertEqual(filterDefinition.id, "blur")
+        XCTAssertEqual(filterDefinition.attributes["x"], "0")
+        XCTAssertEqual(filterDefinition.attributes["y"], "0")
+        XCTAssertEqual(filterDefinition.attributes["width"], "200%")
+        XCTAssertEqual(filterDefinition.attributes["height"], "200%")
+
+        guard let foreground = shapeNode(id: "foreground", in: document) else {
+            return XCTFail("Expected foreground rect")
+        }
+        XCTAssertEqual(foreground.base.style.filter, "url(#blur)")
+        XCTAssertEqual(foreground.base.attributes["filter"], "url(#blur)")
+    }
+
+    func testParseReadsFilterFromInlineStyle() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="inline">
+              <feOffset dx="2" dy="3"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            style="filter: url(#inline); fill: #0ff;"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let foreground = shapeNode(id: "foreground", in: document) else {
+            return XCTFail("Expected foreground rect")
+        }
+        XCTAssertEqual(foreground.base.style.filter, "url(#inline)")
+        XCTAssertEqual(foreground.base.attributes["filter"], "url(#inline)")
+    }
+
+    func testParseReadsFilterPrimitives() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="complex">
+              <feGaussianBlur stdDeviation="2.5 4"/>
+              <feOffset dx="8" dy="-3"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            filter="url(#complex)"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let filterDefinition = document.filterDefinitions["complex"] else {
+            return XCTFail("Expected filter definition for id 'complex'")
+        }
+        XCTAssertEqual(filterDefinition.primitives.count, 2)
+
+        let first = filterDefinition.primitives[0]
+        let second = filterDefinition.primitives[1]
+        XCTAssertEqual(
+            first,
+            .gaussianBlur(stdDeviationX: 2.5, stdDeviationY: 4.0)
+        )
+        XCTAssertEqual(second, .offset(dx: 8, dy: -3))
+    }
+
+    func testParseReadsFilterPrimitivesWithSingleStandardDeviationValue() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="single">
+              <feGaussianBlur stdDeviation="3.25"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            filter="url(#single)"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["single"]?.primitives)
+        XCTAssertEqual(primitives.count, 1)
+        XCTAssertEqual(primitives[0], .gaussianBlur(stdDeviationX: 3.25, stdDeviationY: 3.25))
+    }
+
+    func testParseIgnoresUnknownFilterPrimitives() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="unsupported">
+              <feColorMatrix values="0.5"/>
+              <feGaussianBlur stdDeviation="1"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            filter="url(#unsupported)"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["unsupported"]?.primitives)
+        XCTAssertEqual(primitives.count, 1)
+        XCTAssertEqual(primitives[0], .gaussianBlur(stdDeviationX: 1, stdDeviationY: 1))
+    }
+
     func testParseIgnoresFilterAndMaskElementsButKeepsSupportedSiblings() throws {
         let svg = """
         <svg width="20" height="20">
@@ -184,6 +333,7 @@ final class SVGParserTests: XCTestCase {
         """
 
         let document = try parser.parse(source: .string(svg))
+        XCTAssertNotNil(document.filterDefinitions["blur"])
         XCTAssertNil(shapeNode(id: "blur", in: document))
         XCTAssertNil(shapeNode(id: "mask", in: document))
         XCTAssertEqual(pathNode(id: "base", in: document)?.pathData, "M0 0 L20 20")

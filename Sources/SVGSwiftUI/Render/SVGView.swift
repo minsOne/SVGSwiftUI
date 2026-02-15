@@ -76,6 +76,7 @@ private struct SVGStaticPlaceholderView: View {
             return buildDrawNodes(
                 from: document.nodes,
                 resolved: resolved,
+                filterDefinitions: document.filterDefinitions,
                 clipPathCache: clipPathCache,
                 inheritedTransform: .identity,
                 inheritedClipPaths: [],
@@ -92,6 +93,7 @@ private struct SVGStaticPlaceholderView: View {
         return buildDrawNodes(
             from: document.nodes,
             resolved: resolved,
+            filterDefinitions: document.filterDefinitions,
             clipPathCache: clipPathCache,
             inheritedTransform: .identity,
             inheritedClipPaths: [],
@@ -103,11 +105,30 @@ private struct SVGStaticPlaceholderView: View {
         GeometryReader { _ in
             Canvas { context, _ in
                 for node in drawNodes {
-                    if !node.clipPaths.isEmpty {
+                    if node.clipPaths.isEmpty && node.filterPrimitives.isEmpty {
+                        let opacity = node.opacity
+                        if let fill = node.fillColor {
+                            context.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
+                        }
+                        if let stroke = node.strokeColor, node.strokeWidth > 0 {
+                            let strokeStyle = StrokeStyle(
+                                lineWidth: node.strokeWidth,
+                                lineCap: node.lineCap,
+                                lineJoin: node.lineJoin,
+                                miterLimit: node.miterLimit,
+                                dash: node.dash,
+                                dashPhase: node.dashPhase
+                            )
+                            context.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
+                        }
+                    } else {
                         context.drawLayer { layer in
-                            for clipPath in node.clipPaths {
-                                layer.clip(to: clipPath, style: .init(eoFill: false))
+                            if !node.clipPaths.isEmpty {
+                                for clipPath in node.clipPaths {
+                                    layer.clip(to: clipPath, style: .init(eoFill: false))
+                                }
                             }
+                            applyFilterPrimitives(node.filterPrimitives, to: &layer)
                             let opacity = node.opacity
                             if let fill = node.fillColor {
                                 layer.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
@@ -123,22 +144,6 @@ private struct SVGStaticPlaceholderView: View {
                                 )
                                 layer.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
                             }
-                        }
-                    } else {
-                        let opacity = node.opacity
-                        if let fill = node.fillColor {
-                            context.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
-                        }
-                        if let stroke = node.strokeColor, node.strokeWidth > 0 {
-                            let strokeStyle = StrokeStyle(
-                                lineWidth: node.strokeWidth,
-                                lineCap: node.lineCap,
-                                lineJoin: node.lineJoin,
-                                miterLimit: node.miterLimit,
-                                dash: node.dash,
-                                dashPhase: node.dashPhase
-                            )
-                            context.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
                         }
                     }
                 }
@@ -245,6 +250,7 @@ private struct SVGStaticPlaceholderView: View {
         cachedDrawNodes = buildDrawNodes(
             from: document.nodes,
             resolved: resolved,
+            filterDefinitions: document.filterDefinitions,
             clipPathCache: clipPathCache,
             inheritedTransform: .identity,
             inheritedClipPaths: [],
@@ -265,6 +271,7 @@ private struct SVGStaticPlaceholderView: View {
     private func buildDrawNodes(
         from nodes: [SVGNode],
         resolved: [String: SVGResolvedNodeStyle],
+        filterDefinitions: [String: SVGFilterDefinition],
         clipPathCache: [String: CGPath],
         inheritedTransform: CGAffineTransform,
         inheritedClipPaths: [CGPath],
@@ -290,6 +297,7 @@ private struct SVGStaticPlaceholderView: View {
             if let built = makeDrawNode(
                 for: node,
                 resolved: resolved[nodeID],
+                filterDefinitions: filterDefinitions,
                 inheritedTransform: inheritedTransform,
                 canUsePathCache: canUsePathCache,
                 clipPaths: activeClipPaths
@@ -299,13 +307,14 @@ private struct SVGStaticPlaceholderView: View {
             if !node.children.isEmpty {
                 output.append(
                     contentsOf: buildDrawNodes(
-                        from: node.children,
-                        resolved: resolved,
-                        clipPathCache: clipPathCache,
-                        inheritedTransform: nodeTransform,
-                        inheritedClipPaths: activeClipPaths,
-                        canUsePathCache: canUsePathCache
-                    )
+                    from: node.children,
+                    resolved: resolved,
+                    filterDefinitions: filterDefinitions,
+                    clipPathCache: clipPathCache,
+                    inheritedTransform: nodeTransform,
+                    inheritedClipPaths: activeClipPaths,
+                    canUsePathCache: canUsePathCache
+                )
                 )
             }
         }
@@ -315,6 +324,7 @@ private struct SVGStaticPlaceholderView: View {
     private func makeDrawNode(
         for node: SVGNode,
         resolved: SVGResolvedNodeStyle?,
+        filterDefinitions: [String: SVGFilterDefinition],
         inheritedTransform: CGAffineTransform,
         canUsePathCache: Bool,
         clipPaths: [CGPath]
@@ -328,9 +338,15 @@ private struct SVGStaticPlaceholderView: View {
                 for: rasterNode,
                 resolved: resolved,
                 inheritedTransform: inheritedTransform,
+                filterDefinitions: filterDefinitions,
                 clipPaths: clipPaths
             )
         }
+
+        let filterPrimitives = resolveFilterPrimitives(
+            from: resolved.style.filter,
+            filterDefinitions: filterDefinitions
+        )
 
         let maybeCachedPath: CGPath? = canUsePathCache
             ? pathCache[node.nodeID]
@@ -360,7 +376,8 @@ private struct SVGStaticPlaceholderView: View {
             dash: resolved.style.strokeDashArray.map { CGFloat($0) },
             dashPhase: CGFloat(resolved.style.strokeDashOffset),
             opacity: resolved.style.opacity,
-            clipPaths: clipPaths.map { Path($0) }
+            clipPaths: clipPaths.map { Path($0) },
+            filterPrimitives: filterPrimitives
         )
     }
 
@@ -368,6 +385,7 @@ private struct SVGStaticPlaceholderView: View {
         for imageNode: SVGRasterImageNode,
         resolved: SVGResolvedNodeStyle,
         inheritedTransform: CGAffineTransform,
+        filterDefinitions: [String: SVGFilterDefinition],
         clipPaths: [CGPath]
     ) -> SVGDrawNode {
         let x: CGFloat = CGFloat(imageNode.x ?? 0)
@@ -413,7 +431,11 @@ private struct SVGStaticPlaceholderView: View {
             dash: resolved.style.strokeDashArray.map { CGFloat($0) },
             dashPhase: CGFloat(resolved.style.strokeDashOffset),
             opacity: resolved.style.opacity,
-            clipPaths: clipPaths.map { Path($0) }
+            clipPaths: clipPaths.map { Path($0) },
+            filterPrimitives: resolveFilterPrimitives(
+                from: resolved.style.filter,
+                filterDefinitions: filterDefinitions
+            )
         )
     }
 
@@ -482,6 +504,37 @@ private struct SVGStaticPlaceholderView: View {
         return mutablePath
     }
 
+    private func resolveFilterPrimitives(
+        from filterValue: String?,
+        filterDefinitions: [String: SVGFilterDefinition]
+    ) -> [SVGFilterPrimitive] {
+        guard let filterValue else {
+            return []
+        }
+        guard let filterID = parseReferenceID(from: filterValue) else {
+            return []
+        }
+        guard let filterDefinition = filterDefinitions[filterID] else {
+            return []
+        }
+        return filterDefinition.primitives
+    }
+
+    private func applyFilterPrimitives(
+        _ primitives: [SVGFilterPrimitive],
+        to context: inout GraphicsContext
+    ) {
+        for primitive in primitives {
+            switch primitive {
+            case .gaussianBlur(let stdDeviationX, let stdDeviationY):
+                let radius = max(stdDeviationX, stdDeviationY)
+                context.addFilter(.blur(radius: CGFloat(radius)))
+            case .offset(let dx, let dy):
+                context.translateBy(x: CGFloat(dx), y: CGFloat(dy))
+            }
+        }
+    }
+
     private func clipPath(
         from node: SVGNode,
         clipPathCache: [String: CGPath]
@@ -496,6 +549,10 @@ private struct SVGStaticPlaceholderView: View {
     }
 
     private func parseClipPathID(from value: String) -> String? {
+        return parseReferenceID(from: value)
+    }
+
+    private func parseReferenceID(from value: String) -> String? {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         let lowered = trimmed.lowercased()
         if !lowered.hasPrefix("url(") || !trimmed.hasSuffix(")") {
@@ -645,5 +702,6 @@ private struct SVGDrawNode: Identifiable {
     let dashPhase: CGFloat
     let opacity: Double
     let clipPaths: [Path]
+    let filterPrimitives: [SVGFilterPrimitive]
 }
 #endif

@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (S3-2 done)
+Last Updated: 2026-02-15 (A11-2 done)
 
 ## Status Legend
 - `todo`: not started
@@ -55,6 +55,8 @@ Last Updated: 2026-02-15 (S3-2 done)
 | A10-1 | A10 | WebKit LayoutTests 매니페스트/수집 스크립트 기획 | done | `Tests/SVGSwiftUITests/WebKit` 매니페스트 및 동기화 규칙 정리 |
 | A10-2 | A10 | WebKit conformance 테스트 생성기/coverage 연동 | done | `testWebKitGeneratedSuite` CI 실행 + strict coverage 검증 포함 |
 | A10-3 | A10 | WebKit 후보군 확장 및 CI 게이트 | done | WebKit 후보군을 52건으로 확장하고 expected 전이 규칙을 정비 |
+| A11-1 | A11 | `filter` 정의 파싱 및 스타일/리졸버 전달 기초 | done | `filter` 속성/요소를 AST/스타일 경로에 보존 |
+| A11-2 | A11 | `filter` 렌더 패스 연동 | done | `filter` primitive(blur/offset) 파싱 결과를 `GraphicsContext` 렌더 체인에 연결 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

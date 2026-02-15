@@ -184,6 +184,8 @@ struct SVGStyleResolver: Sendable {
                 style.strokeLineCap = parseStrokeLineCap(normalizedValue)
             case "stroke-linejoin":
                 style.strokeLineJoin = parseStrokeLineJoin(normalizedValue)
+            case "filter":
+                style.filter = normalizedValue
             case "opacity":
                 style.opacity = parseNumeric(normalizedValue)
             default:

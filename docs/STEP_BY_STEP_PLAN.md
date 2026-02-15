@@ -47,6 +47,8 @@
 | A10-1 | WebKit LayoutTests 1차 반영 | WebKit manifest/fetch/generate 파이프라인 | 8~12개 테스트 케이스 선별 및 소스 정합성 확인 |
 | A10-2 | WebKit conformance CI | `testWebKitGeneratedSuite` + coverage 리포트 | CI에서 pass/fail/unsupported 자동 추적 |
 | A10-3 | WebKit 후보군 확대 및 상태 전이 | unsupported 정책, manifest 갱신 규칙, 후보군 20~40건 확장 | pass/fail/unsupported 분포 추적이 운영 지표로 반영 |
+| A11-1 | filter 파싱/스타일 전달 | `<filter>` 정의 및 `filter` 속성/스타일 전달 | `filter` AST/스타일 경로 보존 테스트 통과 |
+| A11-2 | filter 렌더 패스 연동 | blur/offset 최소 필터 렌더 체인 구축 | `filter` primitive 참조 및 렌더 적용 회귀 테스트 통과 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

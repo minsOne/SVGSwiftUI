@@ -160,6 +160,24 @@ final class SVGStyleResolverTests: XCTestCase {
         XCTAssertEqual(child.style.fill, SVGPaint.color(.init(red: 0, green: 0, blue: 1, alpha: 1)))
     }
 
+    func testStyleResolverAppliesFilterFromStylesheetAndNodeStyle() {
+        let pathBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            style: .init()
+        )
+        let document = SVGDocument(
+            nodes: [.path(.init(base: pathBase, pathData: "M0 0"))],
+            styleRules: [
+                SVGStyleRule(selector: .id("target"), declarations: ["filter": "url(#sheet)"])
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["target"])
+        XCTAssertEqual(node.style.filter, "url(#sheet)")
+    }
+
     func testStyleRulesSpecificityAndSourceOrderAreRespected() {
         let pathBase = SVGBaseNode(
             id: "target",

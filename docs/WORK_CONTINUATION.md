@@ -3,10 +3,10 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, S2-2 완료
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
-- 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료
-- 다음 단계: `S3-2` 실측 근거 수집 + 임계치 근거화
+- 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
+- 다음 단계: `A12` `filter` 미지원 기능 정책 정리(`filter` 고급 primitive 분류/매니페스트 정렬)
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -21,7 +21,7 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. 다음 단계: S3-2 프로파일 로그 기반 임계치 정책 보강 여부 판단
+1. 다음 단계: `A12` `filter` 미지원 항목 분류 및 conformance manifest 정렬
 
 ## 작업 진행 루프(재작업 방지)
 - Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환
@@ -61,6 +61,8 @@
 - [x] S2-2 `clipPath` 미니멈 구현
 - [x] S3-1 렌더 경로 캐시 및 대형 SVG 임계치 정리
 - [x] S3-2 `S3-1` 실측 근거 수집 및 임계치 보강 근거화
+- [x] A11-1 `filter` 정의 파싱/스타일 전달 기초
+- [x] A11-2 `filter` 렌더 패스 연동
 
 
 ## 구현 중 준수 규칙
@@ -75,6 +77,26 @@
 - 결정:
 - 리스크:
 - 다음 액션:
+
+### 2026-02-15 (Session 44)
+- 작업: `A11-2 filter` 렌더 패스 연동
+- 완료:
+  - `<filter>` 프레임에서 `feGaussianBlur`/`feOffset` 파싱을 AST에 축적해 `SVGFilterDefinition.primitives`로 전달
+  - `filter` 참조 문자열에서 `url(#id)`를 역참조해 `GraphicsContext` 렌더 노드에 primitive 목록 적용
+  - `SVGView`에 `GraphicsContext.drawLayer`를 통한 blur/offset 최소 구현 반영 (`max(stdDeviationX,stdDeviationY)` blur 반경, 오프셋 translate)
+  - `SVGParserTests`에 단일 stdDeviation + 미지원 primitive 무시 케이스 추가
+  - `SVGStyleResolverTests`에 stylesheet 필터 규칙 반영 테스트 추가
+- 리스크:
+  - blur/offset 이외 `filter` 기능(merge/comp/colormatrix 등)은 미지원 상태로, 지원 범위/예상치 정책 미정의
+  - 렌더 합성의 정밀도는 iOS simulator에서 확인되었으며 W3C/WebKit 고급 filter fixture에 대한 회귀 데이터는 추가 필요
+- 다음 액션:
+  - `filter` 미지원 항목의 기대값을 conformance manifest에 `unsupported`로 정리하고, 지원 범위 커버리지 문서에 반영
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (132 tests, 0 failures)
+  - `swift test --parallel` (132 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test`
 
 ### 2026-02-15 (Session 41)
 - 작업: `S3-2` 성능 실측 근거 수집

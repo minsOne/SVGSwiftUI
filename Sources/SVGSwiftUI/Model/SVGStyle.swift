@@ -40,6 +40,7 @@ struct SVGStyle: Sendable, Equatable {
     var fillOpacity: Double?
     var stroke: SVGPaint?
     var strokeOpacity: Double?
+    var filter: String?
     var strokeWidth: Double?
     var fillRule: SVGFillRule?
     var strokeMiterLimit: Double?
@@ -54,6 +55,7 @@ struct SVGStyle: Sendable, Equatable {
         fillOpacity: Double? = nil,
         stroke: SVGPaint? = nil,
         strokeOpacity: Double? = nil,
+        filter: String? = nil,
         strokeWidth: Double? = nil,
         fillRule: SVGFillRule? = nil,
         strokeMiterLimit: Double? = nil,
@@ -67,6 +69,7 @@ struct SVGStyle: Sendable, Equatable {
         self.fillOpacity = fillOpacity
         self.stroke = stroke
         self.strokeOpacity = strokeOpacity
+        self.filter = filter
         self.strokeWidth = strokeWidth
         self.fillRule = fillRule
         self.strokeMiterLimit = strokeMiterLimit
@@ -83,6 +86,7 @@ struct SVGResolvedStyle: Sendable, Equatable {
     var fillOpacity: Double
     var stroke: SVGPaint
     var strokeOpacity: Double
+    var filter: String?
     var strokeWidth: Double
     var fillRule: SVGFillRule
     var strokeMiterLimit: Double
@@ -97,6 +101,7 @@ struct SVGResolvedStyle: Sendable, Equatable {
         fillOpacity: Double = 1.0,
         stroke: SVGPaint = .none,
         strokeOpacity: Double = 1.0,
+        filter: String? = nil,
         strokeWidth: Double = 1.0,
         fillRule: SVGFillRule = .nonZero,
         strokeMiterLimit: Double = 4.0,
@@ -110,6 +115,7 @@ struct SVGResolvedStyle: Sendable, Equatable {
         self.fillOpacity = fillOpacity
         self.stroke = stroke
         self.strokeOpacity = strokeOpacity
+        self.filter = filter
         self.strokeWidth = strokeWidth
         self.fillRule = fillRule
         self.strokeMiterLimit = strokeMiterLimit
@@ -128,6 +134,7 @@ extension SVGResolvedStyle {
             fillOpacity: style.fillOpacity ?? fillOpacity,
             stroke: style.stroke ?? stroke,
             strokeOpacity: style.strokeOpacity ?? strokeOpacity,
+            filter: style.filter ?? filter,
             strokeWidth: style.strokeWidth ?? strokeWidth,
             fillRule: style.fillRule ?? fillRule,
             strokeMiterLimit: style.strokeMiterLimit ?? strokeMiterLimit,

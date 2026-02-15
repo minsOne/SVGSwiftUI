@@ -2,6 +2,47 @@
 
 ## 2026-02-15
 
+### Session 44
+- 작업: `A11-2 filter` 렌더 패스 연동
+- 완료:
+  - `<filter>` 프레임의 `feGaussianBlur`/`feOffset` 파싱을 `SVGFilterDefinition.primitives`에 저장
+  - `SVGStyle`/`SVGResolvedStyle`의 `filter` 전달을 렌더 노드 생성 단계에서 반영
+  - `GraphicsContext.drawLayer` 기반 blur/offset 적용 경로 추가 (`max(stdDeviationX,stdDeviationY)` blur 반경 사용)
+  - `SVGParserTests`에 단일 stdDeviation/미지원 primitive 케이스 보강
+  - `SVGStyleResolverTests`에 stylesheet 기준 filter 반영 검증 케이스 추가
+- 리스크:
+  - `filter` 미지원 기능(`feMerge`, `feColorMatrix` 등)은 여전히 무시되며 렌더 fallback 정책 미정의
+  - iOS simulator에서 addFilter/translate 동작은 확인했지만 플랫폼별 미세 차이 보정 필요 가능
+- 다음 액션:
+  - `A11-2` 완료 조건 충족으로 완료 처리
+  - 다음 단계 `A12`로 `filter` 고급 primitive 미지원 범위를 `unsupported` 정책으로 고정하고, manifest/coverage 갱신 규칙 정리
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (132 tests, 0 failures)
+  - `swift test --parallel` (132 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test` (5 tests, 0 failures)
+
+### Session 43
+- 작업: `A11-1 filter` 파싱/스타일 전달 기초 구현
+- 완료:
+  - `SVGFilterDefinition` 모델(`id`, `attributes`) 추가
+  - `SVGDocument`에 `filterDefinitions: [String: SVGFilterDefinition]` 추가
+  - 파서에서 `<filter>` 요소를 frame으로 파싱해 `filterDefinitions`로 수집
+  - `filter` 속성/inline 스타일을 `SVGStyle`과 `SVGResolvedStyle`에 반영
+  - `SVGStyleResolver`가 스타일 선언에서 `filter` 값을 수집하도록 보강
+  - `SVGParserTests`에 `filter` 정의/속성/inline 스타일 보존 테스트 2건 추가
+  - `SVGStyleResolverTests`에 `filter` 규칙 반영 테스트 1건 추가
+- 리스크:
+  - 렌더 단계에서 `filterDefinitions`를 실제 노드에 적용하는 체인은 아직 미구현
+  - 현재는 `filter` 값이 스타일 결과로 전달되는 구조 준비까지만 완료
+- 다음 액션:
+  - `A11-2`로 `feGaussianBlur`/`feOffset` 등 최소 필터 primitive 적용 방식을 설계하고,
+    `SVGView` 렌더 경로에서 지원 여부를 결정
+- 검증:
+  - `swift test --filter SVGParserTests --filter SVGStyleResolverTests`
+  - `swift test --parallel` (129 tests, 0 failures)
+
 ### Session 42
 - 작업: 변경 반영 정리 및 커밋 루틴 고정
 - 완료:

@@ -111,7 +111,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             viewBox: parsedDocument.viewBox,
             nodes: expandedNodes,
             styleRules: parsedDocument.styleRules,
-            clipPaths: parsedDocument.clipPaths
+            clipPaths: parsedDocument.clipPaths,
+            filterDefinitions: parsedDocument.filterDefinitions
         )
     }
 
@@ -392,6 +393,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         case path
         case defs
         case clipPath
+        case filter
         case shape(SVGElementKind)
         case image
     }
@@ -400,6 +402,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         var kind: FrameKind
         var base: SVGBaseNode
         var attributes: [String: String]
+        var filterPrimitives: [SVGFilterPrimitive]
         var children: [SVGNode]
         var childCount: Int
     }
@@ -414,6 +417,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     private var styleBuffer: String = ""
     private var styleRules: [SVGStyleRule] = []
     private var clipPathDefinitions: [String: [SVGNode]] = [:]
+    private var filterDefinitions: [String: SVGFilterDefinition] = [:]
     private var parseError: SVGParserError?
     private var rootDocument: SVGDocument?
 
@@ -428,6 +432,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         styleBuffer.removeAll(keepingCapacity: false)
         styleRules.removeAll(keepingCapacity: false)
         clipPathDefinitions.removeAll(keepingCapacity: false)
+        filterDefinitions.removeAll(keepingCapacity: false)
         parseError = nil
         rootDocument = nil
 
@@ -463,8 +468,16 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         if parseError != nil {
             return
         }
+        let normalizedName = normalizeName(elementName)
         if styleDepth > 0 {
             styleDepth += 1
+            return
+        }
+        if let filterPrimitive = parseFilterPrimitive(
+            name: normalizedName,
+            attributes: attributeDict
+        ) {
+            appendFilterPrimitive(filterPrimitive)
             return
         }
         if ignoreDepth > 0 {
@@ -472,7 +485,6 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return
         }
 
-        let normalizedName = normalizeName(elementName)
         if normalizedName == "style" {
             if options.enableStyleTag {
                 styleDepth = 1
@@ -512,6 +524,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 kind: frameKind,
                 base: base,
                 attributes: styledAttributes,
+                filterPrimitives: [],
                 children: [],
                 childCount: 0
             )
@@ -564,7 +577,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 viewBox: parseViewBox(attributes: frame.attributes),
                 nodes: frame.children,
                 styleRules: styleRules,
-                clipPaths: clipPathDefinitions
+                clipPaths: clipPathDefinitions,
+                filterDefinitions: filterDefinitions
             )
         case .group:
             appendNode(.group(.init(base: frame.base, children: frame.children)), parser: parser)
@@ -573,6 +587,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         case .clipPath:
             if let clipPathID = frame.base.id {
                 clipPathDefinitions[clipPathID] = frame.children
+            }
+        case .filter:
+            if let filterID = frame.base.id {
+                filterDefinitions[filterID] = SVGFilterDefinition(
+                    id: filterID,
+                    attributes: frame.attributes,
+                    primitives: frame.filterPrimitives
+                )
             }
         case .path:
             let pathData = frame.attributes["d"] ?? ""
@@ -611,6 +633,66 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         if let text = String(data: CDATABlock, encoding: .utf8) {
             styleBuffer.append(text)
         }
+    }
+
+    private func parseFilterPrimitive(
+        name: String,
+        attributes: [String: String]
+    ) -> SVGFilterPrimitive? {
+        guard let currentParent = frames.last,
+              case .filter = currentParent.kind else {
+            return nil
+        }
+        switch name {
+        case "fegaussianblur":
+            let stdDeviation: SVGFilterPrimitive? = parseStdDeviation(attributes["stdDeviation"])
+            if let stdDeviation {
+                return stdDeviation
+            }
+            let stdX = parseNumeric(attributes["stdDeviationX"] ?? "") ?? 0.0
+            let stdY = parseNumeric(attributes["stdDeviationY"] ?? "") ?? stdX
+            return .gaussianBlur(
+                stdDeviationX: stdX,
+                stdDeviationY: stdY
+            )
+        case "feoffset":
+            let dx: Double = parseNumeric(attributes["dx"] ?? "") ?? 0.0
+            let dy: Double = parseNumeric(attributes["dy"] ?? "") ?? 0.0
+            return .offset(dx: dx, dy: dy)
+        default:
+            return nil
+        }
+    }
+
+    private func parseStdDeviation(_ value: String?) -> SVGFilterPrimitive? {
+        guard let value else {
+            return nil
+        }
+        let values = value
+            .split(
+                whereSeparator: { separator in
+                    separator == " " || separator == "," || separator == "\n" || separator == "\t"
+                }
+            )
+            .compactMap { parseNumeric(String($0)) }
+        if values.isEmpty {
+            return nil
+        }
+        let stdDeviationX: Double = values[0]
+        let stdDeviationY: Double = values.count > 1 ? values[1] : values[0]
+        return .gaussianBlur(stdDeviationX: stdDeviationX, stdDeviationY: stdDeviationY)
+    }
+
+    private func appendFilterPrimitive(_ primitive: SVGFilterPrimitive) {
+        guard let currentParent = frames.last,
+              case .filter = currentParent.kind else {
+            ignoreDepth = 1
+            return
+        }
+        var parent = frames.removeLast()
+        parent.filterPrimitives.append(primitive)
+        frames.append(parent)
+        ignoreDepth = 1
     }
 
     private func appendNode(_ node: SVGNode, parser: XMLParser) {
@@ -655,6 +737,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return .image
         case "clippath":
             return .clipPath
+        case "filter":
+            return .filter
         case "g":
             return .group
         case "path":
@@ -688,6 +772,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return "path"
         case .clipPath:
             return "clippath"
+        case .filter:
+            return "filter"
         case .image:
             return "image"
         case .shape(let shapeKind):
@@ -798,6 +884,9 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         if let clipPathFromStyle = parseClipPathStyle(from: attributes["style"]) {
             output["clip-path"] = clipPathFromStyle
         }
+        if let filterFromStyle = parseFilterStyle(from: attributes["style"]) {
+            output["filter"] = filterFromStyle
+        }
         return output
     }
 
@@ -807,6 +896,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         }
         let declarations = styleDeclarationParser.parse(styleText)
         return declarations["clip-path"]
+    }
+
+    private func parseFilterStyle(from styleText: String?) -> String? {
+        guard let styleText else {
+            return nil
+        }
+        let declarations = styleDeclarationParser.parse(styleText)
+        return declarations["filter"]
     }
 
     private func applyStyleAttributes(attributes: [String: String], to style: inout SVGStyle) {
@@ -836,6 +933,9 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         }
         if let strokeDashoffset = attributes["stroke-dashoffset"] {
             style.strokeDashOffset = parseNumeric(strokeDashoffset)
+        }
+        if let filter = attributes["filter"] {
+            style.filter = filter
         }
         if let opacity = attributes["opacity"] {
             style.opacity = parseNumeric(opacity)
@@ -874,6 +974,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             style.strokeLineCap = parseStrokeLineCap(rawValue)
         case "stroke-linejoin":
             style.strokeLineJoin = parseStrokeLineJoin(rawValue)
+        case "filter":
+            style.filter = rawValue
         case "opacity":
                 style.opacity = parseNumeric(rawValue)
             default:
