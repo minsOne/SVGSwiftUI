@@ -20,6 +20,9 @@
 - 입력/옵션:
   - `SVGSource`
   - `SVGParserOptions`
+- 캐시 관찰 API:
+  - `SVGCacheMetrics`
+  - `SVGCacheStats`
 - 오버라이드 계약:
   - `SVGRenderConfiguration`
   - `NodeOverride`

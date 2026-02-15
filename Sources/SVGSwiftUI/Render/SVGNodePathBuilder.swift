@@ -3,17 +3,31 @@ import CoreGraphics
 struct SVGNodePathBuilder: Sendable {
     private let commandBuilder = SVGPathCommandBuilder()
     private let pathDataParser = SVGPathDataParser()
+    private let transformBuilder = SVGTransformBuilder()
 
     init() {}
 
-    func buildPath(for node: SVGNode) -> CGPath? {
+    func buildPath(
+        for node: SVGNode,
+        inheritedTransform: CGAffineTransform = .identity
+    ) -> CGPath? {
         switch node {
         case .group:
             return nil
         case .path(let pathNode):
-            return buildPathPath(pathNode)
+            let path: CGPath = buildPathPath(pathNode)
+            return applyTransform(
+                path,
+                local: pathNode.base.transform,
+                inherited: inheritedTransform
+            )
         case .shape(let shapeNode):
-            return buildShapePath(shapeNode)
+            let path: CGPath = buildShapePath(shapeNode)
+            return applyTransform(
+                path,
+                local: shapeNode.base.transform,
+                inherited: inheritedTransform
+            )
         }
     }
 
@@ -83,5 +97,21 @@ struct SVGNodePathBuilder: Sendable {
             break
         }
         return path
+    }
+
+    private func applyTransform(
+        _ path: CGPath,
+        local: SVGTransform,
+        inherited: CGAffineTransform
+    ) -> CGPath {
+        let combinedTransform: CGAffineTransform = transformBuilder.concatenate(
+            local: local,
+            inherited: inherited
+        )
+        if combinedTransform == .identity {
+            return path
+        }
+        var mutableTransform: CGAffineTransform = combinedTransform
+        return path.copy(using: &mutableTransform) ?? path
     }
 }

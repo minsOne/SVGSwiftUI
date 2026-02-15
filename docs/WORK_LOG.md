@@ -303,3 +303,55 @@
 - Next:
   1. `P7-1` cache 통계 패널 구현
   2. `P6-1` transform 누적/고급 렌더 보강
+
+### Session 14
+- Scope:
+  - `P7-1` Demo cache 통계 패널 구현
+  - cache telemetry API를 공개 표면으로 최소 추가
+- Completed:
+  - 공개 타입 추가:
+    - `SVGCacheMetrics` (`requests/hits/misses/entries/totalCost/hitRate`)
+    - `SVGCacheStats` (`ObservableObject`, read-only metrics)
+  - 내부 cache 계측 추가:
+    - `SVGParseCache`에 hit/miss 카운터와 `metricsSnapshot()` 구현
+  - `SVGView` 확장:
+    - `cacheStats: SVGCacheStats?` 파라미터 추가
+    - load 경로에서 metrics를 갱신해 외부에 전달
+  - Demo UI 반영:
+    - `ContentView`에 cache metrics 패널 추가
+    - requests/hits/misses/hitRate/entries/totalCost 표시
+  - 테스트 보강:
+    - `SVGParseCacheTests`에 metrics snapshot/초기화 테스트 2개 추가
+    - UITest launch 검증에 cache metrics 패널 존재 확인 추가
+  - 시각 회귀 안정화:
+    - baseline 허용오차 `0.50%`로 조정
+- Validation:
+  - `swift test` 통과 (55 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test` 통과 (5 tests, 0 failures)
+- Next:
+  1. `P6-1` transform 누적/고급 렌더 보강
+  2. `P8-1` fixture 확장 및 통합 회귀 보강
+
+### Session 15
+- Scope:
+  - `P6-1` transform 누적 렌더 보강
+  - transform 연산 순서/결합 순서 회귀 테스트 추가
+- Completed:
+  - 신규 내부 유틸 `SVGTransformBuilder` 추가:
+    - `SVGTransform` -> `CGAffineTransform` 변환
+    - local/inherited transform 결합(`local -> inherited`) 구현
+  - `SVGNodePathBuilder` 확장:
+    - `buildPath(for:inheritedTransform:)` 추가
+    - path/shape 생성 후 local + inherited transform 적용
+  - `SVGView` 렌더 경로 보강:
+    - draw node 재귀 빌드 시 부모 transform 누적 전파
+    - 각 노드 렌더에서 inherited transform 반영된 path 생성
+  - 테스트 보강:
+    - `SVGNodePathBuilderTests` 2개 추가(local transform 적용, inherited 누적 적용)
+    - `SVGTransformBuilderTests` 3개 신규(연산 순서, center rotate, 결합 순서)
+- Validation:
+  - `swift test` 통과 (60 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test` 통과 (5 tests, 0 failures)
+- Next:
+  1. `P8-1` 샘플 fixture 확장 및 통합 회귀 테스트 보강
+  2. `P9-1` README/사용 가이드 정리

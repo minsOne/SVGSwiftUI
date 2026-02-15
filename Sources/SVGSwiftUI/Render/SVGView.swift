@@ -9,15 +9,18 @@ public struct SVGView: View {
     private let source: SVGSource
     private let configuration: SVGRenderConfiguration
     private let options: SVGParserOptions
+    private let cacheStats: SVGCacheStats?
 
     public init(
         source: SVGSource,
         options: SVGParserOptions = .init(),
-        configuration: SVGRenderConfiguration = .init()
+        configuration: SVGRenderConfiguration = .init(),
+        cacheStats: SVGCacheStats? = nil
     ) {
         self.source = source
         self.options = options
         self.configuration = configuration
+        self.cacheStats = cacheStats
     }
 
     public var body: some View {
@@ -26,7 +29,8 @@ public struct SVGView: View {
             parser: Self.parser,
             cache: Self.parseCache,
             options: options,
-            configuration: configuration
+            configuration: configuration,
+            cacheStats: cacheStats
         )
     }
 }
@@ -42,19 +46,25 @@ private struct SVGStaticPlaceholderView: View {
     let cache: SVGParseCache
     let options: SVGParserOptions
     let configuration: SVGRenderConfiguration
+    let cacheStats: SVGCacheStats?
 
     @State private var parsingFailed = false
     @State private var document: SVGDocument?
 
     private let styleResolver = SVGStyleResolver()
     private let nodePathBuilder = SVGNodePathBuilder()
+    private let transformBuilder = SVGTransformBuilder()
 
     private var drawNodes: [SVGDrawNode] {
         guard let document else {
             return []
         }
         let resolved = styleResolver.resolve(document: document, configuration: configuration)
-        return buildDrawNodes(from: document.nodes, resolved: resolved)
+        return buildDrawNodes(
+            from: document.nodes,
+            resolved: resolved,
+            inheritedTransform: .identity
+        )
     }
 
     var body: some View {
@@ -96,6 +106,7 @@ private struct SVGStaticPlaceholderView: View {
             if let cached = await cache.document(for: key) {
                 document = cached
                 parsingFailed = false
+                await refreshCacheMetrics()
                 return
             }
 
@@ -103,33 +114,67 @@ private struct SVGStaticPlaceholderView: View {
             await cache.insert(parsed, for: key, cost: data.count)
             document = parsed
             parsingFailed = false
+            await refreshCacheMetrics()
         } catch {
             parsingFailed = true
             document = nil
+            await refreshCacheMetrics()
         }
+    }
+
+    @MainActor
+    private func refreshCacheMetrics() async {
+        guard let cacheStats else {
+            return
+        }
+        let metrics = await cache.metricsSnapshot()
+        cacheStats.update(metrics)
     }
 
     private func buildDrawNodes(
         from nodes: [SVGNode],
-        resolved: [String: SVGResolvedNodeStyle]
+        resolved: [String: SVGResolvedNodeStyle],
+        inheritedTransform: CGAffineTransform
     ) -> [SVGDrawNode] {
         var output: [SVGDrawNode] = []
         for node in nodes {
-            if let built = makeDrawNode(for: node, resolved: resolved[node.nodeID]) {
+            let nodeTransform: CGAffineTransform = transformBuilder.concatenate(
+                local: node.base.transform,
+                inherited: inheritedTransform
+            )
+
+            if let built = makeDrawNode(
+                for: node,
+                resolved: resolved[node.nodeID],
+                inheritedTransform: inheritedTransform
+            ) {
                 output.append(built)
             }
             if !node.children.isEmpty {
-                output.append(contentsOf: buildDrawNodes(from: node.children, resolved: resolved))
+                output.append(
+                    contentsOf: buildDrawNodes(
+                        from: node.children,
+                        resolved: resolved,
+                        inheritedTransform: nodeTransform
+                    )
+                )
             }
         }
         return output
     }
 
-    private func makeDrawNode(for node: SVGNode, resolved: SVGResolvedNodeStyle?) -> SVGDrawNode? {
+    private func makeDrawNode(
+        for node: SVGNode,
+        resolved: SVGResolvedNodeStyle?,
+        inheritedTransform: CGAffineTransform
+    ) -> SVGDrawNode? {
         guard let resolved else {
             return nil
         }
-        guard var cgPath = nodePathBuilder.buildPath(for: node) else {
+        guard var cgPath = nodePathBuilder.buildPath(
+            for: node,
+            inheritedTransform: inheritedTransform
+        ) else {
             return nil
         }
         cgPath = applyGeometryOverrides(cgPath, scale: resolved.scale, offset: resolved.offset)

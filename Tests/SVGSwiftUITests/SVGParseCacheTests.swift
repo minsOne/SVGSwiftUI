@@ -127,4 +127,38 @@ final class SVGParseCacheTests: XCTestCase {
         XCTAssertNil(a)
         XCTAssertNil(b)
     }
+
+    func testCacheMetricsSnapshotTracksHitAndMiss() async throws {
+        let cache = SVGParseCache(maxCost: 100, maxEntries: 5)
+        let hitKey = SVGParseCacheKey(sourceHash: "hit", options: .init())
+        let missKey = SVGParseCacheKey(sourceHash: "miss", options: .init())
+        await cache.insert(.init(nodes: []), for: hitKey, cost: 8)
+
+        _ = await cache.document(for: hitKey)
+        _ = await cache.document(for: missKey)
+        let metrics = await cache.metricsSnapshot()
+
+        XCTAssertEqual(metrics.requests, 2)
+        XCTAssertEqual(metrics.hits, 1)
+        XCTAssertEqual(metrics.misses, 1)
+        XCTAssertEqual(metrics.entries, 1)
+        XCTAssertEqual(metrics.totalCost, 8)
+    }
+
+    func testCacheMetricsAreResetByRemoveAll() async throws {
+        let cache = SVGParseCache(maxCost: 100, maxEntries: 5)
+        let key = SVGParseCacheKey(sourceHash: "a", options: .init())
+        await cache.insert(.init(nodes: []), for: key, cost: 8)
+        _ = await cache.document(for: key)
+        _ = await cache.document(for: SVGParseCacheKey(sourceHash: "b", options: .init()))
+
+        await cache.removeAll()
+        let metrics = await cache.metricsSnapshot()
+
+        XCTAssertEqual(metrics.requests, 0)
+        XCTAssertEqual(metrics.hits, 0)
+        XCTAssertEqual(metrics.misses, 0)
+        XCTAssertEqual(metrics.entries, 0)
+        XCTAssertEqual(metrics.totalCost, 0)
+    }
 }

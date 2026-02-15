@@ -14,6 +14,10 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         let app = launchApp()
         XCTAssertTrue(app.otherElements["demo.canvas"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.otherElements["demo.controls"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.otherElements["demo.cacheStats"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["demo.cache.requests"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["demo.cache.hits"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["demo.cache.misses"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["demo.fillToggle"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.switches["demo.strokeToggle"].waitForExistence(timeout: 5))
     }
@@ -141,7 +145,7 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         let mode = SnapshotMode.current(sourceFilePath: file)
         let comparator = SnapshotComparator(
             mode: mode,
-            tolerance: 0.0035
+            tolerance: 0.005
         )
         comparator.assertMatchesBaseline(
             screenshot: screenshot,

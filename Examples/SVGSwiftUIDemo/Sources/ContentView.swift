@@ -1,9 +1,11 @@
+import Foundation
 import SVGSwiftUI
 import SwiftUI
 
 struct ContentView: View {
     private let samples = DemoSamples.all
 
+    @StateObject private var cacheStats = SVGCacheStats()
     @State private var selectedIndex = 0
     @State private var targetNodeID = DemoSamples.all.first?.defaultNodeID ?? ""
     @State private var fillEnabled = true
@@ -92,7 +94,8 @@ struct ContentView: View {
 
             SVGView(
                 source: .string(selectedSample.svg),
-                configuration: renderConfiguration
+                configuration: renderConfiguration,
+                cacheStats: cacheStats
             )
             .frame(height: 300)
             .background(Color(white: 0.97))
@@ -148,9 +151,75 @@ struct ContentView: View {
                 Slider(value: $offsetY, in: -60...60, step: 1)
                     .accessibilityIdentifier("demo.offsetYSlider")
             }
+
+            cacheStatsSection
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("demo.controls")
+    }
+
+    private var cacheStatsSection: some View {
+        let metrics = cacheStats.metrics
+        let hitRatePercent = metrics.hitRate * 100.0
+        let hitRateText = String(format: "%.2f%%", hitRatePercent)
+        let totalCostValue = Int64(metrics.totalCost)
+        let totalCostText = ByteCountFormatter.string(
+            fromByteCount: totalCostValue,
+            countStyle: .memory
+        )
+
+        return VStack(alignment: .leading, spacing: 6) {
+            Text("Cache Metrics")
+                .font(.headline)
+
+            metricRow(
+                label: "Requests",
+                value: "\(metrics.requests)",
+                valueIdentifier: "demo.cache.requests"
+            )
+            metricRow(
+                label: "Hits",
+                value: "\(metrics.hits)",
+                valueIdentifier: "demo.cache.hits"
+            )
+            metricRow(
+                label: "Misses",
+                value: "\(metrics.misses)",
+                valueIdentifier: "demo.cache.misses"
+            )
+            metricRow(
+                label: "Hit Rate",
+                value: hitRateText,
+                valueIdentifier: "demo.cache.hitRate"
+            )
+            metricRow(
+                label: "Entries",
+                value: "\(metrics.entries)",
+                valueIdentifier: "demo.cache.entries"
+            )
+            metricRow(
+                label: "Total Cost",
+                value: totalCostText,
+                valueIdentifier: "demo.cache.cost"
+            )
+        }
+        .padding(12)
+        .background(Color(white: 0.95))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("demo.cacheStats")
+    }
+
+    private func metricRow(label: String, value: String, valueIdentifier: String) -> some View {
+        HStack {
+            Text(label)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+                .font(.system(.body, design: .monospaced))
+                .accessibilityIdentifier(valueIdentifier)
+        }
+        .font(.caption)
     }
 }
 

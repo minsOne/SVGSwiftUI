@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (Baseline snapshots + visual regression checks)
+Last Updated: 2026-02-15 (Transform 누적 렌더 적용 + 회귀 테스트 통과)
 
 ## Status Legend
 - `todo`: not started
@@ -21,11 +21,11 @@ Last Updated: 2026-02-15 (Baseline snapshots + visual regression checks)
 | P3-1 | P3 | 도형 요소 파싱/Path 변환 | done | `SVGNodePathBuilder`로 rect/circle/ellipse/line/polyline/polygon -> `CGPath` 변환 완료 |
 | P4-1 | P4 | 스타일 상속 + override 우선순위 구현 | done | `SVGStyleResolver` 엔진 구현 및 `SVGView` 연동 완료 |
 | P5-1 | P5 | AST LRU 캐시 구현/테스트 | done | actor LRU + schemaVersion 포함 cache key + `SVGView` 연동 완료 |
-| P6-1 | P6 | SwiftUI 렌더러 구현 | in_progress | Canvas 렌더/스타일 적용 완료, transform 누적/고급 렌더 보강 필요 |
-| P7-1 | P7 | Demo 앱 UI(노드 제어/캐시 통계) | in_progress | 노드 제어 UI 완료, cache 통계 패널 미구현 |
+| P6-1 | P6 | SwiftUI 렌더러 구현 | done | Canvas 렌더/스타일 적용 + node/group transform 누적 적용 완료 |
+| P7-1 | P7 | Demo 앱 UI(노드 제어/캐시 통계) | done | `SVGCacheMetrics/SVGCacheStats` 추가 + Demo cache 통계 패널/UITest 반영 |
 | P7-2 | P7 | Demo UITest 타깃 구성 | done | UITest 5개(시각 회귀 포함) 작성 및 `xcodebuild test` 통과 |
 | P7-3 | P7 | 기준 이미지(snapshot baseline) 수집 | done | `UITests/Baselines/iPhone_17/26.2/*.png` 생성 및 저장 |
-| P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | parser/cache/path/style/view 지원 로직 테스트 53개 통과 |
+| P8-1 | P8 | 테스트 확장/회귀 fixture | in_progress | parser/cache/path/style/view/transform 지원 로직 테스트 60개 통과 |
 | P8-2 | P8 | UITest 결과 비교(시각 회귀) | done | `testCanvasMatchesBaselines` + diff artifact 출력 + 허용오차 비교 구현 |
 | P9-1 | P9 | README/가이드 문서 | todo | 미시작 |
 | P9-2 | P9 | 공개 API 캡슐화 정책 수립/적용 | done | 내부 엔진(parser/model/cache/render helper) `internal` 전환 + 정책 문서화 |

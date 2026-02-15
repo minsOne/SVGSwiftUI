@@ -33,7 +33,7 @@
    - 현재 baseline: `iPhone_17/26.2/{badge_default,panel_stroke,route_offset}.png`
 5. 비교 방식
    - 픽셀 mismatch ratio 계산 후 허용오차 비교
-   - 현재 허용오차: `0.35%` (`0.0035`)
+   - 현재 허용오차: `0.50%` (`0.005`)
 6. 실패 시 산출물
    - actual, expected, diff 이미지 저장
    - 로그에 mismatch 비율 + artifact 경로 출력

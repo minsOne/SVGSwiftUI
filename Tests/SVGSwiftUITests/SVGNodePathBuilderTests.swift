@@ -69,6 +69,45 @@ final class SVGNodePathBuilderTests: XCTestCase {
         let node = SVGNode.group(.init(base: .init(id: "g", syntheticID: "auto:/0/0"), children: []))
         XCTAssertNil(builder.buildPath(for: node))
     }
+
+    func testBuildPathAppliesLocalTransform() {
+        let node = SVGNode.shape(
+            .init(
+                base: .init(
+                    id: "rect",
+                    syntheticID: "auto:/0/0",
+                    transform: .init(operations: [
+                        .translate(tx: 3, ty: 4),
+                    ])
+                ),
+                kind: .rect,
+                values: ["x": 1, "y": 2, "width": 4, "height": 5]
+            )
+        )
+
+        let path = builder.buildPath(for: node)
+        XCTAssertEqual(path?.boundingBoxOfPath, CGRect(x: 4, y: 6, width: 4, height: 5))
+    }
+
+    func testBuildPathAppliesInheritedTransformAfterLocalTransform() {
+        let node = SVGNode.shape(
+            .init(
+                base: .init(
+                    id: "rect",
+                    syntheticID: "auto:/0/0",
+                    transform: .init(operations: [
+                        .translate(tx: 2, ty: 0),
+                    ])
+                ),
+                kind: .rect,
+                values: ["x": 1, "y": 1, "width": 2, "height": 3]
+            )
+        )
+        let inherited: CGAffineTransform = CGAffineTransform(scaleX: 2.0, y: 2.0)
+
+        let path = builder.buildPath(for: node, inheritedTransform: inherited)
+        XCTAssertEqual(path?.boundingBoxOfPath, CGRect(x: 6, y: 2, width: 4, height: 6))
+    }
 }
 
 private extension CGPath {

@@ -41,6 +41,8 @@ actor SVGParseCache {
     private let maxCost: Int
     private let maxEntries: Int
     private var totalCost: Int = 0
+    private var hitCount: Int = 0
+    private var missCount: Int = 0
 
     init(maxCost: Int = 10_000_000, maxEntries: Int = 256) {
         self.maxCost = maxCost
@@ -49,8 +51,10 @@ actor SVGParseCache {
 
     func document(for key: SVGParseCacheKey) -> SVGDocument? {
         guard let entry = entries[key] else {
+            missCount += 1
             return nil
         }
+        hitCount += 1
         touch(key)
         return entry.document
     }
@@ -70,6 +74,8 @@ actor SVGParseCache {
         entries.removeAll()
         order.removeAll()
         totalCost = 0
+        hitCount = 0
+        missCount = 0
     }
 
     var count: Int {
@@ -78,6 +84,17 @@ actor SVGParseCache {
 
     var currentCost: Int {
         totalCost
+    }
+
+    func metricsSnapshot() -> SVGCacheMetrics {
+        let requests = hitCount + missCount
+        return SVGCacheMetrics(
+            requests: requests,
+            hits: hitCount,
+            misses: missCount,
+            entries: entries.count,
+            totalCost: totalCost
+        )
     }
 
     private func touch(_ key: SVGParseCacheKey) {

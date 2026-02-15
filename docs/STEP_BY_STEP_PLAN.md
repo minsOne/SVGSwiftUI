@@ -49,6 +49,7 @@
   - `SVGView`
   - `SVGSource`: `.string`, `.data`, `.fileURL`
   - `SVGParserOptions`
+  - `SVGCacheMetrics`, `SVGCacheStats`
   - `SVGRenderConfiguration`: `idOverrides`, `resolver`
   - `NodeOverrideMap`: `[String: NodeOverride]`
   - `NodeStyleResolver`: `(NodeContext) -> NodeOverride?`

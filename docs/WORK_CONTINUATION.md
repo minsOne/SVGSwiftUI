@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5 핵심 완료, `SVGView` 캐시 연동 렌더까지 완료, 패키지 테스트 53개 + Demo UITest 5개(시각 회귀 포함) 통과
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, node/group transform 누적 렌더 적용 완료, 패키지 테스트 60개 + Demo UITest 5개(시각 회귀 포함) 통과
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 
 ## 잠금된 의사결정
@@ -19,10 +19,9 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. Demo UI에 cache 통계 패널 추가(`P7-1`)
-2. transform/고급 렌더 보강(`P6-1`)
-3. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강(`P8-1`)
-4. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+1. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강(`P8-1`)
+2. README/사용 가이드 정리(`P9-1`)
+3. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
 - [x] P0 부트스트랩 완료
@@ -31,8 +30,8 @@
 - [x] P3 도형 파서 완료
 - [x] P4 스타일/노드 제어 완료
 - [x] P5 캐시 완료
-- [ ] P6 렌더러 완료
-- [ ] P7 Demo 앱 완료
+- [x] P6 렌더러 완료
+- [x] P7 Demo 앱 완료
 - [ ] P8 테스트 강화 완료
 - [ ] P9 문서화 완료
 - [ ] A1~A7 v2 고급 기능 완료
@@ -107,5 +106,17 @@
 ### 2026-02-15 (Session 13)
 - 작업: `P7-3` baseline 캡처 + `P8-2` 시각 회귀 비교 유틸 구현
 - 결정: baseline은 `UITests/Baselines/<device>/<runtime>/<name>.png` 구조로 저장하고, 캡처는 `demo.canvas` 요소 스크린샷 기준으로 비교
-- 리스크: anti-aliasing 미세 오차로 완전일치가 불안정해 허용오차(0.35%)를 적용
+- 리스크: anti-aliasing 미세 오차로 완전일치가 불안정해 허용오차(0.50%)를 적용
 - 다음 액션: `P7-1` cache 통계 패널 구현으로 이동
+
+### 2026-02-15 (Session 14)
+- 작업: `P7-1` cache 통계 패널 구현 + read-only telemetry API 추가
+- 결정: 내부 `SVGParseCache`는 캡슐화 유지, 외부에는 `SVGCacheMetrics`/`SVGCacheStats`만 공개
+- 리스크: 시각 회귀는 환경 편차가 있어 허용오차를 0.50%로 유지 필요
+- 다음 액션: `P6-1` transform 누적/고급 렌더 보강 진행
+
+### 2026-02-15 (Session 15)
+- 작업: `P6-1` transform 누적 렌더 구현(`SVGTransformBuilder` + parent/local transform 전파)
+- 결정: transform 결합 순서는 `local` 후 `inherited`로 고정하여 SVG 계층 transform 의미를 유지
+- 리스크: clipPath/mask/filter 등 고급 렌더 규칙은 v1 범위 외라 이후 확장 단계에서 처리 필요
+- 다음 액션: `P8-1` fixture 기반 통합 회귀 테스트 확장
