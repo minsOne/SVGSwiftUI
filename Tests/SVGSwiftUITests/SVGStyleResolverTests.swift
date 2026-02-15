@@ -130,6 +130,141 @@ final class SVGStyleResolverTests: XCTestCase {
         XCTAssertEqual(resolved["path"]?.style.fill, red)
     }
 
+    func testStyleRulesApplyBySelectorAndInheritFromParent() {
+        let groupBase = SVGBaseNode(
+            id: "group",
+            syntheticID: "auto:/0/0",
+            style: .init(),
+            attributes: ["class": "bg"]
+        )
+        let childBase = SVGBaseNode(id: "child", syntheticID: "auto:/0/0/0")
+        let document = SVGDocument(
+            nodes: [
+                .group(.init(
+                    base: groupBase,
+                    children: [.path(.init(base: childBase, pathData: "M0 0"))]
+                )),
+            ],
+            styleRules: [
+                SVGStyleRule(selector: .id("group"), declarations: ["fill": "blue"]),
+                SVGStyleRule(selector: .class("bg"), declarations: ["stroke": "#00ff00"]),
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let group = tryUnwrap(resolved["group"])
+        let child = tryUnwrap(resolved["child"])
+
+        XCTAssertEqual(group.style.fill, SVGPaint.color(.init(red: 0, green: 0, blue: 1, alpha: 1)))
+        XCTAssertEqual(group.style.stroke, SVGPaint.color(.init(red: 0, green: 1, blue: 0, alpha: 1)))
+        XCTAssertEqual(child.style.fill, SVGPaint.color(.init(red: 0, green: 0, blue: 1, alpha: 1)))
+    }
+
+    func testStyleRulesSpecificityAndSourceOrderAreRespected() {
+        let pathBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            attributes: ["class": "highlight"]
+        )
+        let document = SVGDocument(
+            nodes: [.path(.init(base: pathBase, pathData: "M0 0"))],
+            styleRules: [
+                SVGStyleRule(selector: .class("highlight"), declarations: ["fill": "red"]),
+                SVGStyleRule(selector: .element("path"), declarations: ["fill": "blue"]),
+                SVGStyleRule(selector: .id("target"), declarations: ["fill": "green"]),
+                SVGStyleRule(selector: .class("highlight"), declarations: ["fill": "#ffffff"]),
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["target"])
+
+        XCTAssertEqual(node.style.fill, SVGPaint.color(.init(red: 0, green: 1, blue: 0, alpha: 1)))
+    }
+
+    func testStyleRulesWithSameSpecificityUseSourceOrder() {
+        let pathBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            attributes: ["class": "highlight"]
+        )
+        let document = SVGDocument(
+            nodes: [.path(.init(base: pathBase, pathData: "M0 0"))],
+            styleRules: [
+                SVGStyleRule(selector: .class("highlight"), declarations: ["fill": "red"]),
+                SVGStyleRule(selector: .class("highlight"), declarations: ["fill": "#ffffff"]),
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["target"])
+        XCTAssertEqual(node.style.fill, SVGPaint.color(.init(red: 1, green: 1, blue: 1, alpha: 1)))
+    }
+
+    func testNodeStyleOverridesStylesheetRules() {
+        let pathBase = SVGBaseNode(
+            id: "styled-path",
+            syntheticID: "auto:/0/0",
+            style: .init(fill: SVGPaint.color(.init(red: 1, green: 0, blue: 0, alpha: 1)))
+        )
+        let document = SVGDocument(
+            nodes: [.path(.init(base: pathBase, pathData: "M0 0"))],
+            styleRules: [SVGStyleRule(selector: .any, declarations: ["fill": "#00ff00"])]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["styled-path"])
+        XCTAssertEqual(node.style.fill, SVGPaint.color(.init(red: 1, green: 0, blue: 0, alpha: 1)))
+    }
+
+    func testAppliesStrokeCapJoinStyleDeclarations() {
+        let pathBase = SVGBaseNode(id: "styled-path", syntheticID: "auto:/0/0")
+        let document = SVGDocument(
+            nodes: [.path(.init(base: pathBase, pathData: "M0 0"))],
+            styleRules: [
+                SVGStyleRule(
+                    selector: .id("styled-path"),
+                    declarations: [
+                        "stroke-linecap": "square",
+                        "stroke-linejoin": "round",
+                    ]
+                ),
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["styled-path"])
+
+        XCTAssertEqual(node.style.strokeLineCap, .square)
+        XCTAssertEqual(node.style.strokeLineJoin, .round)
+    }
+
+    func testAppliesFillRuleAndDashStylesInResolver() {
+        let pathBase = SVGBaseNode(id: "styled-path", syntheticID: "auto:/0/0")
+        let document = SVGDocument(
+            nodes: [.path(.init(base: pathBase, pathData: "M0 0"))],
+            styleRules: [
+                SVGStyleRule(
+                    selector: .id("styled-path"),
+                    declarations: [
+                        "fill-rule": "evenodd",
+                        "stroke-miterlimit": "7",
+                        "stroke-dasharray": "2 4 6",
+                        "stroke-dashoffset": "1",
+                    ]
+                ),
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["styled-path"])
+
+        XCTAssertEqual(node.style.fillRule, .evenOdd)
+        XCTAssertEqual(node.style.strokeMiterLimit, 7)
+        XCTAssertEqual(node.style.strokeDashArray, [2, 4, 6])
+        XCTAssertEqual(node.style.strokeDashOffset, 1)
+    }
+
     private func tryUnwrap(_ value: SVGResolvedNodeStyle?) -> SVGResolvedNodeStyle {
         guard let value else {
             XCTFail("Expected resolved node")

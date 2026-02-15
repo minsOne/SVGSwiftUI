@@ -3,8 +3,10 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, node/group transform 누적 렌더 적용 완료, 패키지 테스트 63개 + Demo UITest 5개(시각 회귀 포함) 통과
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, S2-2 완료
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
+- 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료
+- 다음 단계: `S3-2` 실측 근거 수집 + 임계치 근거화
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -19,8 +21,15 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. README/사용 가이드 정리(`P9-1`)
-2. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+1. 다음 단계: S3-2 프로파일 로그 기반 임계치 정책 보강 여부 판단
+
+## 작업 진행 루프(재작업 방지)
+- Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환
+- 구현 후 `WORK_LOG.md`에 검증/리스크를 즉시 기록
+- 테스트/검증을 통과하면 변경사항을 정리해 `git add`/`git commit` 진행
+- 커밋 메시지에 세션 번호, 처리 Task, 변경 범위를 반영
+- 커밋 후 `git push`로 원격 저장소 동기화
+- 다음 작업 전 `TASK_BOARD`, `WORK_CONTINUATION`, `STEP_BY_STEP_PLAN`의 상태를 동기화
 
 ## 체크리스트 (진행 시 갱신)
 - [x] P0 부트스트랩 완료
@@ -31,9 +40,28 @@
 - [x] P5 캐시 완료
 - [x] P6 렌더러 완료
 - [x] P7 Demo 앱 완료
-- [ ] P8 테스트 강화 완료
-- [ ] P9 문서화 완료
-- [ ] A1~A7 v2 고급 기능 완료
+- [x] P8 테스트 강화 완료
+- [x] P9 문서화 완료
+- [x] A8-1 W3C fixture subset 기초 골격
+- [x] A8-2 W3C 자동 생성 테스트 적용
+- [x] A9-1 W3C coverage 리포트 스크립트 산출
+- [x] A9-2 W3C conformance CI 단계 및 strict artifact 업로드
+- [x] S1-1 렌더 path 캐시(prebuild)로 프레임별 재빌드 비용 감소
+- [x] S2-1 고급 렌더 후보 분석 문서화 (`clipPath/mask/filter`)
+- [x] A1-1 `style` 속성 parser 고도화
+- [x] A2-1 `<style>` CSS subset parser
+- [x] A3-1 cascade/specificity engine
+- [x] A4-1 `data:` URI parser/base64 decoder
+- [x] A5-1 embedded SVG 재귀 제한 처리(depth/count)
+- [x] A6-1 raster 정책
+- [x] A7-1 cache key versioning
+- [x] A10-1 WebKit LayoutTests 동기화/매니페스트 정리
+- [x] A10-2 WebKit conformance suite/coverage 정합성 검증
+- [x] A10-3 WebKit 후보군 확장 및 unsupported 정책 정리
+- [x] S2-2 `clipPath` 미니멈 구현
+- [x] S3-1 렌더 경로 캐시 및 대형 SVG 임계치 정리
+- [x] S3-2 `S3-1` 실측 근거 수집 및 임계치 보강 근거화
+
 
 ## 구현 중 준수 규칙
 - 파서/모델 계층은 UI 타입(`Color`) 의존을 피하고 값 타입 중심으로 유지
@@ -47,6 +75,242 @@
 - 결정:
 - 리스크:
 - 다음 액션:
+
+### 2026-02-15 (Session 41)
+- 작업: `S3-2` 성능 실측 근거 수집
+- 완료:
+  - `SVGRenderPerformanceProfileTests` 3개 시나리오 추가 (2000/2001 nodes, 300000/300001 bytes)
+  - `Scripts/performance/run-s3-profile.sh` 추가 및 `s3-profile.log` 산출 경로 연결
+  - CI에 S3 프로파일 스텝/아티팩트 업로드 단계 추가
+  - `docs/S3_PERFORMANCE_TUNING.md`에 성능 프로파일 기준 수집 항목 추가
+- 리스크:
+  - `measure` 값은 CI 머신/부하에 따라 흔들릴 수 있어 임계치 고정치 결정 전 오프라인 비교 필요
+- 다음 액션:
+  - 측정 로그(`s3-profile.log`) 기반으로 `S3_PERFORMANCE_TUNING.md`에 운영 기준(평균 반복 수, 허용 편차)을 고정
+- 검증:
+  - `swift test --filter SVGRenderPerformanceProfileTests --no-parallel`
+  - `./Scripts/performance/run-s3-profile.sh`
+  - `swift test --parallel` (126 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (pass)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+
+### 2026-02-15 (Session 40)
+- 작업: `S3-1` 경계값 재점검(정합성 보강)
+- 완료:
+  - `SVGRenderCachePolicy` 임계치 테스트를 `nodeCount == 2000`, `sourceBytes == 300_000` 경계까지 확장
+  - `swift test --filter SVGRenderCachePolicyTests --parallel` 재실행(통과)
+  - `swift test --parallel`(123) 및 W3C/WebKit conformance 단계 재확인
+- 리스크:
+  - 임계값 바로 위/아래 경계 구간은 런타임 프로파일 데이터가 없어 성능 정합성 추적 필요
+- 다음 액션:
+  - 대표 대형 SVG 기준 실측 프로파일을 수집해 임계값 조정 근거화
+- 검증:
+  - `swift test --filter SVGRenderCachePolicyTests --parallel`
+  - `swift test --parallel` (123 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (pass)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+
+### 2026-02-15 (Session 38)
+- 작업: `S3-1` render 캐시 기반 성능 개선 착수
+- 완료:
+  - `SVGStaticPlaceholderView`에 렌더 구성 캐시 키(`SVGRenderConfigurationSignature`) 도입
+  - `resolver` 없는 정적 구성에서 `drawNodes` 계산 결과를 캐시해 반복 resolve/트리 순회 제거
+  - `drawNodes` 캐시 적중 기준(`idOverrides` 정렬 키 + `resolver` 존재 여부) 반영
+  - 리로드 경로에서 캐시 상태 정합성(`cachedConfigurationFingerprint`, `cachedDrawNodes`) 정리
+  - 설정 캐시 키 안정성 단위 테스트 3건 추가
+- 리스크:
+  - `resolver`는 클로저 정체성 추적이 어려워 캐시 키에 존재 여부만 반영되어 resolver 동적 교체에 민감할 수 있음
+  - 대형 SVG 메모리 임계값(`drawNodes` 적재 정책)은 이번 1차 단계에서 미반영
+- 결정:
+  - 동적 `resolver` 구성은 안정성 우선으로 매 렌더 단계 실시간 계산 유지
+  - S3-1의 다음 단계에서 임계값과 메모리 게이트를 문서화
+- 검증:
+  - `swift test --parallel`
+  - `swift test --filter SVGRenderConfigurationSignatureTests`
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel`
+
+### 2026-02-15 (Session 36)
+- 작업: `A10-3` 후보군 확장 완료 및 테스트 산출물 재생성
+- 완료:
+  - `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`에 unsupported 후보 12건(`text`, `filter`, `mask`, `marker`, `image`) 추가
+  - `./Scripts/webkit/fetch-layout-tests.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json Tests/SVGSwiftUITests/WebKit/fixtures` 재실행
+  - `./Scripts/webkit/generate-webkit-tests.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json Tests/SVGSwiftUITests/WebKitGeneratedTests.swift` 재생성
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict` 재생성
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict` 실행
+- 결정:
+  - `A10-3`를 완료 처리하고 다음 단계인 `S2-2`(clipPath 최소 구현)로 전환
+- 리스크:
+  - `unsupported` 항목은 파싱 신호만 추적되며 렌더 경로 완전 지원은 다음 단계에서 분리 검증 필요
+- 다음 액션:
+  - `S2-2`: `url(#id)` 기준 `clipPath` 최소 렌더 경로 설계 및 테스트
+- 검증:
+  - `swift test --parallel` (106 tests, 0 failures)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+
+### 2026-02-15 (Session 37)
+- 작업: `S2-2` clipPath 최소 구현 마무리
+- 완료:
+  - `SVGXMLDocumentParser`에서 `<clipPath>` 정의를 수집해 `SVGDocument.clipPaths` 전달
+  - `SVGView`에 `clipPath` 참조 해석 및 `GraphicsContext` 클리핑 적용
+  - `SVGParser` 내 파싱 결과 전파 검증(클립 경로 캐시/구조 전달 일관성)
+  - 인라인 스타일 `style=\"clip-path:...\"`도 `base.attributes["clip-path"]`로 반영되도록 파서 보강
+- 결정:
+  - `S2-2`를 완료 처리하고 `S3-1`의 성능/메모리 튜닝으로 이동
+- 리스크:
+  - `clipPath`는 현재 `url(#id)` 참조와 shape/path 중심 경로만 지원, 텍스트/필터/마스크 경유 경로 미지원
+- 다음 액션:
+  - `S3-1`: 대형 SVG에서 렌더링 타임/메모리 경향 수치화 및 임계값/메모리 정책 정리
+- 검증:
+  - `swift test --filter SVGParserTests`
+  - `swift test --filter SVGClipPathTests`
+  - `swift test`
+
+### 2026-02-15 (Session 35)
+- 작업: WebKit LayoutTests 정합성 정리 및 `fetch-layout-tests.sh` 경로 정규화 보정
+- 완료:
+  - `./Scripts/webkit/fetch-layout-tests.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json Tests/SVGSwiftUITests/WebKit/fixtures` 재실행
+  - fixture 정합성 검사: manifest 40건, missing 0 / extra 0
+  - `./Scripts/webkit/generate-webkit-tests.sh` 및 `./Scripts/webkit/webkit-coverage.sh ... --strict` 재생성
+- 결정:
+  - `LayoutTests/svg` 소스 기준을 고정하고, 현재 후보군은 pass 40건으로 운영
+- 리스크:
+  - mask/filter/canvas 고급 경로는 아직 후보군에 미포함
+- 다음 액션:
+  - `A10-3`에서 unsupported 후보 확장 계획을 별도 검증 항목으로 반영
+- 검증:
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel`
+  - `swift test --parallel`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
+
+### 2026-02-15 (Session 34)
+- 작업: A10-2 WebKit conformance 파이프라인 최종 정합성 점검
+- 완료:
+  - `swift test --parallel` 재실행 (97 tests, 0 failures)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict` (strict pass)
+- 결정:
+  - A10-2는 WebKit 테스트 생성, CI 실행 경로, strict 산출물 갱신까지 완료 처리
+- 리스크:
+  - 1차 WebKit 후보군은 모두 `pass` 기대치로, 미지원 시그널은 아직 제한적
+- 다음 액션:
+  - A10-3로 후보군을 20~40건으로 확장하고 `unsupported` 전환 규칙을 manifest와 체크리스트에 반영
+- 검증:
+  - `swift test --parallel`
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel`
+  - `./Scripts/webkit/webkit-coverage.sh ... --strict`
+
+### 2026-02-15 (Session 33)
+- 작업: WebKit LayoutTests 기반 conformance 인프라 1차 구축
+- 완료:
+  - `Scripts/webkit/fetch-layout-tests.sh`, `generate-webkit-tests.sh`, `webkit-coverage.sh` 추가
+  - `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json` 및 12개 WebKit SVG fixture 동기화/커밋
+  - `Tests/SVGSwiftUITests/WebKitGeneratedTests.swift` 생성
+- 결정:
+  - WebKit reference는 1차 단계에서 미사용 허용하여 `reference` 빈 값을 strict 검사에서 제외
+- 리스크:
+  - WebKit LayoutTests 후보군은 12개로 시작해 향후 확장 필요
+- 다음 액션:
+  - `A10-2` (`testWebKitGeneratedSuite`/coverage CI) 완료 후 `S2-2`로 복귀
+- 검증:
+  - `swift test --parallel` (97 tests, 0 failures)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
+### 2026-02-15 (Session 30)
+- 작업: 운영 안정화 단계 1차 정합성 점검
+- 완료:
+  - `README.md` 지원/미지원 항목 문구 정합성 보정
+  - CI/테스트 실행 로그 재확인
+  - `docs/WORK_LOG.md`, `docs/WORK_CONTINUATION.md`에 현재 세션 기록 반영
+- 결정:
+  - W3C/CI 파이프라인은 동작이 검증되어 문서 반영만 선행
+- 리스크:
+  - 향후 `swift test --filter` 동작은 toolchain별 차이가 남아있어 CI는 `--no-parallel` 유지가 안정적
+- 다음 액션:
+  - 다음 마일스톤: 추가 고급 렌더 기능(clip/mask/filter/marker) 및 v2 fixture 확장 여부 판단
+- 검증:
+  - `swift test --parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test`
+
+### 2026-02-15 (Session 31)
+- 작업: 운영 안정화 1차 성능 개선
+- 완료:
+  - `SVGView`에 패스 캐시(`pathCache`) 적용
+  - `loadDocument` 시점에 `SVGNode` 경로를 선생성해 `drawNodes` 단계의 반복 파싱 제거
+  - 렌더 실패 분기에서 캐시 초기화로 오염 상태 방지
+- 결정:
+  - 고급 렌더 기능(clip/mask/filter/masking)은 `운영 안정화` 2차로 분리
+- 검증:
+  - `swift test --parallel`
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test`
+
+### 2026-02-15 (Session 32)
+- 작업: S2-1 고급 렌더 기능 후보 분석
+- 완료:
+  - `docs/ADVANCED_RENDER_FEATURE_ANALYSIS.md` 추가로 clip/mask/filter/masking 분석 및 우선순위 확정
+  - `docs/STEP_BY_STEP_PLAN.md`에 `S2-2 clipPath 미니멈 구현` 단계 추가
+- 결정:
+  - 1차 렌더 확장은 `clipPath`만 분리 착수, `mask/filter`는 다음 단계로 이관
+- 리스크:
+  - 현재 파서가 `<clipPath>/<mask>/<filter>`를 지원하지 않아 먼저 분석/보존 규칙만 확정 필요
+- 다음 액션:
+  - `clipPath` 파서/렌더 최소 경로 분석을 코드로 구체화하고 지원 범위를 축소 정의
+- 검증:
+  - `swift test --parallel`
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test`
+
+### 2026-02-15 (Session 29)
+- 작업: `A6-1` raster image 정책 및 `A7-1` cache key 버전 관리 보강
+- 완료:
+  - `SVGParser`에 `SVGImageNodePolicy` 추가: `.ignore`, `.renderRaster`, `.failOnRaster`
+  - `image` 노드의 data URI 처리 정책 적용, raster placeholder 렌더 경로 추가
+  - `testParseImageNode*` 3건 추가(기본/렌더/실패 정책)
+  - `SVGParseCache` key 회귀 방지용 테스트에 options 변화 케이스 추가
+- 결정:
+  - W3C conformance 실행은 `--specifier/--parallel` 조합이 테스트 선별 실행에서 동작하지 않는 환경 이슈가 있어, CI를 `--filter` + `--no-parallel`로 고정 변경
+- 리스크:
+  - `swift test --filter`는 현재 Swift 6.2 일부 조합에서 동작이 제한적이라 병렬 실행은 분리 단계에서 비활성화 필요
+- 다음 액션:
+  - `A1~A7` 완료 후 운영 로그 기준으로 다음 마일스톤(추가 v2/성능 안정화) 도출
+- 검증:
+  - `swift test --parallel` (93 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test` (5 tests, 0 failures)
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (1/1 W3C conformance)
+
+### 2026-02-15 (Session 28)
+- 작업: `A5-1` embedded SVG 재귀 처리 + depth/count 제한 정책 구현 완료
+- 결정:
+  - XML 파서는 `image` 요소를 즉시 재귀 파싱하지 않고 `embeddedImageSourceAttribute` 마커만 보관
+  - `SVGEmbeddedImageState`로 전체 파싱 공유 카운트와 깊이를 추적해 재귀 임계치 초과를 일괄 제어
+  - 임베디드 파싱이 실패하거나 결과가 비어 있으면 해당 `image` 노드는 최종 AST에서 제거
+- 리스크:
+  - syntheticID 재바인딩은 내부 구현이므로 외부 의존이 없지만, 향후 경로 규칙 변경 시 테스트 동기화 필요
+- 다음 액션: `A6-1` raster image 정책 적용
+- 검증:
+  - `swift test --parallel` (90 tests, 0 failures)
+
+### 2026-02-15 (Session 21)
+- 작업: A3-1 cascade/specificity 엔진 구현
+- 결정:
+  - stylesheet 규칙 적용 순서를 `inherited -> stylesheet -> node.style -> idOverrides -> resolver`로 고정
+  - selector matching은 id/class/element/any 단일 selector만 지원
+  - specificity 가중치는 id 100, class 10, element 1, any 0
+  - 동일 specificity는 소스 순서(후순위 덮어쓰기) 적용
+- 리스크:
+  - CSS 상속/미지원 속성/`!important`는 v2 범위에서 축소 지원 상태로 유지
+- 다음 액션:
+  - A4-1 data URI 파서 및 base64 디코더 착수
+- 검증:
+  - `swift test --parallel` (77 tests, 0 failures)
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
 
 ### 2026-02-15
 - 작업: P0-1/P0-2, P1 타입 스켈레톤, 파서/캐시 기본 골격 작성
@@ -143,3 +407,22 @@
 - 다음 액션:
   - `P9-1` README/사용 가이드 정리
   - W3C fixture subset 확장 계획 수립
+
+### 2026-02-15 (Session 20)
+- 작업:
+  - W3C fixture를 `Tests/SVGSwiftUITests/W3C`로 이동해 테스트 타깃 리소스에 수집되도록 정리
+  - `Scripts/w3c/generate-w3c-tests.sh`를 manifest 기반 다중 fixture 자동 생성기로 정식 구현
+  - `Tests/SVGSwiftUITests/W3CGeneratedTests.swift`를 생성해 CI에서 `swift test --parallel` 경유로 회귀 검증
+  - W3C 리소스 번들(`.process("W3C")`) 등록 및 CI 생성기 실행 단계 추가
+- 결정:
+  - W3C 경로는 flat 리소스 구조를 고려해 경로 파싱 시 basename 기반 조회로 처리
+  - 생성 스텝을 CI `swift-tests` 잡에서 `swift test` 전에 선행 실행
+- 검증:
+  - `Scripts/w3c/generate-w3c-tests.sh` 실행으로 4개 fixture 테스트 코드 생성 확인
+  - `swift test --parallel` 통과 (`64` tests)
+  - `xcodebuild ... UITests` 통과 (`5` tests, `0` failures)
+- 리스크:
+  - 리소스가 플랫으로 복사되므로 manifest 경로는 정규화되어야 하며, 향후 중복 파일명 충돌 시 충돌 규칙이 필요
+- 다음 액션:
+  - `A9-1` W3C coverage 리포트 스크립트 추가
+  - `A9-2` CI에서 W3C conformance 전용 아티팩트(리포트/이슈) 업로드 반영

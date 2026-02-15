@@ -4,6 +4,8 @@ struct SVGTransform: Sendable, Equatable {
         case translate(tx: Double, ty: Double)
         case scale(sx: Double, sy: Double)
         case rotate(angleDegrees: Double, cx: Double?, cy: Double?)
+        case skewX(angleDegrees: Double)
+        case skewY(angleDegrees: Double)
     }
 
     var operations: [Operation]

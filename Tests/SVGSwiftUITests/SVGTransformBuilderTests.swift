@@ -45,4 +45,26 @@ final class SVGTransformBuilderTests: XCTestCase {
         XCTAssertEqual(transformed.x, 12.0, accuracy: 0.0001)
         XCTAssertEqual(transformed.y, 2.0, accuracy: 0.0001)
     }
+
+    func testBuildSkewXTransform() {
+        let transform = SVGTransform(operations: [
+            .skewX(angleDegrees: 45),
+        ])
+        let matrix: CGAffineTransform = builder.makeCGAffineTransform(from: transform)
+        let point = CGPoint(x: 1.0, y: 1.0).applying(matrix)
+
+        XCTAssertEqual(point.x, 2.0, accuracy: 0.0001)
+        XCTAssertEqual(point.y, 1.0, accuracy: 0.0001)
+    }
+
+    func testBuildSkewYTransform() {
+        let transform = SVGTransform(operations: [
+            .skewY(angleDegrees: 45),
+        ])
+        let matrix: CGAffineTransform = builder.makeCGAffineTransform(from: transform)
+        let point = CGPoint(x: 1.0, y: 1.0).applying(matrix)
+
+        XCTAssertEqual(point.x, 1.0, accuracy: 0.0001)
+        XCTAssertEqual(point.y, 2.0, accuracy: 0.0001)
+    }
 }

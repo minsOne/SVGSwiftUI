@@ -17,6 +17,17 @@ final class SVGParseCacheTests: XCTestCase {
         XCTAssertNotEqual(keyA, keyB)
     }
 
+    func testCacheKeyFromSourceDataChangesWithOptions() {
+        let data = Data("abc".utf8)
+        let optionsA = SVGParserOptions(enableStyleTag: true)
+        let optionsB = SVGParserOptions(enableStyleTag: false)
+
+        let keyA = SVGParseCacheKey.from(sourceData: data, options: optionsA)
+        let keyB = SVGParseCacheKey.from(sourceData: data, options: optionsB)
+
+        XCTAssertNotEqual(keyA, keyB)
+    }
+
     func testCacheStoresAndFetchesDocument() async throws {
         let cache = SVGParseCache(maxCost: 100, maxEntries: 5)
         let key = SVGParseCacheKey(sourceHash: "a", options: .init())

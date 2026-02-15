@@ -23,7 +23,9 @@ let package = Package(
             name: "SVGSwiftUITests",
             dependencies: ["SVGSwiftUI"],
             resources: [
-                .process("Fixtures")
+                .process("Fixtures"),
+                .process("W3C"),
+                .process("WebKit")
             ]
         ),
     ]

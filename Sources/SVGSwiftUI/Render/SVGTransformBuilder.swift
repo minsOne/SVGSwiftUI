@@ -44,6 +44,14 @@ struct SVGTransformBuilder: Sendable {
                 cx: cx,
                 cy: cy
             )
+        case .skewX(let angleDegrees):
+            let angleRadians: Double = angleDegrees * (.pi / 180.0)
+            let tanRadians: Double = tan(angleRadians)
+            return CGAffineTransform(a: 1, b: 0, c: CGFloat(tanRadians), d: 1, tx: 0, ty: 0)
+        case .skewY(let angleDegrees):
+            let angleRadians: Double = angleDegrees * (.pi / 180.0)
+            let tanRadians: Double = tan(angleRadians)
+            return CGAffineTransform(a: 1, b: CGFloat(tanRadians), c: 0, d: 1, tx: 0, ty: 0)
         }
     }
 

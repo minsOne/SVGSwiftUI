@@ -34,6 +34,21 @@ final class SVGNodePathBuilderTests: XCTestCase {
         XCTAssertEqual(path?.boundingBoxOfPath, CGRect(x: 2, y: 3, width: 4, height: 5))
     }
 
+    func testBuildsRoundedRectShapePath() {
+        let node = SVGNode.shape(
+            .init(
+                base: .init(id: "rounded", syntheticID: "auto:/0/0"),
+                kind: .rect,
+                values: ["x": 0, "y": 0, "width": 20, "height": 10, "rx": 4, "ry": 2]
+            )
+        )
+
+        let path = builder.buildPath(for: node)
+        XCTAssertEqual(path?.boundingBoxOfPath, CGRect(x: 0, y: 0, width: 20, height: 10))
+        let hasCurve = path?.elements.contains(where: { $0.type == .addCurveToPoint }) == true
+        XCTAssertTrue(hasCurve)
+    }
+
     func testBuildsCircleShapePath() {
         let node = SVGNode.shape(
             .init(

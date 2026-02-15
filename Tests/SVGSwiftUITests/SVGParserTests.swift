@@ -82,6 +82,114 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(circle.kind, .circle)
     }
 
+    func testParseKeepsElementsWithClipPathAttributeAndDropsClipPathBlock() throws {
+        let svg = """
+        <svg width="20" height="20">
+          <defs>
+            <clipPath id="clip">
+              <rect x="0" y="0" width="10" height="10"/>
+            </clipPath>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" clip-path="url(#clip)"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let clipNodes = document.clipPaths["clip"] else {
+            return XCTFail("Expected clipPath definition for id 'clip'")
+        }
+        XCTAssertEqual(clipNodes.count, 1)
+        guard case .shape(let clipShape) = clipNodes[0] else {
+            return XCTFail("Expected clipPath child to remain as shape node")
+        }
+        XCTAssertEqual(clipShape.kind, .rect)
+        XCTAssertNil(shapeNode(id: "clip", in: document))
+
+        guard let shape = shapeNode(id: "foreground", in: document) else {
+            return XCTFail("Expected foreground shape")
+        }
+        XCTAssertEqual(shape.kind, .rect)
+        XCTAssertEqual(shape.base.attributes["clip-path"], "url(#clip)")
+    }
+
+    func testParseReadsClipPathDefinitionsInClipPathNode() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <clipPath id="clip-window">
+              <g transform="translate(5 7)">
+                <rect x="10" y="20" width="3" height="4"/>
+              </g>
+            </clipPath>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" clip-path="url(#clip-window)"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let clipNodes = document.clipPaths["clip-window"] else {
+            return XCTFail("Expected clipPath definition for id 'clip-window'")
+        }
+        XCTAssertEqual(clipNodes.count, 1)
+        guard case .group(let clipGroup) = clipNodes[0] else {
+            return XCTFail("Expected wrapper group inside clipPath")
+        }
+        XCTAssertEqual(clipGroup.base.transform.operations.count, 1)
+        XCTAssertEqual(clipGroup.base.transform.operations[0], .translate(tx: 5, ty: 7))
+        XCTAssertEqual(clipGroup.children.count, 1)
+    }
+
+    func testParseReadsClipPathFromInlineStyle() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <clipPath id="inline">
+              <rect x="0" y="0" width="8" height="8"/>
+            </clipPath>
+          </defs>
+          <clipPath id="attr">
+            <rect x="0" y="0" width="2" height="2"/>
+          </clipPath>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            clip-path="url(#attr)"
+            style="clip-path:url(#inline); fill:#0ff"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let foreground = shapeNode(id: "foreground", in: document) else {
+            return XCTFail("Expected foreground shape")
+        }
+        XCTAssertEqual(foreground.base.attributes["clip-path"], "url(#inline)")
+    }
+
+    func testParseIgnoresFilterAndMaskElementsButKeepsSupportedSiblings() throws {
+        let svg = """
+        <svg width="20" height="20">
+          <filter id="blur">
+            <ellipse cx="10" cy="10" rx="5" ry="5"/>
+          </filter>
+          <path id="base" d="M0 0 L20 20"/>
+          <mask id="mask">
+            <rect x="0" y="0" width="10" height="10"/>
+          </mask>
+          <path id="visible" d="M0 20 L20 0"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        XCTAssertNil(shapeNode(id: "blur", in: document))
+        XCTAssertNil(shapeNode(id: "mask", in: document))
+        XCTAssertEqual(pathNode(id: "base", in: document)?.pathData, "M0 0 L20 20")
+        XCTAssertEqual(pathNode(id: "visible", in: document)?.pathData, "M0 20 L20 0")
+    }
+
     func testParseIgnoresNestedSVGSubtrees() throws {
         let svg = """
         <svg>
@@ -188,6 +296,225 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(path.base.style.opacity, 0.5)
     }
 
+    func testStyleTagIgnoredWhenDisabled() throws {
+        let svg = """
+        <svg width="24" height="24">
+          <style>
+            .hidden { fill: #ff00ff; }
+          </style>
+          <path id="ignored" d="M0 0 L1 1"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg), options: .init())
+        XCTAssertTrue(document.styleRules.isEmpty)
+    }
+
+    func testStyleTagParsedWhenEnabled() throws {
+        let svg = """
+        <svg width="24" height="24">
+          <style>
+            #primary {
+              fill: #00ff00;
+              stroke-width: 2;
+            }
+          </style>
+          <path id="target" d="M0 0 L1 1"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg), options: .init(enableStyleTag: true))
+        XCTAssertEqual(document.styleRules.count, 1)
+
+        let rule = tryUnwrap(document.styleRules.first)
+        guard case .id("primary") = rule.selector else {
+            return XCTFail("Expected id selector")
+        }
+        XCTAssertEqual(rule.declarations["fill"], "#00ff00")
+        XCTAssertEqual(rule.declarations["stroke-width"], "2")
+    }
+
+    func testStyleTagSupportsMultipleSelectors() throws {
+        let svg = """
+        <svg width="24" height="24">
+          <style>
+            #primary, .secondary, path { fill: blue; opacity: 0.75; }
+          </style>
+          <path id="p" d="M0 0 L1 1"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg), options: .init(enableStyleTag: true))
+        XCTAssertEqual(document.styleRules.count, 3)
+
+        guard case .id("primary") = document.styleRules[0].selector else {
+            return XCTFail("Expected id selector")
+        }
+        guard case .class("secondary") = document.styleRules[1].selector else {
+            return XCTFail("Expected class selector")
+        }
+        guard case .element("path") = document.styleRules[2].selector else {
+            return XCTFail("Expected element selector")
+        }
+        XCTAssertEqual(document.styleRules[1].declarations["fill"], "blue")
+    }
+
+    func testParseImageNodeExpandsDataURIEmbeddedSVG() throws {
+        let embedded = """
+        <svg>
+          <path id="embedded-path" d="M0 0 L10 10"/>
+        </svg>
+        """
+
+        let uri = makeDataURISource(from: embedded)
+        let document = try parser.parse(
+            source: .string("<svg><image href=\"\(uri)\"/></svg>"),
+            options: SVGParserOptions(enableDataURI: true)
+        )
+
+        XCTAssertEqual(document.nodes.count, 1)
+        guard case .group(let imageGroup) = document.nodes[0] else {
+            return XCTFail("Expected group wrapper for embedded image")
+        }
+        XCTAssertEqual(imageGroup.children.count, 1)
+
+        guard case .path(let pathNode) = imageGroup.children[0] else {
+            return XCTFail("Expected embedded path node")
+        }
+        XCTAssertEqual(pathNode.pathData, "M0 0 L10 10")
+        XCTAssertEqual(pathNode.base.syntheticID, "auto:/0/0/embedded/0")
+    }
+
+    func testParseImageNodeIgnoresRasterDataURINodeByDefault() throws {
+        let source = "<svg><image href=\"data:image/png;base64,iVBORw0KGgo=\"/></svg>"
+        let document = try parser.parse(
+            source: .string(source),
+            options: SVGParserOptions(enableDataURI: true)
+        )
+        XCTAssertEqual(document.nodes.count, 0)
+    }
+
+    func testParseImageNodeRendersRasterDataURINodeWhenPolicyIsRenderRaster() throws {
+        let source = """
+        <svg>
+          <image id="logo" x="4" y="5" width="10" height="20" href="data:image/png;base64,iVBORw0KGgo="/>
+        </svg>
+        """
+        let document = try parser.parse(
+            source: .string(source),
+            options: SVGParserOptions(
+                enableDataURI: true,
+                imageNodePolicy: .renderRaster
+            )
+        )
+
+        XCTAssertEqual(document.nodes.count, 1)
+        guard case .rasterImage(let imageNode) = document.nodes[0] else {
+            return XCTFail("Expected raster image node")
+        }
+        XCTAssertEqual(imageNode.base.id, "logo")
+        XCTAssertEqual(imageNode.base.attributes["href"], "data:image/png;base64,iVBORw0KGgo=")
+        XCTAssertEqual(imageNode.x, 4)
+        XCTAssertEqual(imageNode.y, 5)
+        XCTAssertEqual(imageNode.width, 10)
+        XCTAssertEqual(imageNode.height, 20)
+        XCTAssertEqual(imageNode.mediaType, "image/png")
+    }
+
+    func testParseImageNodeFailsOnRasterDataURINodeWhenPolicyFailOnRaster() {
+        let source = "<svg><image href=\"data:image/png;base64,iVBORw0KGgo=\"/></svg>"
+        XCTAssertThrowsError(
+            try parser.parse(
+                source: .string(source),
+                options: SVGParserOptions(
+                    enableDataURI: true,
+                    imageNodePolicy: .failOnRaster
+                )
+            )
+        ) { error in
+            guard case .notImplemented = error as? SVGParserError else {
+                return XCTFail("Expected notImplemented error, got \(error)")
+            }
+        }
+    }
+
+    func testParseImageNodeSupportsNestedImageDataURIs() throws {
+        let leaf = """
+        <svg>
+          <path id="leaf-path" d="M1 2 L3 4"/>
+        </svg>
+        """
+
+        let mid = """
+        <svg>
+          <image xlink:href="\(makeDataURISource(from: leaf))"/>
+        </svg>
+        """
+        let outer = """
+        <svg>
+          <image href="\(makeDataURISource(from: mid))"/>
+        </svg>
+        """
+
+        let document = try parser.parse(
+            source: .string(outer),
+            options: SVGParserOptions(enableDataURI: true)
+        )
+
+        XCTAssertEqual(document.nodes.count, 1)
+        guard case .group(let outerGroup) = document.nodes[0] else {
+            return XCTFail("Expected first level embedded group")
+        }
+        XCTAssertEqual(outerGroup.children.count, 1)
+        guard case .group(let innerGroup) = outerGroup.children[0] else {
+            return XCTFail("Expected second level embedded group")
+        }
+        XCTAssertEqual(innerGroup.children.count, 1)
+        guard case .path(let leafPath) = innerGroup.children[0] else {
+            return XCTFail("Expected leaf path")
+        }
+        XCTAssertEqual(leafPath.pathData, "M1 2 L3 4")
+        XCTAssertTrue(leafPath.base.syntheticID.contains("/embedded/0/embedded/0"))
+    }
+
+    func testEmbeddedImageRespectsMaxCount() throws {
+        let payload = """
+        <svg>
+          <path id="payload-path" d="M0 0 L5 5"/>
+        </svg>
+        """
+
+        let uri = makeDataURISource(from: payload)
+        let source = "<svg><image href=\"\(uri)\"/><image href=\"\(uri)\"/></svg>"
+
+        let document = try parser.parse(
+            source: .string(source),
+            options: SVGParserOptions(enableDataURI: true, maxEmbeddedImageCount: 1)
+        )
+
+        XCTAssertEqual(document.nodes.count, 1)
+    }
+
+    func testEmbeddedImageRespectsMaxDepth() throws {
+        let leaf = "<svg><path d=\"M0 0 L1 1\"/></svg>"
+        let nestedImage = """
+        <svg>
+          <image href="\(makeDataURISource(from: leaf))"/>
+        </svg>
+        """
+        let source = """
+        <svg>
+          <image href="\(makeDataURISource(from: nestedImage))"/>
+        </svg>
+        """
+        let document = try parser.parse(
+            source: .string(source),
+            options: SVGParserOptions(enableDataURI: true, maxEmbeddedImageDepth: 1)
+        )
+
+        XCTAssertEqual(document.nodes.count, 0)
+    }
+
     func testParseSupportsMultiplePaintFormats() throws {
         let svg = """
         <svg>
@@ -222,6 +549,87 @@ final class SVGParserTests: XCTestCase {
             .rotate(angleDegrees: 90, cx: 1, cy: 2),
             .matrix(a: 1, b: 0, c: 0, d: 1, tx: 3, ty: 4),
         ])
+    }
+
+    func testParseSkewTransformOperations() throws {
+        let svg = """
+        <svg>
+          <path id="t" d="M0 0" transform="skewX(30) skewY(-20)"/>
+        </svg>
+        """
+        let operations = try parser.parse(source: .string(svg))
+            .nodes
+            .compactMap { node in
+                if case .path(let path) = node { return path.base.transform.operations }
+                return nil
+            }
+
+        XCTAssertEqual(operations, [[.skewX(angleDegrees: 30), .skewY(angleDegrees: -20)]])
+    }
+
+    func testParseRoundedRectRadii() throws {
+        let document = try parser.parse(source: .string("<svg><rect id='r' x='1' y='2' width='10' height='20' rx='3' ry='4'/></svg>"))
+        guard let rect = shapeNode(id: "r", in: document) else {
+            return XCTFail("Expected rounded rect node")
+        }
+
+        XCTAssertEqual(rect.values["rx"], 3)
+        XCTAssertEqual(rect.values["ry"], 4)
+    }
+
+    func testParseStrokeCapAndJoinStyles() throws {
+        let document = try parser.parse(source: .string("""
+        <svg>
+          <path
+            id="styled"
+            d="M0 0"
+            stroke-linecap="square"
+            stroke-linejoin="bevel"
+            style="stroke-linecap: round; stroke-linejoin: miter;"
+          />
+        </svg>
+        """))
+        guard case .path(let pathNode) = document.nodes.first else {
+            return XCTFail("Expected path node")
+        }
+
+        XCTAssertEqual(pathNode.base.style.strokeLineCap, .round)
+        XCTAssertEqual(pathNode.base.style.strokeLineJoin, .miter)
+    }
+
+    func testParseAdvancedStylingProperties() throws {
+        let document = try parser.parse(source: .string("""
+        <svg>
+          <path
+            id="attr-style"
+            d="M0 0"
+            fill-rule="evenodd"
+            stroke-miterlimit="8"
+            stroke-dasharray="6 4 2"
+            stroke-dashoffset="1.25"
+          />
+          <path
+            id="inline-style"
+            d="M1 1"
+            style="fill-rule: nonzero; stroke-dasharray: none; stroke-miterlimit: 2.75;"
+          />
+        </svg>
+        """))
+
+        guard let attrStylePath = pathNode(id: "attr-style", in: document) else {
+            return XCTFail("Expected attr-style path node")
+        }
+        XCTAssertEqual(attrStylePath.base.style.fillRule, .evenOdd)
+        XCTAssertEqual(attrStylePath.base.style.strokeMiterLimit, 8)
+        XCTAssertEqual(attrStylePath.base.style.strokeDashArray, [6, 4, 2])
+        XCTAssertEqual(attrStylePath.base.style.strokeDashOffset, 1.25)
+
+        guard let inlineStylePath = pathNode(id: "inline-style", in: document) else {
+            return XCTFail("Expected inline-style path node")
+        }
+        XCTAssertEqual(inlineStylePath.base.style.fillRule, .nonZero)
+        XCTAssertEqual(inlineStylePath.base.style.strokeDashArray, [])
+        XCTAssertEqual(inlineStylePath.base.style.strokeMiterLimit, 2.75)
     }
 
     func testParsePathWithoutDUsesEmptyString() throws {
@@ -316,5 +724,18 @@ final class SVGParserTests: XCTestCase {
             }
         }
         return nil
+    }
+
+    private func makeDataURISource(from svgSource: String) -> String {
+        let encoded: String = Data(svgSource.utf8).base64EncodedString()
+        return "data:image/svg+xml;base64,\(encoded)"
+    }
+
+    private func tryUnwrap(_ rule: SVGStyleRule?) -> SVGStyleRule {
+        guard let rule else {
+            XCTFail("Expected style rule")
+            return SVGStyleRule(selector: .any, declarations: [:])
+        }
+        return rule
     }
 }

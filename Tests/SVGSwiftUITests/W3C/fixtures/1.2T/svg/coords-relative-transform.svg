@@ -1,0 +1,5 @@
+<svg width="140" height="140" viewBox="0 0 140 140">
+  <g id="coords-group" transform="translate(20,20) scale(0.8)">
+    <rect id="coords-rect" x="10" y="10" width="80" height="40" fill="#ffcc00" />
+  </g>
+</svg>

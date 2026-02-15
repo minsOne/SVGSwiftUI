@@ -18,6 +18,11 @@ public enum SVGPaint: Sendable, Equatable {
     case currentColor
 }
 
+enum SVGFillRule: Sendable, Equatable {
+    case nonZero
+    case evenOdd
+}
+
 enum SVGLineCap: Sendable, Equatable {
     case butt
     case round
@@ -36,6 +41,10 @@ struct SVGStyle: Sendable, Equatable {
     var stroke: SVGPaint?
     var strokeOpacity: Double?
     var strokeWidth: Double?
+    var fillRule: SVGFillRule?
+    var strokeMiterLimit: Double?
+    var strokeDashArray: [Double]?
+    var strokeDashOffset: Double?
     var strokeLineCap: SVGLineCap?
     var strokeLineJoin: SVGLineJoin?
     var opacity: Double?
@@ -46,6 +55,10 @@ struct SVGStyle: Sendable, Equatable {
         stroke: SVGPaint? = nil,
         strokeOpacity: Double? = nil,
         strokeWidth: Double? = nil,
+        fillRule: SVGFillRule? = nil,
+        strokeMiterLimit: Double? = nil,
+        strokeDashArray: [Double]? = nil,
+        strokeDashOffset: Double? = nil,
         strokeLineCap: SVGLineCap? = nil,
         strokeLineJoin: SVGLineJoin? = nil,
         opacity: Double? = nil
@@ -55,6 +68,10 @@ struct SVGStyle: Sendable, Equatable {
         self.stroke = stroke
         self.strokeOpacity = strokeOpacity
         self.strokeWidth = strokeWidth
+        self.fillRule = fillRule
+        self.strokeMiterLimit = strokeMiterLimit
+        self.strokeDashArray = strokeDashArray
+        self.strokeDashOffset = strokeDashOffset
         self.strokeLineCap = strokeLineCap
         self.strokeLineJoin = strokeLineJoin
         self.opacity = opacity
@@ -67,6 +84,10 @@ struct SVGResolvedStyle: Sendable, Equatable {
     var stroke: SVGPaint
     var strokeOpacity: Double
     var strokeWidth: Double
+    var fillRule: SVGFillRule
+    var strokeMiterLimit: Double
+    var strokeDashArray: [Double]
+    var strokeDashOffset: Double
     var strokeLineCap: SVGLineCap
     var strokeLineJoin: SVGLineJoin
     var opacity: Double
@@ -77,6 +98,10 @@ struct SVGResolvedStyle: Sendable, Equatable {
         stroke: SVGPaint = .none,
         strokeOpacity: Double = 1.0,
         strokeWidth: Double = 1.0,
+        fillRule: SVGFillRule = .nonZero,
+        strokeMiterLimit: Double = 4.0,
+        strokeDashArray: [Double] = [],
+        strokeDashOffset: Double = 0.0,
         strokeLineCap: SVGLineCap = .butt,
         strokeLineJoin: SVGLineJoin = .miter,
         opacity: Double = 1.0
@@ -86,6 +111,10 @@ struct SVGResolvedStyle: Sendable, Equatable {
         self.stroke = stroke
         self.strokeOpacity = strokeOpacity
         self.strokeWidth = strokeWidth
+        self.fillRule = fillRule
+        self.strokeMiterLimit = strokeMiterLimit
+        self.strokeDashArray = strokeDashArray
+        self.strokeDashOffset = strokeDashOffset
         self.strokeLineCap = strokeLineCap
         self.strokeLineJoin = strokeLineJoin
         self.opacity = opacity
@@ -100,6 +129,10 @@ extension SVGResolvedStyle {
             stroke: style.stroke ?? stroke,
             strokeOpacity: style.strokeOpacity ?? strokeOpacity,
             strokeWidth: style.strokeWidth ?? strokeWidth,
+            fillRule: style.fillRule ?? fillRule,
+            strokeMiterLimit: style.strokeMiterLimit ?? strokeMiterLimit,
+            strokeDashArray: style.strokeDashArray ?? strokeDashArray,
+            strokeDashOffset: style.strokeDashOffset ?? strokeDashOffset,
             strokeLineCap: style.strokeLineCap ?? strokeLineCap,
             strokeLineJoin: style.strokeLineJoin ?? strokeLineJoin,
             opacity: style.opacity ?? opacity

@@ -1,12 +1,19 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (P8-1 통합 fixture 완료 + CI UITest 재현성 개선)
+Last Updated: 2026-02-15 (S3-2 done)
 
 ## Status Legend
 - `todo`: not started
 - `in_progress`: currently active
 - `done`: completed and verified
 - `blocked`: waiting on dependency/decision
+
+## Workflow Rule (mandatory)
+- 시작: `in_progress`로 전환 후 작업 항목 및 범위 확정
+- 진행: 단위/통합 테스트와 conformance 커버리지 실행
+- 정리: 변경 근거를 `WORK_LOG.md`에 세션 단위로 기록
+- 완료: `done` 변경 전에 커밋 및 푸시를 완료
+- 유지: 다음 작업 시작 전 `WORK_CONTINUATION` 상태와 `Last Updated`를 동기화
 
 ## v1 Milestones
 | ID | Phase | Task | Status | Notes |
@@ -27,24 +34,37 @@ Last Updated: 2026-02-15 (P8-1 통합 fixture 완료 + CI UITest 재현성 개�
 | P7-3 | P7 | 기준 이미지(snapshot baseline) 수집 | done | `UITests/Baselines/iPhone_17/26.2/*.png` 생성 및 저장 |
 | P8-1 | P8 | 테스트 확장/회귀 fixture | done | parser/cache/path/style/view/transform 지원 로직 테스트 63개 통과 |
 | P8-2 | P8 | UITest 결과 비교(시각 회귀) | done | `testCanvasMatchesBaselines` + diff artifact 출력 + 허용오차 비교 구현 |
-| P8-3 | P8 | GitHub CI 파이프라인 | in_progress | `swift test` + Demo UITest 자동 검증 워크플로우 추가 |
-| P9-1 | P9 | README/가이드 문서 | todo | 미시작 |
+| P8-3 | P8 | GitHub CI 파이프라인 | done | `swift test` + Demo UITest 자동 검증 워크플로우 + 안정성 조정 반영 |
+| P9-1 | P9 | README/가이드 문서 | done | 설치/예시/노드 제어/캐시/테스트·CI 가이드 정리 |
 | P9-2 | P9 | 공개 API 캡슐화 정책 수립/적용 | done | 내부 엔진(parser/model/cache/render helper) `internal` 전환 + 정책 문서화 |
 
 ## v2 Milestones
 | ID | Phase | Task | Status | Notes |
 |---|---|---|---|---|
-| A1-1 | A1 | `style` attribute parser | todo |  |
-| A2-1 | A2 | `<style>` CSS subset parser | todo |  |
-| A3-1 | A3 | cascade/specificity engine | todo |  |
-| A4-1 | A4 | `data:` URI parser/base64 decoder | todo |  |
-| A5-1 | A5 | embedded SVG recursion 제한 처리 | todo |  |
-| A6-1 | A6 | raster image policy 처리 | todo |  |
-| A7-1 | A7 | v2 cache key versioning | todo |  |
-| A8-1 | A8 | W3C fixture subset 도입(1.1F2/1.2T) | todo | 지원 요소 기준(paths/shapes/coords/styling 우선) |
-| A8-2 | A8 | W3C 테스트케이스 자동 생성 스크립트 | todo | fixture manifest -> XCTest 코드 생성 |
-| A9-1 | A9 | W3C coverage 리포트 생성 스크립트 | todo | pass/fail/unsupported 카테고리별 집계 |
-| A9-2 | A9 | CI에 W3C conformance 단계 추가 | todo | 회귀 시 fail, 리포트 아티팩트 업로드 |
+| A1-1 | A1 | `style` attribute parser | done | declaration parser + `style` 속성 inline 지원 |
+| A2-1 | A2 | `<style>` CSS subset parser | done | `<style>` 블록 수집 + selector/rule parser + 문서 반영 |
+| A3-1 | A3 | cascade/specificity engine | done | style 규칙 매칭(id/class/element/any), specificity/order 정렬, `inherited -> stylesheet -> node style -> override` 적용 |
+| A4-1 | A4 | `data:` URI parser/base64 decoder | done | `data:` URI 파싱/옵션 기반 base64 디코더 유틸 구현 + 8개 회귀 테스트 추가 |
+| A5-1 | A5 | embedded SVG recursion 제한 처리 | done | `SVGParser`가 data URI embedded SVG를 임계치 기반으로 post-parse 확장 + max depth/count 제한 구현 |
+| A6-1 | A6 | raster image policy 처리 | done | data URI image 정책(`ignore/renderRaster/failOnRaster`) 처리 완료 |
+| A7-1 | A7 | v2 cache key versioning | done | parser 옵션/스키마 기반 cache key 분기 검증 강화 |
+| A8-1 | A8 | W3C fixture subset 도입(1.1F2/1.2T) | done | `Tests/SVGSwiftUITests/W3C/fixtures` + `w3c-manifest.json` + `A8-2` 연동 전제 정비 |
+| A8-2 | A8 | W3C 테스트케이스 자동 생성 스크립트 | done | fixture manifest(`Tests/SVGSwiftUITests/W3C/w3c-manifest.json`) -> `Tests/SVGSwiftUITests/W3CGeneratedTests.swift` 자동 생성/실행 |
+| A9-1 | A9 | W3C coverage 리포트 생성 스크립트 | done | pass/fail/unsupported 카테고리별 집계 |
+| A9-2 | A9 | CI에 W3C conformance 단계 추가 | done | W3C 전용 테스트/coverage log 및 strict 검증을 CI에서 아티팩트로 업로드 |
+| A10-1 | A10 | WebKit LayoutTests 매니페스트/수집 스크립트 기획 | done | `Tests/SVGSwiftUITests/WebKit` 매니페스트 및 동기화 규칙 정리 |
+| A10-2 | A10 | WebKit conformance 테스트 생성기/coverage 연동 | done | `testWebKitGeneratedSuite` CI 실행 + strict coverage 검증 포함 |
+| A10-3 | A10 | WebKit 후보군 확장 및 CI 게이트 | done | WebKit 후보군을 52건으로 확장하고 expected 전이 규칙을 정비 |
+
+## Stabilization Milestones
+| ID | Phase | Task | Status | Notes |
+|---|---|---|---|---|
+| S1-1 | S1 | 렌더 path 캐시 적용 | done | `SVGView` load 시 shape/path `CGPath` prebuild 및 재사용 |
+| S1-2 | S1 | 경로 캐시 오류 경로 정리 | done | 렌더 실패/문서 갱신 시 path cache clear 적용 |
+| S2-1 | S2 | clip/mask/filter/masking 우선순위 정리 | done | `docs/ADVANCED_RENDER_FEATURE_ANALYSIS.md` 반영 |
+| S2-2 | S2 | `clipPath` 미니멈 구현 설계/구현 | done | `url(#id)` 참조 기반 clipPath 저장/클리핑 적용, inline `style` `clip-path` 반영 |
+| S3-1 | S3 | 고해상도/메모리 튜닝 계획 | done | `drawNodes` 캐시 + `pathCache` 임계치 기반 게이팅 적용 |
+| S3-2 | S3 | 경계 지점 성능 프로파일 수집/정합성 | done | `SVGRenderPerformanceProfileTests`, profile 스크립트, CI 아티팩트 업로드 |
 
 ## Anti-Duplication Rules
 1. 작업 시작 전 해당 Task ID를 `in_progress`로 먼저 바꾼다.

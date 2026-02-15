@@ -28,6 +28,8 @@ struct SVGNodePathBuilder: Sendable {
                 local: shapeNode.base.transform,
                 inherited: inheritedTransform
             )
+        case .rasterImage:
+            return nil
         }
     }
 
@@ -51,7 +53,24 @@ struct SVGNodePathBuilder: Sendable {
             let y = CGFloat(node.values["y"] ?? 0)
             let width = CGFloat(node.values["width"] ?? 0)
             let height = CGFloat(node.values["height"] ?? 0)
-            path.addRect(CGRect(x: x, y: y, width: width, height: height))
+            let rawRx: CGFloat = CGFloat(node.values["rx"] ?? 0)
+            let rawRy: CGFloat = CGFloat(node.values["ry"] ?? 0)
+            let fallbackRy: CGFloat = rawRx
+            let fallbackRx: CGFloat = rawRy
+            let syncedRx: CGFloat = rawRx == 0 ? fallbackRx : rawRx
+            let syncedRy: CGFloat = rawRy == 0 ? fallbackRy : rawRy
+            let clampedRx: CGFloat = min(max(0, syncedRx), width / 2.0)
+            let clampedRy: CGFloat = min(max(0, syncedRy), height / 2.0)
+
+            if clampedRx > 0 || clampedRy > 0 {
+                path.addRoundedRect(
+                    in: CGRect(x: x, y: y, width: width, height: height),
+                    cornerWidth: clampedRx,
+                    cornerHeight: clampedRy
+                )
+            } else {
+                path.addRect(CGRect(x: x, y: y, width: width, height: height))
+            }
 
         case .circle:
             let cx = CGFloat(node.values["cx"] ?? 0)
@@ -93,7 +112,7 @@ struct SVGNodePathBuilder: Sendable {
             }
             path.closeSubpath()
 
-        case .path, .group, .svg:
+        case .path, .group, .svg, .image:
             break
         }
         return path

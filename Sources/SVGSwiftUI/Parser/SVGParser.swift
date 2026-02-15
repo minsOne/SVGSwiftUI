@@ -4,8 +4,70 @@ protocol SVGDocumentParsing: Sendable {
     func parse(source: SVGSource, options: SVGParserOptions) throws -> SVGDocument
 }
 
+private final class SVGEmbeddedImageState {
+    var embeddedImageCount: Int = 0
+    var currentEmbeddedDepth: Int = 0
+    let maxEmbeddedImageCount: Int
+    let maxEmbeddedImageDepth: Int
+
+    init(maxEmbeddedImageCount: Int, maxEmbeddedImageDepth: Int) {
+        self.maxEmbeddedImageCount = maxEmbeddedImageCount
+        self.maxEmbeddedImageDepth = maxEmbeddedImageDepth
+    }
+
+    func canEmbedAnother() -> Bool {
+        if maxEmbeddedImageCount <= 0 {
+            return false
+        }
+        if maxEmbeddedImageDepth <= 0 {
+            return false
+        }
+        if embeddedImageCount >= maxEmbeddedImageCount {
+            return false
+        }
+        if currentEmbeddedDepth >= maxEmbeddedImageDepth {
+            return false
+        }
+        return true
+    }
+
+    func beginEmbedding() -> Bool {
+        if !canEmbedAnother() {
+            return false
+        }
+        embeddedImageCount += 1
+        currentEmbeddedDepth += 1
+        return true
+    }
+
+    func endEmbedding(succeeded: Bool) {
+        if currentEmbeddedDepth > 0 {
+            currentEmbeddedDepth -= 1
+        }
+        if !succeeded && embeddedImageCount > 0 {
+            embeddedImageCount -= 1
+        }
+    }
+}
+
+private let embeddedImageSourceAttribute = "__svgswiftui_embeddedImageSource"
+
 struct SVGParser: SVGDocumentParsing, Sendable {
+    private let dataURIParser = SVGDataURIParser()
+
     init() {}
+
+    func parseDataURI(_ uri: String, options: SVGParserOptions = .init()) throws -> SVGDataURIPayload {
+        guard options.enableDataURI else {
+            throw SVGParserError.notImplemented(reason: "Data URI parsing is disabled")
+        }
+
+        guard options.maxDataURIBytes > 0 else {
+            throw SVGParserError.notImplemented(reason: "maxDataURIBytes must be greater than 0")
+        }
+
+        return try dataURIParser.parse(uri, maxBytes: options.maxDataURIBytes)
+    }
 
     func parse(source: SVGSource, options: SVGParserOptions = .init()) throws -> SVGDocument {
         let data = try source.loadData()
@@ -13,6 +75,18 @@ struct SVGParser: SVGDocumentParsing, Sendable {
     }
 
     func parse(data: Data, options: SVGParserOptions = .init()) throws -> SVGDocument {
+        let state = SVGEmbeddedImageState(
+            maxEmbeddedImageCount: options.maxEmbeddedImageCount,
+            maxEmbeddedImageDepth: options.maxEmbeddedImageDepth
+        )
+        return try parse(data: data, options: options, embeddedImageState: state)
+    }
+
+    fileprivate func parse(
+        data: Data,
+        options: SVGParserOptions,
+        embeddedImageState: SVGEmbeddedImageState
+    ) throws -> SVGDocument {
         guard !data.isEmpty else {
             throw SVGParserError.emptyInput
         }
@@ -26,7 +100,288 @@ struct SVGParser: SVGDocumentParsing, Sendable {
         }
 
         let xmlParser = SVGXMLDocumentParser(options: options)
-        return try xmlParser.parse(data: data)
+        let parsedDocument = try xmlParser.parse(data: data)
+        let expandedNodes = try expandEmbeddedImageNodes(
+            in: parsedDocument.nodes,
+            options: options,
+            state: embeddedImageState
+        )
+        return SVGDocument(
+            size: parsedDocument.size,
+            viewBox: parsedDocument.viewBox,
+            nodes: expandedNodes,
+            styleRules: parsedDocument.styleRules,
+            clipPaths: parsedDocument.clipPaths
+        )
+    }
+
+    private func expandEmbeddedImageNodes(
+        in nodes: [SVGNode],
+        options: SVGParserOptions,
+        state: SVGEmbeddedImageState
+    ) throws -> [SVGNode] {
+        var output: [SVGNode] = []
+        for node in nodes {
+            output.append(contentsOf: try expandEmbeddedImageNode(node, options: options, state: state))
+        }
+        return output
+    }
+
+    private func expandEmbeddedImageNode(
+        _ node: SVGNode,
+        options: SVGParserOptions,
+        state: SVGEmbeddedImageState
+    ) throws -> [SVGNode] {
+        switch node {
+        case .group(let sourceGroup):
+            if let embeddedSource = sourceGroup.base.attributes[embeddedImageSourceAttribute] {
+                if let expandedChildren = try parseEmbeddedImageChildren(
+                    source: embeddedSource,
+                    parentSyntheticID: sourceGroup.base.syntheticID,
+                    options: options,
+                    state: state
+                ) {
+                    return [.group(.init(base: sourceGroup.base, children: expandedChildren))]
+                }
+                switch options.imageNodePolicy {
+                case .ignore:
+                    return []
+                case .renderRaster:
+                    return [makeRasterImageNode(for: sourceGroup)]
+                case .failOnRaster:
+                    let message = "Unsupported raster image policy: failOnRaster"
+                    throw SVGParserError.notImplemented(reason: message)
+                }
+            }
+            let children = try expandEmbeddedImageNodes(
+                in: sourceGroup.children,
+                options: options,
+                state: state
+            )
+            return [.group(.init(base: sourceGroup.base, children: children))]
+        case .path(let sourcePath):
+            return [.path(.init(
+                base: sourcePath.base,
+                pathData: sourcePath.pathData,
+                commands: sourcePath.commands
+            ))]
+        case .shape(let sourceShape):
+            return [.shape(.init(
+                base: sourceShape.base,
+                kind: sourceShape.kind,
+                values: sourceShape.values,
+                points: sourceShape.points
+            ))]
+        case .rasterImage:
+            return [node]
+        }
+    }
+
+    private func parseEmbeddedImageChildren(
+        source: String,
+        parentSyntheticID: String,
+        options: SVGParserOptions,
+        state: SVGEmbeddedImageState
+    ) throws -> [SVGNode]? {
+        let normalizedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalizedSource.hasPrefix("data:") else {
+            return nil
+        }
+
+        let payload: SVGDataURIPayload
+        do {
+            payload = try parseDataURI(normalizedSource, options: options)
+        } catch {
+            switch options.imageNodePolicy {
+            case .failOnRaster:
+                throw SVGParserError.notImplemented(reason: "Failed to parse data URI in raster image node")
+            case .ignore, .renderRaster:
+                return nil
+            }
+        }
+
+        let loweredMediaType = payload.mediaType.lowercased()
+        guard loweredMediaType.hasPrefix("image/svg+xml") else {
+            switch options.imageNodePolicy {
+            case .ignore:
+                return nil
+            case .renderRaster:
+                return nil
+            case .failOnRaster:
+                let reason = "Data URI is not an embedded SVG image"
+                throw SVGParserError.notImplemented(reason: reason)
+            }
+        }
+
+        if !state.beginEmbedding() {
+            switch options.imageNodePolicy {
+            case .ignore, .renderRaster:
+                return nil
+            case .failOnRaster:
+                return nil
+            }
+        }
+
+        var didEmbed = false
+        defer { state.endEmbedding(succeeded: didEmbed) }
+
+        let embeddedDocument: SVGDocument
+        do {
+            embeddedDocument = try parse(
+                data: payload.data,
+                options: options,
+                embeddedImageState: state
+            )
+            didEmbed = true
+        } catch {
+            return nil
+        }
+        if embeddedDocument.nodes.isEmpty {
+            return nil
+        }
+
+        return rebaseEmbeddedNodes(embeddedDocument.nodes, parentSyntheticID: parentSyntheticID)
+    }
+
+    private func makeRasterImageNode(for sourceGroup: SVGGroupNode) -> SVGNode {
+        let source = sourceGroup.base.attributes[embeddedImageSourceAttribute] ?? ""
+        let sourceMediaType = parseDataURIMediaType(from: source)
+        let x = parseNumeric(sourceGroup.base.attributes["x"])
+        let y = parseNumeric(sourceGroup.base.attributes["y"])
+        let width = parseNumeric(sourceGroup.base.attributes["width"])
+        let height = parseNumeric(sourceGroup.base.attributes["height"])
+
+        return .rasterImage(.init(
+            base: sourceGroup.base,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            mediaType: sourceMediaType
+        ))
+    }
+
+    private func parseDataURIMediaType(from source: String) -> String? {
+        let normalizedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalizedSource.hasPrefix("data:") else {
+            return nil
+        }
+        guard let commaIndex = normalizedSource.firstIndex(of: ",") else {
+            return nil
+        }
+        let payloadStartIndex = normalizedSource.index(
+            normalizedSource.startIndex,
+            offsetBy: "data:".count
+        )
+        let metadata = String(normalizedSource[payloadStartIndex..<commaIndex])
+        let mediaTypePart = metadata.split(separator: ";").first
+        guard let rawMediaType = mediaTypePart, !rawMediaType.isEmpty else {
+            return nil
+        }
+        return rawMediaType.lowercased()
+    }
+
+    private func parseNumeric(_ value: String?) -> Double? {
+        guard let value else {
+            return nil
+        }
+
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return nil
+        }
+        if trimmed.hasSuffix("px") {
+            return Double(trimmed.dropLast(2))
+        }
+        if trimmed.hasSuffix("%") {
+            return nil
+        }
+        return Double(trimmed)
+    }
+
+    private func rebaseEmbeddedNodes(
+        _ nodes: [SVGNode],
+        parentSyntheticID: String
+    ) -> [SVGNode] {
+        let parentSuffix = parentEmbeddedSuffix(from: parentSyntheticID)
+        return nodes.map { rebaseEmbeddedNode($0, parentSyntheticSuffix: parentSuffix) }
+    }
+
+    private func rebaseEmbeddedNode(
+        _ node: SVGNode,
+        parentSyntheticSuffix: String
+    ) -> SVGNode {
+        switch node {
+        case .group(let sourceGroup):
+            let base = rebaseSyntheticID(in: sourceGroup.base, parentSuffix: parentSyntheticSuffix)
+            let children = sourceGroup.children.map {
+                rebaseEmbeddedNode($0, parentSyntheticSuffix: parentSyntheticSuffix)
+            }
+            return .group(.init(base: base, children: children))
+        case .path(let sourcePath):
+            let base = rebaseSyntheticID(in: sourcePath.base, parentSuffix: parentSyntheticSuffix)
+            return .path(.init(base: base, pathData: sourcePath.pathData, commands: sourcePath.commands))
+        case .shape(let sourceShape):
+            let base = rebaseSyntheticID(in: sourceShape.base, parentSuffix: parentSyntheticSuffix)
+            return .shape(
+                .init(
+                    base: base,
+                    kind: sourceShape.kind,
+                    values: sourceShape.values,
+                    points: sourceShape.points
+                )
+            )
+        case .rasterImage(let sourceRasterImage):
+            let base = rebaseSyntheticID(in: sourceRasterImage.base, parentSuffix: parentSyntheticSuffix)
+            return .rasterImage(
+                .init(
+                    base: base,
+                    x: sourceRasterImage.x,
+                    y: sourceRasterImage.y,
+                    width: sourceRasterImage.width,
+                    height: sourceRasterImage.height,
+                    mediaType: sourceRasterImage.mediaType
+                )
+            )
+        }
+    }
+
+    private func rebaseSyntheticID(in sourceBase: SVGBaseNode, parentSuffix: String) -> SVGBaseNode {
+        let childSuffix = embeddedChildSuffix(from: sourceBase.syntheticID)
+        let rebasedID = "auto:\(parentSuffix)/embedded\(childSuffix)"
+        return SVGBaseNode(
+            id: sourceBase.id,
+            syntheticID: rebasedID,
+            style: sourceBase.style,
+            transform: sourceBase.transform,
+            attributes: sourceBase.attributes
+        )
+    }
+
+    private func parentEmbeddedSuffix(from syntheticID: String) -> String {
+        let prefix = "auto:"
+        guard syntheticID.hasPrefix(prefix) else {
+            return "/\(syntheticID)"
+        }
+        let startIndex = syntheticID.index(syntheticID.startIndex, offsetBy: prefix.count)
+        return String(syntheticID[startIndex...])
+    }
+
+    private func embeddedChildSuffix(from syntheticID: String) -> String {
+        let prefix = "auto:"
+        guard syntheticID.hasPrefix(prefix) else {
+            return "/\(syntheticID)"
+        }
+        let startIndex = syntheticID.index(syntheticID.startIndex, offsetBy: prefix.count)
+        let withoutAuto = String(syntheticID[startIndex...])
+        if withoutAuto == "/0" {
+            return withoutAuto
+        }
+        if withoutAuto.hasPrefix("/0/") {
+            let index = withoutAuto.index(withoutAuto.startIndex, offsetBy: 2)
+            return String(withoutAuto[index...])
+        }
+        return withoutAuto
     }
 }
 
@@ -35,7 +390,10 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         case svg
         case group
         case path
+        case defs
+        case clipPath
         case shape(SVGElementKind)
+        case image
     }
 
     private struct Frame {
@@ -47,9 +405,15 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     }
 
     private let options: SVGParserOptions
+    private let styleDeclarationParser = SVGStyleDeclarationParser()
+    private let styleRuleParser = SVGStyleRuleParser()
     private let pathDataParser = SVGPathDataParser()
     private var frames: [Frame] = []
     private var ignoreDepth: Int = 0
+    private var styleDepth: Int = 0
+    private var styleBuffer: String = ""
+    private var styleRules: [SVGStyleRule] = []
+    private var clipPathDefinitions: [String: [SVGNode]] = [:]
     private var parseError: SVGParserError?
     private var rootDocument: SVGDocument?
 
@@ -60,6 +424,10 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     func parse(data: Data) throws -> SVGDocument {
         frames.removeAll()
         ignoreDepth = 0
+        styleDepth = 0
+        styleBuffer.removeAll(keepingCapacity: false)
+        styleRules.removeAll(keepingCapacity: false)
+        clipPathDefinitions.removeAll(keepingCapacity: false)
         parseError = nil
         rootDocument = nil
 
@@ -95,31 +463,55 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         if parseError != nil {
             return
         }
+        if styleDepth > 0 {
+            styleDepth += 1
+            return
+        }
         if ignoreDepth > 0 {
             ignoreDepth += 1
             return
         }
 
         let normalizedName = normalizeName(elementName)
+        if normalizedName == "style" {
+            if options.enableStyleTag {
+                styleDepth = 1
+                styleBuffer.removeAll(keepingCapacity: false)
+                return
+            }
+            ignoreDepth = 1
+            return
+        }
+
         guard let frameKind = frameKind(for: normalizedName, stackDepth: frames.count) else {
             ignoreDepth = 1
             return
         }
 
+        let embeddedSource: String? = if case .image = frameKind {
+            embeddedImageSource(from: attributeDict)
+        } else {
+            nil
+        }
         let syntheticID = makeSyntheticID(parentDepth: frames.count)
+        var styledAttributes = enrichStyledAttributes(attributeDict)
+        if let embeddedSource {
+            styledAttributes[embeddedImageSourceAttribute] = embeddedSource
+        }
+
         let base = SVGBaseNode(
             id: attributeDict["id"],
             syntheticID: syntheticID,
             style: parseStyle(attributes: attributeDict),
             transform: parseTransform(attributes: attributeDict),
-            attributes: attributeDict
+            attributes: styledAttributes
         )
 
         frames.append(
             Frame(
                 kind: frameKind,
                 base: base,
-                attributes: attributeDict,
+                attributes: styledAttributes,
                 children: [],
                 childCount: 0
             )
@@ -133,6 +525,17 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         qualifiedName qName: String?
     ) {
         if parseError != nil {
+            return
+        }
+        if styleDepth > 0 {
+            if normalizeName(elementName) == "style" {
+                if styleDepth == 1 {
+                    let rules = styleRuleParser.parse(styleBuffer)
+                    styleRules.append(contentsOf: rules)
+                    styleBuffer.removeAll(keepingCapacity: false)
+                }
+                styleDepth -= 1
+            }
             return
         }
         if ignoreDepth > 0 {
@@ -159,10 +562,18 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             rootDocument = SVGDocument(
                 size: parseRootSize(attributes: frame.attributes),
                 viewBox: parseViewBox(attributes: frame.attributes),
-                nodes: frame.children
+                nodes: frame.children,
+                styleRules: styleRules,
+                clipPaths: clipPathDefinitions
             )
         case .group:
             appendNode(.group(.init(base: frame.base, children: frame.children)), parser: parser)
+        case .defs:
+            break
+        case .clipPath:
+            if let clipPathID = frame.base.id {
+                clipPathDefinitions[clipPathID] = frame.children
+            }
         case .path:
             let pathData = frame.attributes["d"] ?? ""
             do {
@@ -174,12 +585,31 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             }
         case .shape(let kind):
             appendNode(buildShapeNode(kind: kind, frame: frame), parser: parser)
+        case .image:
+            if !frame.children.isEmpty || frame.base.attributes[embeddedImageSourceAttribute] != nil {
+                appendNode(.group(.init(base: frame.base, children: frame.children)), parser: parser)
+            }
         }
     }
 
     func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
         if self.parseError == nil {
             self.parseError = .malformedDocument(reason: parseError.localizedDescription)
+        }
+    }
+
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
+        if styleDepth > 0 {
+            styleBuffer.append(string)
+        }
+    }
+
+    func parser(_ parser: XMLParser, foundCDATA CDATABlock: Data) {
+        guard styleDepth > 0 else {
+            return
+        }
+        if let text = String(data: CDATABlock, encoding: .utf8) {
+            styleBuffer.append(text)
         }
     }
 
@@ -194,10 +624,37 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         frames.append(parent)
     }
 
+    private func embeddedImageSource(from attributes: [String: String]) -> String? {
+        guard let href = attributeValue(named: "href", in: attributes) else {
+            return nil
+        }
+        let normalizedHref = href.trimmingCharacters(in: .whitespacesAndNewlines)
+        return normalizedHref
+    }
+
+    private func attributeValue(named attributeName: String, in attributes: [String: String]) -> String? {
+        if let directMatch = attributes[attributeName] {
+            return directMatch
+        }
+        for (key, value) in attributes {
+            let normalized = normalizeName(key)
+            if normalized == attributeName {
+                return value
+            }
+        }
+        return nil
+    }
+
     private func frameKind(for name: String, stackDepth: Int) -> FrameKind? {
         switch name {
         case "svg":
             return stackDepth == 0 ? .svg : nil
+        case "defs":
+            return .defs
+        case "image":
+            return .image
+        case "clippath":
+            return .clipPath
         case "g":
             return .group
         case "path":
@@ -225,8 +682,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return "svg"
         case .group:
             return "g"
+        case .defs:
+            return "defs"
         case .path:
             return "path"
+        case .clipPath:
+            return "clippath"
+        case .image:
+            return "image"
         case .shape(let shapeKind):
             return shapeKind.rawValue
         }
@@ -322,19 +785,39 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
 
     private func parseStyle(attributes: [String: String]) -> SVGStyle {
         var style = SVGStyle()
-        applyStyleAttribute(attributes: attributes, to: &style)
+        applyStyleAttributes(attributes: attributes, to: &style)
         if let inlineStyle = attributes["style"] {
-            applyInlineStyle(inlineStyle, to: &style)
+            let declarations = styleDeclarationParser.parse(inlineStyle)
+            applyStyleDeclarations(declarations, to: &style)
         }
         return style
     }
 
-    private func applyStyleAttribute(attributes: [String: String], to style: inout SVGStyle) {
+    private func enrichStyledAttributes(_ attributes: [String: String]) -> [String: String] {
+        var output = attributes
+        if let clipPathFromStyle = parseClipPathStyle(from: attributes["style"]) {
+            output["clip-path"] = clipPathFromStyle
+        }
+        return output
+    }
+
+    private func parseClipPathStyle(from styleText: String?) -> String? {
+        guard let styleText else {
+            return nil
+        }
+        let declarations = styleDeclarationParser.parse(styleText)
+        return declarations["clip-path"]
+    }
+
+    private func applyStyleAttributes(attributes: [String: String], to style: inout SVGStyle) {
         if let fill = attributes["fill"] {
             style.fill = parsePaint(fill)
         }
         if let fillOpacity = attributes["fill-opacity"] {
             style.fillOpacity = parseNumeric(fillOpacity)
+        }
+        if let fillRule = attributes["fill-rule"] {
+            style.fillRule = parseFillRule(fillRule)
         }
         if let stroke = attributes["stroke"] {
             style.stroke = parsePaint(stroke)
@@ -345,33 +828,54 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         if let strokeWidth = attributes["stroke-width"] {
             style.strokeWidth = parseNumeric(strokeWidth)
         }
+        if let strokeMiterLimit = attributes["stroke-miterlimit"] {
+            style.strokeMiterLimit = parseNumeric(strokeMiterLimit)
+        }
+        if let strokeDasharray = attributes["stroke-dasharray"] {
+            style.strokeDashArray = parseDashArray(strokeDasharray)
+        }
+        if let strokeDashoffset = attributes["stroke-dashoffset"] {
+            style.strokeDashOffset = parseNumeric(strokeDashoffset)
+        }
         if let opacity = attributes["opacity"] {
             style.opacity = parseNumeric(opacity)
         }
+        if let strokeLinecap = attributes["stroke-linecap"] {
+            style.strokeLineCap = parseStrokeLineCap(strokeLinecap)
+        }
+        if let strokeLinejoin = attributes["stroke-linejoin"] {
+            style.strokeLineJoin = parseStrokeLineJoin(strokeLinejoin)
+        }
     }
 
-    private func applyInlineStyle(_ inline: String, to style: inout SVGStyle) {
-        let declarations = inline.split(separator: ";")
-        for declaration in declarations {
-            let pair = declaration.split(separator: ":", maxSplits: 1).map(String.init)
-            guard pair.count == 2 else {
-                continue
-            }
-            let key = pair[0].trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            let value = pair[1].trimmingCharacters(in: .whitespacesAndNewlines)
-            switch key {
-            case "fill":
-                style.fill = parsePaint(value)
-            case "fill-opacity":
-                style.fillOpacity = parseNumeric(value)
-            case "stroke":
-                style.stroke = parsePaint(value)
-            case "stroke-opacity":
-                style.strokeOpacity = parseNumeric(value)
-            case "stroke-width":
-                style.strokeWidth = parseNumeric(value)
-            case "opacity":
-                style.opacity = parseNumeric(value)
+    private func applyStyleDeclarations(_ declarations: [String: String], to style: inout SVGStyle) {
+        for (rawKey, rawValue) in declarations {
+            let key = rawKey
+        switch key {
+        case "fill":
+            style.fill = parsePaint(rawValue)
+        case "fill-opacity":
+            style.fillOpacity = parseNumeric(rawValue)
+        case "fill-rule":
+            style.fillRule = parseFillRule(rawValue)
+        case "stroke":
+            style.stroke = parsePaint(rawValue)
+        case "stroke-opacity":
+            style.strokeOpacity = parseNumeric(rawValue)
+        case "stroke-width":
+            style.strokeWidth = parseNumeric(rawValue)
+        case "stroke-miterlimit":
+            style.strokeMiterLimit = parseNumeric(rawValue)
+        case "stroke-dasharray":
+            style.strokeDashArray = parseDashArray(rawValue)
+        case "stroke-dashoffset":
+            style.strokeDashOffset = parseNumeric(rawValue)
+        case "stroke-linecap":
+            style.strokeLineCap = parseStrokeLineCap(rawValue)
+        case "stroke-linejoin":
+            style.strokeLineJoin = parseStrokeLineJoin(rawValue)
+        case "opacity":
+                style.opacity = parseNumeric(rawValue)
             default:
                 continue
             }
@@ -488,6 +992,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 } else if values.count >= 2 {
                     operations.append(.scale(sx: values[0], sy: values[1]))
                 }
+            case "skewx":
+                if values.count >= 1 {
+                    operations.append(.skewX(angleDegrees: values[0]))
+                }
+            case "skewy":
+                if values.count >= 1 {
+                    operations.append(.skewY(angleDegrees: values[0]))
+                }
             case "rotate":
                 if values.count == 1 {
                     operations.append(.rotate(angleDegrees: values[0], cx: nil, cy: nil))
@@ -512,5 +1024,63 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             }
         }
         return SVGTransform(operations: operations)
+    }
+
+    private func parseStrokeLineCap(_ value: String) -> SVGLineCap? {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch normalized {
+        case "butt":
+            return .butt
+        case "square":
+            return .square
+        case "round":
+            return .round
+        default:
+            return nil
+        }
+    }
+
+    private func parseStrokeLineJoin(_ value: String) -> SVGLineJoin? {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch normalized {
+        case "miter":
+            return .miter
+        case "bevel":
+            return .bevel
+        case "round":
+            return .round
+        default:
+            return nil
+        }
+    }
+
+    private func parseFillRule(_ value: String) -> SVGFillRule? {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch normalized {
+        case "nonzero", "non-zero":
+            return .nonZero
+        case "evenodd", "even-odd":
+            return .evenOdd
+        default:
+            return nil
+        }
+    }
+
+    private func parseDashArray(_ value: String) -> [Double]? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return nil
+        }
+        if trimmed.lowercased() == "none" {
+            return []
+        }
+        let normalized = trimmed.replacingOccurrences(of: ",", with: " ")
+        let numericValues = normalized
+            .split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" })
+            .compactMap { Double($0) }
+        if numericValues.isEmpty {
+            return nil
+        }
+        return numericValues
     }
 }

@@ -159,6 +159,8 @@ final class SVGFixtureRegressionTests: XCTestCase {
             return nil
         case .path(let path):
             return path.base.id == targetID ? path : nil
+        case .rasterImage:
+            return nil
         case .shape:
             return nil
         }

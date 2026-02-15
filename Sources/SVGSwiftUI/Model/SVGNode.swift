@@ -2,6 +2,7 @@ public enum SVGElementKind: String, Sendable, Equatable {
     case svg
     case group = "g"
     case path
+    case image
     case rect
     case circle
     case ellipse
@@ -54,6 +55,31 @@ struct SVGPathNode: Sendable, Equatable {
     }
 }
 
+struct SVGRasterImageNode: Sendable, Equatable {
+    let base: SVGBaseNode
+    let x: Double?
+    let y: Double?
+    let width: Double?
+    let height: Double?
+    let mediaType: String?
+
+    init(
+        base: SVGBaseNode,
+        x: Double?,
+        y: Double?,
+        width: Double?,
+        height: Double?,
+        mediaType: String?
+    ) {
+        self.base = base
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.mediaType = mediaType
+    }
+}
+
 struct SVGShapeNode: Sendable, Equatable {
     var base: SVGBaseNode
     var kind: SVGElementKind
@@ -76,6 +102,7 @@ struct SVGShapeNode: Sendable, Equatable {
 enum SVGNode: Sendable, Equatable {
     case group(SVGGroupNode)
     case path(SVGPathNode)
+    case rasterImage(SVGRasterImageNode)
     case shape(SVGShapeNode)
 
     var elementKind: SVGElementKind {
@@ -84,6 +111,8 @@ enum SVGNode: Sendable, Equatable {
             return .group
         case .path:
             return .path
+        case .rasterImage:
+            return .image
         case .shape(let node):
             return node.kind
         }
@@ -94,6 +123,8 @@ enum SVGNode: Sendable, Equatable {
         case .group(let node):
             return node.base.id ?? node.base.syntheticID
         case .path(let node):
+            return node.base.id ?? node.base.syntheticID
+        case .rasterImage(let node):
             return node.base.id ?? node.base.syntheticID
         case .shape(let node):
             return node.base.id ?? node.base.syntheticID
@@ -106,6 +137,8 @@ enum SVGNode: Sendable, Equatable {
             return node.base
         case .path(let node):
             return node.base
+        case .rasterImage(let node):
+            return node.base
         case .shape(let node):
             return node.base
         }
@@ -115,7 +148,7 @@ enum SVGNode: Sendable, Equatable {
         switch self {
         case .group(let node):
             return node.children
-        case .path, .shape:
+        case .path, .rasterImage, .shape:
             return []
         }
     }

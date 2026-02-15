@@ -1,0 +1,76 @@
+{
+    "fixtures": [
+        {
+            "id": "w3c-1.1F2-coords-skew-transform",
+            "suite": "1.1F2",
+            "category": "coords",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/coords-skew-transform.svg",
+            "reference": "fixtures/1.1F2/ref/coords-skew-transform.expected.txt"
+        },
+        {
+            "id": "w3c-1.1F2-shapes-rounded-rect",
+            "suite": "1.1F2",
+            "category": "shapes",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/shapes-rounded-rect.svg",
+            "reference": "fixtures/1.1F2/ref/shapes-rounded-rect.expected.txt"
+        },
+        {
+            "id": "w3c-1.1F2-paths-move-line",
+            "suite": "1.1F2",
+            "category": "paths",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/paths-move-line.svg",
+            "reference": "fixtures/1.1F2/ref/paths-move-line.expected.txt"
+        },
+        {
+            "id": "w3c-1.1F2-shapes-rect-circle",
+            "suite": "1.1F2",
+            "category": "shapes",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/shapes-rect-circle.svg",
+            "reference": "fixtures/1.1F2/ref/shapes-rect-circle.expected.txt"
+        },
+        {
+            "id": "w3c-1.2T-coords-relative-transform",
+            "suite": "1.2T",
+            "category": "coords",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.2T/svg/coords-relative-transform.svg",
+            "reference": "fixtures/1.2T/ref/coords-relative-transform.expected.txt"
+        },
+        {
+            "id": "w3c-1.2T-styling-fill-stroke",
+            "suite": "1.2T",
+            "category": "styling",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.2T/svg/styling-fill-stroke.svg",
+            "reference": "fixtures/1.2T/ref/styling-fill-stroke.expected.txt"
+        },
+        {
+            "id": "w3c-1.1F2-styling-stroke-capjoin",
+            "suite": "1.1F2",
+            "category": "styling",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/styling-stroke-capjoin.svg",
+            "reference": "fixtures/1.1F2/ref/styling-stroke-capjoin.expected.txt"
+        },
+        {
+            "id": "w3c-1.1F2-styling-fillrule-dash",
+            "suite": "1.1F2",
+            "category": "styling",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/styling-fillrule-dash.svg",
+            "reference": "fixtures/1.1F2/ref/styling-fillrule-dash.expected.txt"
+        }
+    ]
+}

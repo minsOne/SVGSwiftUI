@@ -15,10 +15,66 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Generate W3C conformance tests
+        run: ./Scripts/w3c/generate-w3c-tests.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json Tests/SVGSwiftUITests/W3CGeneratedTests.swift
+
+      - name: Generate WebKit conformance tests
+        run: |
+          ./Scripts/webkit/generate-webkit-tests.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json Tests/SVGSwiftUITests/WebKitGeneratedTests.swift
+
       - name: Run swift test
         run: |
           swift --version
           swift test --parallel
+
+      - name: Run W3C conformance tests
+        run: |
+          swift test --filter testW3CGeneratedSuite --no-parallel 2>&1 | tee w3c-conformance.log
+
+      - name: Run WebKit conformance tests
+        run: |
+          swift test --filter testWebKitGeneratedSuite --no-parallel 2>&1 | tee webkit-conformance.log
+
+      - name: Run S3 performance profile
+        run: ./Scripts/performance/run-s3-profile.sh
+
+      - name: Generate W3C coverage report
+        if: always()
+        run: ./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict
+
+      - name: Generate WebKit coverage report
+        if: always()
+        run: ./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict
+
+      - name: Upload W3C conformance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: w3c-conformance-${{ github.run_id }}
+          path: |
+            docs/W3C_COVERAGE.md
+            Tests/SVGSwiftUITests/W3C/w3c-manifest.json
+            Tests/SVGSwiftUITests/W3CGeneratedTests.swift
+            w3c-conformance.log
+
+      - name: Upload WebKit conformance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: webkit-conformance-${{ github.run_id }}
+          path: |
+            docs/WEBKIT_COVERAGE.md
+            Tests/SVGSwiftUITests/WebKit/webkit-manifest.json
+            Tests/SVGSwiftUITests/WebKitGeneratedTests.swift
+            webkit-conformance.log
+
+      - name: Upload S3 performance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s3-performance-${{ github.run_id }}
+          path: |
+            s3-profile.log
 
   demo-uitests:
     name: Demo UITests
