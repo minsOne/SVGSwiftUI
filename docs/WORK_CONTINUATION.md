@@ -4,10 +4,10 @@
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2 완료
-- 다음 단계: `A14-3` 완료 처리 후 다음 고급 렌더 후보(예: `filter` 알파/색공간 보존 경로) 사전 설계
+- 다음 단계: `A15-1` 실행 그래프 분리 착수 및 `A15-2` 필터 합성 정밀도 강화 검토
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
-- 다음 단계: `A14-3` (`in`/`in2`/`result` chain 회귀 검증 강화)
+- 다음 단계: `A15-1` (`in`/`in2`/`result` 실행 정책 분리) 착수
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -22,7 +22,7 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. 다음 단계: `A14-3` 완료 검수 후 `A15` 후보 기능(필터 결과 블렌딩 정확도 강화) 반영 검토
+1. 다음 단계: `A15-1` 실행 그래프 분리 적용 후 `A15-2` 블렌딩 정밀도 강화 착수
 
 ## 작업 진행 루프(재작업 방지)
 - Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환
@@ -70,6 +70,7 @@
 - [x] A14-1 `in`/`in2`/`result` 파싱/저장 보강
 - [x] A14-2 체인 렌더 가드 적용
 - [x] A14-3 chain 회귀 검증 강화
+- [x] A15-1 필터 체인 실행 그래프 추상화 적용
 
 ### 2026-02-16 (Session 48)
 - 작업: `A14-1/A14-2` filter 체인 메타데이터 파싱 + 렌더 체인 가드 구현
@@ -103,6 +104,19 @@
   - `swift test --no-parallel` (137 tests, 0 failures)
   - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
   - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
+### 2026-02-16 (Session 50)
+- 작업: `A15-1` 필터 체인 실행 그래프 분리
+- 완료:
+  - `SVGFilterGraphExecutor` 추가: `canExecute`/`requiredSourceNames`/`resolvedResultName`를 중앙화
+  - `SVGView.applyFilterPrimitives`가 공용 executor를 통해 source/result 정책을 동일하게 적용
+  - `SVGFilterGraphExecutionTests` 추가로 필터 체인 실행 규칙 단위 검증
+- 리스크:
+  - `feBlend`/`feColorMatrix`의 픽셀 합성 정밀도는 여전히 기존 `GraphicsContext` 경로로만 처리됨
+- 다음 액션:
+  - `A15-2`에서 오프스크린 합성 그래프를 도입해 `blend`/`colorMatrix` 정확도 강화
+- 검증:
+  - `swift test --no-parallel` (138 tests, 0 failures)
 
 ## 구현 중 준수 규칙
 - 파서/모델 계층은 UI 타입(`Color`) 의존을 피하고 값 타입 중심으로 유지

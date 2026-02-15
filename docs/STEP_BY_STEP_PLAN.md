@@ -55,6 +55,7 @@
 | A14-1 | filter 체인 소스/결과 모델링 | `in`/`in2`/`result` 파싱 기본값/반영 | 파서 반환 primitive에 소스·결과 정보 보존 |
 | A14-2 | filter 체인 실행 가드 | `applyFilterPrimitives` 입력 소스 가용성 확인 | 유효하지 않은 체인은 no-op, 유효 체인만 적용 |
 | A14-3 | chain 회귀 검증 강화 | 파싱/시각 회귀 케이스 보강 | `filter` 체인 케이스 기반 conformance 범위 확장 |
+| A15-1 | 필터 체인 실행 그래프 분리 | `SourceGraphic`/`SourceAlpha`/`result` 상태머신 추상화 | renderer/파서 체인 가용성 규칙 정합성 보강 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

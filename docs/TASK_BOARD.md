@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (A14-3 done)
+Last Updated: 2026-02-16 (A15-1 in_progress)
 
 ## Status Legend
 - `todo`: not started
@@ -63,6 +63,7 @@ Last Updated: 2026-02-16 (A14-3 done)
 | A14-1 | A14 | filter 체인 소스/결과 모델링 | done | `in`/`in2`/`result` 파싱/보존 및 기본값 적용 |
 | A14-2 | A14 | filter 체인 렌더 가드 | done | 입력 소스 가용성 검사 기반 `applyFilterPrimitives` 로직 적용 |
 | A14-3 | A14 | filter chain 회귀 테스트 강화 | done | WebKit/W3C `in`/`result` 체인 케이스 보강 및 conformance 범위 확장 |
+| A15-1 | A15 | 필터 체인 실행 그래프 분리 | in_progress | `SourceGraphic`/`SourceAlpha`/`result` 규칙을 렌더/파서 공통 실행 정책으로 통합 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

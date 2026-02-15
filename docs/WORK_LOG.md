@@ -2,6 +2,20 @@
 
 ## 2026-02-16
 
+### Session 50
+- 작업: `A15-1` 필터 체인 실행 그래프 분리
+- 완료:
+  - `SVGFilterGraphExecutor` 추가: `canExecute`, `requiredSourceNames`, `resolvedResultName` 규칙 중앙화
+  - `SVGView.applyFilterPrimitives`에서 실행 판단을 공용 executor로 전환
+  - `SVGFilterGraphExecutionTests`로 체인 가용성/`result` 전달 규칙 검증
+- 리스크:
+  - 실제 블렌드/색공간 합성 정밀도(시각 파이프라인)는 아직 기존 `GraphicsContext` 방식으로 유지
+  - `feColorMatrix`/`feBlend` 합성의 픽셀 정확도는 `canExecute` 단계와 분리되어 있으며, 이후 단계에서 오프스크린 파이프라인으로 전환 필요
+- 다음 액션:
+  - `A15-2`: `SourceGraphic`/`SourceAlpha`/`result` 그래프를 기반으로 실제 오프스크린 합성 파이프라인으로 확장해 `blend`/`colorMatrix` 정확도 강화
+- 검증:
+  - `swift test --no-parallel` (138 tests, 0 failures)
+
 ### Session 49
 - 작업: `A14-3` filter chain 회귀 테스트 강화
 - 완료:
