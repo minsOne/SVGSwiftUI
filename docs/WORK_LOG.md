@@ -2,6 +2,25 @@
 
 ## 2026-02-16
 
+### Session 53
+- 작업: `A16-1` `feComposite` 지원
+- 완료:
+  - `SVGFilterPrimitive`에 `.composite` 추가 (`operator`, `in`, `in2`, `k1~k4`, `result` 반영)
+  - `<filter>` 파서에서 `feComposite` 특화 파싱 및 기본값(`operator=over`) 적용
+  - `SVGFilterGraphExecutor`에 `requiredSourceNames`/`resolvedResultName` 규칙을 통합
+  - 오프스크린 경로에 `feComposite` 정합도(지원 필터 소스+연산자 매핑) 추가
+  - `SVGView` 체인 렌더 폴백 경로에서 `.composite` 처리 추가(현재 결과 등록 중심, unsupported no-op 유지)
+  - `SVGFilterGraphExecutionTests`, `SVGFilterImageRendererTests`, `SVGParserTests` 테스트 케이스 추가
+- 리스크:
+  - `operator="arithmetic"`(`k1~k4`)과 일부 특수 연산은 현재 `CISourceOverCompositing` 폴백으로 처리되어 정밀한 수식 합성은 미지원
+- 다음 액션:
+  - `A16-2`로 `feComposite` arithmetic 모드 정밀도 지원/대체 정책 정리 및 conformance fixture 반영
+- 검증:
+  - `swift test --filter testParseTracksSupportedCompositePrimitive --no-parallel`
+  - `swift test --filter testFilterGraphCanExecuteCompositePrimitiveWithResult --no-parallel`
+  - `swift test --filter testRenderFilteredImageAppliesCompositeInOperator --no-parallel`
+  - `swift test --filter testRequiresOffscreenProcessingForCompositePrimitive --no-parallel`
+  - `swift test --no-parallel`
 ### Session 52
 - 작업: `A15-2` 오프스크린 블렌드 정밀도 보강
 - 완료:

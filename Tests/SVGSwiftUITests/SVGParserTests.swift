@@ -420,6 +420,51 @@ final class SVGParserTests: XCTestCase {
         )
     }
 
+    func testParseTracksSupportedCompositePrimitive() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="composite">
+              <feComposite operator="in" in="SourceGraphic" in2="SourceAlpha" k1="0.2" k2="0.3" k3="0.4" k4="0.5"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            filter="url(#composite)"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["composite"]?.primitives)
+        XCTAssertEqual(primitives.count, 1)
+        guard case .composite(
+            let operatorType,
+            let inSource,
+            let inSourceTwo,
+            let k1,
+            let k2,
+            let k3,
+            let k4,
+            let result
+        ) = primitives[0] else {
+            return XCTFail("Expected composite filter primitive")
+        }
+        XCTAssertEqual(operatorType, "in")
+        XCTAssertEqual(inSource, "SourceGraphic")
+        XCTAssertEqual(inSourceTwo, "SourceAlpha")
+        XCTAssertEqual(k1, 0.2)
+        XCTAssertEqual(k2, 0.3)
+        XCTAssertEqual(k3, 0.4)
+        XCTAssertEqual(k4, 0.5)
+        XCTAssertNil(result)
+        XCTAssertFalse(document.filterDefinitions["composite"]?.hasUnsupportedPrimitives == true)
+    }
+
     func testParseKeepsUnsupportedFilterPrimitives() throws {
         let svg = """
         <svg>

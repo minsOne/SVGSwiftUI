@@ -40,6 +40,10 @@ internal enum SVGFilterGraphExecutor {
             let resolvedSourceOne: String = inSource ?? sourceGraphicName
             let resolvedSourceTwo: String = inSourceTwo ?? sourceGraphicName
             return [resolvedSourceOne, resolvedSourceTwo]
+        case .composite(_, let inSource, let inSourceTwo, _, _, _, _, _):
+            let resolvedSourceOne: String = inSource ?? sourceGraphicName
+            let resolvedSourceTwo: String = inSourceTwo ?? sourceGraphicName
+            return [resolvedSourceOne, resolvedSourceTwo]
         case .colorMatrix(_, let inSource, _):
             let resolvedSource: String = inSource ?? sourceGraphicName
             return [resolvedSource]
@@ -55,6 +59,8 @@ internal enum SVGFilterGraphExecutor {
         case .offset(_, _, _, let result):
             return normalizedSourceName(from: result)
         case .blend(_, _, _, let result):
+            return normalizedSourceName(from: result)
+        case .composite(_, _, _, _, _, _, _, let result):
             return normalizedSourceName(from: result)
         case .colorMatrix(_, _, let result):
             return normalizedSourceName(from: result)

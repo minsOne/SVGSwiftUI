@@ -709,6 +709,26 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 inSource: inSource,
                 result: result
             )
+        case "fecomposite":
+            let operatorType: String = parseCompositeOperator(normalizedAttributes["operator"])
+            let inSourceTwo: String = parseFilterSourceReference(
+                from: normalizedAttributes["in2"],
+                defaultValue: inSourceDefault
+            )
+            let k1: Double = parseNumeric(normalizedAttributes["k1"] ?? "0") ?? 0
+            let k2: Double = parseNumeric(normalizedAttributes["k2"] ?? "0") ?? 0
+            let k3: Double = parseNumeric(normalizedAttributes["k3"] ?? "0") ?? 0
+            let k4: Double = parseNumeric(normalizedAttributes["k4"] ?? "0") ?? 0
+            return .composite(
+                operatorType: operatorType,
+                inSource: inSource,
+                inSourceTwo: inSourceTwo,
+                k1: k1,
+                k2: k2,
+                k3: k3,
+                k4: k4,
+                result: result
+            )
         default:
             if name.hasPrefix("fe") {
                 return .unsupported(
@@ -769,6 +789,16 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return "normal"
         }
         return mode
+    }
+
+    private func parseCompositeOperator(_ value: String?) -> String {
+        let operatorType: String = value?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased() ?? ""
+        if operatorType.isEmpty {
+            return "over"
+        }
+        return operatorType
     }
 
     private func parseNumericList(from value: String) -> [Double] {

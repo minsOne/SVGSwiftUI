@@ -64,6 +64,44 @@ final class SVGFilterGraphExecutionTests: XCTestCase {
         )
     }
 
+    func testFilterGraphCanExecuteCompositePrimitiveWithResult() {
+        let primitives: [SVGFilterPrimitive] = [
+            .composite(
+                operatorType: "in",
+                inSource: "SourceGraphic",
+                inSourceTwo: "SourceAlpha",
+                k1: 1,
+                k2: 0,
+                k3: 0,
+                k4: 0,
+                result: "masked"
+            ),
+            .colorMatrix(
+                values: [
+                    1, 0, 0, 0, 0,
+                    1, 0, 0, 0, 0,
+                    1, 0, 0, 0, 0,
+                    0, 0, 0, 1, 0
+                ],
+                inSource: "masked",
+                result: nil
+            )
+        ]
+        var availableSources: Set<String> = SVGFilterGraphExecutor.defaultAvailableSources()
+        for primitive in primitives {
+            let canExecute: Bool = SVGFilterGraphExecutor.canExecute(
+                primitive,
+                availableSources: availableSources
+            )
+            XCTAssertTrue(canExecute)
+            if let resultName: String = SVGFilterGraphExecutor.resolvedResultName(for: primitive) {
+                availableSources.insert(resultName)
+            }
+        }
+
+        XCTAssertTrue(availableSources.contains("masked"))
+    }
+
     func testFilterGraphDefaultsSourceInputsWhenMissingIn() {
         let primitive: SVGFilterPrimitive = .offset(
             dx: 2,

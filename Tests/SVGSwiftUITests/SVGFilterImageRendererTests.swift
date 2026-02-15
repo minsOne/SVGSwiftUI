@@ -246,6 +246,67 @@ final class SVGFilterImageRendererTests: XCTestCase {
         XCTAssertLessThan(pixel.b, 60)
     }
 
+    func testRenderFilteredImageAppliesCompositeInOperator() throws {
+        let sourceColor: Color = Color(red: 0.1, green: 0.7, blue: 0.9, opacity: 1)
+        let imageSize: CGSize = CGSize(width: 20, height: 20)
+        guard let renderedImage = SVGFilterImageRenderer.renderFilteredImage(
+            path: Path(CGRect(origin: .zero, size: imageSize)),
+            fillColor: sourceColor,
+            fillStyle: FillStyle(eoFill: false),
+            strokeColor: nil,
+            strokeWidth: 0,
+            lineCap: .round,
+            lineJoin: .miter,
+            miterLimit: 10,
+            dash: [],
+            dashPhase: 0,
+            opacity: 1.0,
+            size: imageSize,
+            primitives: [
+                .composite(
+                    operatorType: "in",
+                    inSource: "SourceGraphic",
+                    inSourceTwo: "SourceAlpha",
+                    k1: 0,
+                    k2: 0,
+                    k3: 0,
+                    k4: 0,
+                    result: nil
+                )
+            ]
+        ) else {
+            XCTFail("Expected rendered image")
+            return
+        }
+
+        let center = CGPoint(x: 10, y: 10)
+        guard let pixel = pixel(from: renderedImage, at: center) else {
+            XCTFail("Expected non-nil pixel")
+            return
+        }
+        XCTAssertGreaterThan(pixel.r, 15)
+        XCTAssertGreaterThan(pixel.g, 150)
+        XCTAssertGreaterThan(pixel.b, 120)
+        XCTAssertEqual(pixel.a, 255)
+    }
+
+    func testRequiresOffscreenProcessingForCompositePrimitive() {
+        XCTAssertTrue(
+            SVGFilterImageRenderer.requiresOffscreenProcessing(
+                [.composite(
+                    operatorType: "over",
+                    inSource: "SourceGraphic",
+                    inSourceTwo: "SourceGraphic",
+                    k1: 0,
+                    k2: 0,
+                    k3: 0,
+                    k4: 0,
+                    result: nil
+                )]
+            )
+        )
+    }
+
     func testRequiresOffscreenProcessingForBlendAndMatrixOnly() {
         XCTAssertTrue(
             SVGFilterImageRenderer.requiresOffscreenProcessing(

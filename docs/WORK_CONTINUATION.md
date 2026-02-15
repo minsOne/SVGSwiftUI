@@ -3,11 +3,11 @@
 ## 현재 상태 (2026-02-16)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료
-- 다음 단계: `A15-2` 정밀도 검증 보강(`SourceAlpha`/fallback 정책) 계속 수행
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1 완료
+- 다음 단계: `A16-2`로 `feComposite` 고급 연산(`arithmetic` 중심) 정밀도 정책 정리
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
-- 다음 단계: `A15-2` 정밀도 검증 보강(`SourceAlpha`/fallback 정책) 계속 수행
+- 다음 단계: `A16-2`로 `feComposite` 고급 연산(`arithmetic` 중심) 정밀도 정책 정리
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -22,7 +22,7 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. 다음 단계: `A15-2` 정밀도 검증 보강(`SourceAlpha`/fallback 정책) 계속 수행
+1. 다음 단계: `A16-2`로 `feComposite` 고급 연산(`arithmetic`) 지원 또는 대체 정책 정리
 
 ## 작업 진행 루프(재작업 방지)
 - Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환
@@ -72,6 +72,7 @@
 - [x] A14-3 chain 회귀 검증 강화
 - [x] A15-1 필터 체인 실행 그래프 추상화 적용
 - [x] A15-2 오프스크린 블렌드/컬러매트릭스 정밀도 보강
+- [x] A16-1 `feComposite` 지원
 
 ### 2026-02-16 (Session 48)
 - 작업: `A14-1/A14-2` filter 체인 메타데이터 파싱 + 렌더 체인 가드 구현
@@ -132,6 +133,25 @@
   - `A15-2`: `blend`/`colorMatrix` 오프스크린 경로 정합성 강화를 위한 픽셀 비교 중심 테스트 확장
 - 검증:
   - `swift test --filter SVGFilterImageRendererTests --no-parallel`
+  - `swift test --no-parallel`
+
+### 2026-02-16 (Session 53)
+- 작업: `A16-1` `feComposite` 지원
+- 완료:
+  - `SVGFilterPrimitive`에 `.composite` 케이스를 추가해 `operator`, `in`, `in2`, `k1~k4`, `result`를 모델링
+  - `SVGParser`에서 `feComposite` 파서 및 속성 기본값(`operator=over`) 처리 추가
+  - `SVGFilterGraphExecutor`에 `requiredSourceNames`/`resolvedResultName` 규칙을 중앙화
+  - 오프스크린 `SVGFilterImageRenderer`에 `feComposite` 정합도 경로 추가(`over/in/out/atop/xor/lighter` 등 매핑)
+  - 체인/파서/렌더 테스트를 3개 추가
+- 리스크:
+  - `arithmetic` 모드(`k1~k4`)는 현재 `CISourceOverCompositing` 폴백 처리되어 수식 기반 합성은 미지원
+- 다음 액션:
+  - `A16-2`: `feComposite` arithmetic 모드 정확도 지원 또는 대체 정책 정리 후 fixture로 정합도 보강
+- 검증:
+  - `swift test --filter testParseTracksSupportedCompositePrimitive --no-parallel`
+  - `swift test --filter testFilterGraphCanExecuteCompositePrimitiveWithResult --no-parallel`
+  - `swift test --filter testRenderFilteredImageAppliesCompositeInOperator --no-parallel`
+  - `swift test --filter testRequiresOffscreenProcessingForCompositePrimitive --no-parallel`
   - `swift test --no-parallel`
 
 ## 구현 중 준수 규칙

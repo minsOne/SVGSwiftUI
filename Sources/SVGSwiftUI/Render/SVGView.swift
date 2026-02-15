@@ -589,6 +589,8 @@ private struct SVGStaticPlaceholderView: View {
                 if let resultName: String = SVGFilterGraphExecutor.resolvedResultName(for: primitive) {
                     availableSources.insert(resultName)
                 }
+            case .composite:
+                continue
             case .colorMatrix(
                 _,
                 _,

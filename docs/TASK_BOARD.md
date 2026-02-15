@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (A15-2 done)
+Last Updated: 2026-02-16 (A16-1 done)
 
 ## Status Legend
 - `todo`: not started
@@ -65,6 +65,7 @@ Last Updated: 2026-02-16 (A15-2 done)
 | A14-3 | A14 | filter chain 회귀 테스트 강화 | done | WebKit/W3C `in`/`result` 체인 케이스 보강 및 conformance 범위 확장 |
 | A15-1 | A15 | 필터 체인 실행 그래프 분리 | done | `SourceGraphic`/`SourceAlpha`/`result` 규칙을 렌더/파서 공통 실행 정책으로 통합 |
 | A15-2 | A15 | 오프스크린 필터 합성 정밀도 강화 | done | `feBlend`/`feColorMatrix`를 CI 기반 렌더 경로로 수행해 `result` 체인 시각 정합성 강화 |
+| A16-1 | A16 | feComposite 지원 | done | `feComposite` 파서/그래프/오프스크린 CI 렌더 경로 및 체인 테스트 보강 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

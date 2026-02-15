@@ -17,6 +17,16 @@ enum SVGFilterPrimitive: Sendable, Equatable {
         inSourceTwo: String?,
         result: String?
     )
+    case composite(
+        operatorType: String,
+        inSource: String?,
+        inSourceTwo: String?,
+        k1: Double,
+        k2: Double,
+        k3: Double,
+        k4: Double,
+        result: String?
+    )
     case colorMatrix(
         values: [Double],
         inSource: String?,
@@ -28,7 +38,7 @@ enum SVGFilterPrimitive: Sendable, Equatable {
 extension SVGFilterPrimitive {
     var isSupported: Bool {
         switch self {
-        case .gaussianBlur, .offset, .blend, .colorMatrix:
+        case .gaussianBlur, .offset, .blend, .composite, .colorMatrix:
             true
         case .unsupported:
             false

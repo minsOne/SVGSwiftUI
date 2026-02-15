@@ -19,7 +19,7 @@ internal enum SVGFilterImageRenderer {
     static func requiresOffscreenProcessing(_ primitives: [SVGFilterPrimitive]) -> Bool {
         for primitive in primitives {
             switch primitive {
-            case .blend, .colorMatrix:
+            case .blend, .colorMatrix, .composite:
                 return true
             case .gaussianBlur, .offset, .unsupported:
                 continue
@@ -254,6 +254,30 @@ internal enum SVGFilterImageRenderer {
             blendFilter.setValue(secondSource, forKey: kCIInputBackgroundImageKey)
             let filtered: CIImage? = blendFilter.outputImage?.cropped(to: fallbackExtent)
             return filtered
+        case .composite(
+            let operatorType,
+            let inSource,
+            let inSourceTwo,
+            _, _, _, _,
+            _
+        ):
+            let firstSourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
+            let secondSourceName: String = normalizedFilterSourceName(inSourceTwo, default: sourceGraphicName)
+            let firstSource: CIImage = sourceImage(
+                name: firstSourceName,
+                availableSources: availableSources
+            )
+            let secondSource: CIImage = sourceImage(
+                name: secondSourceName,
+                availableSources: availableSources
+            )
+            let filterName: String = compositeFilterName(for: operatorType)
+            guard let compositeFilter: CIFilter = CIFilter(name: filterName) else {
+                return nil
+            }
+            compositeFilter.setValue(firstSource, forKey: kCIInputImageKey)
+            compositeFilter.setValue(secondSource, forKey: kCIInputBackgroundImageKey)
+            return compositeFilter.outputImage?.cropped(to: fallbackExtent)
         case .colorMatrix(let values, let inSource, _):
             let normalizedSourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
             let source: CIImage = sourceImage(
@@ -344,6 +368,30 @@ internal enum SVGFilterImageRenderer {
             return "CILuminosityBlendMode"
         case "plus":
             return "CIAdditionCompositing"
+        default:
+            return "CISourceOverCompositing"
+        }
+    }
+
+    private static func compositeFilterName(for operatorType: String) -> String {
+        let normalizedOperator: String = operatorType
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        switch normalizedOperator {
+        case "", "over", "source-over":
+            return "CISourceOverCompositing"
+        case "in":
+            return "CISourceInCompositing"
+        case "out":
+            return "CISourceOutCompositing"
+        case "atop":
+            return "CISourceAtopCompositing"
+        case "xor":
+            return "CIXorCompositing"
+        case "lighter":
+            return "CIAdditionCompositing"
+        case "arithmetic":
+            return "CISourceOverCompositing"
         default:
             return "CISourceOverCompositing"
         }
