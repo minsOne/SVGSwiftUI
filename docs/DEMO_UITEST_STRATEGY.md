@@ -6,14 +6,24 @@
 
 ## 현재 구현 상태 (2026-02-15)
 - `Examples/SVGSwiftUIDemo/UITests/SVGSwiftUIDemoUITests.swift` 구현 완료
+- 브라우저 기준 오라클(Playwright) 비교 모드 추가: 환경변수 `SVG_BROWSER_REFERENCE_DIR`로 기준 이미지 경로를 바인딩하면 로컬 baseline 대신 브라우저 렌더 이미지를 기준으로 비교
 - 현재 자동화 범위:
   - launch + 핵심 접근성 요소 존재 확인
   - sample 전환 + node id 입력 반영 확인
   - fill/stroke toggle 조작
   - offset slider 조작
   - canvas baseline 시각 회귀 비교(`testCanvasMatchesBaselines`)
+- 브라우저 기준 시나리오 생성은 `Scripts/browser-oracle/browser-oracle-manifest.json` + `Scripts/browser-oracle/generate-browser-baselines.sh` 기반
 - 검증 커맨드:
   - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
+
+### 브라우저 기준 비교 실행
+- 기준 생성:
+  - `./Scripts/browser-oracle/generate-browser-baselines.sh --output Examples/SVGSwiftUIDemo/UITests/BrowserBaselines`
+  - 필요 시 기존 Swift baseline 크기에 맞추려면:
+    - `./Scripts/browser-oracle/generate-browser-baselines.sh --output Examples/SVGSwiftUIDemo/UITests/BrowserBaselines --reference-baseline-dir Examples/SVGSwiftUIDemo/UITests/Baselines/iPhone_17/26.2`
+- 테스트 실행:
+  - `SVG_BROWSER_REFERENCE_DIR=Examples/SVGSwiftUIDemo/UITests/BrowserBaselines SVG_BROWSER_REFERENCE_TOLERANCE=2 xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
 
 ## 범위
 1. DemoApp launch 및 샘플 SVG 화면 진입 테스트

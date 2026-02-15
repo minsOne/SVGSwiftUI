@@ -76,7 +76,15 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
     @MainActor
     func testCanvasMatchesBaselines() {
         let app = launchApp()
-        assertCanvasBaseline(app, name: "badge_default")
+        let referenceDirectory = browserReferenceDirectory()
+        let referenceImageTolerance = browserImageTolerance()
+
+        assertCanvasBaseline(
+            app,
+            name: "badge_default",
+            referenceDirectory: referenceDirectory,
+            comparisonTolerance: referenceImageTolerance
+        )
 
         selectSample(app, index: 1)
         setSwitch(app.switches["demo.fillToggle"], isOn: true)
@@ -84,7 +92,12 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         setSlider(app.sliders["demo.scaleSlider"], normalizedValue: 0.25)
         setSlider(app.sliders["demo.offsetXSlider"], normalizedValue: 0.5)
         setSlider(app.sliders["demo.offsetYSlider"], normalizedValue: 0.5)
-        assertCanvasBaseline(app, name: "panel_stroke")
+        assertCanvasBaseline(
+            app,
+            name: "panel_stroke",
+            referenceDirectory: referenceDirectory,
+            comparisonTolerance: referenceImageTolerance
+        )
 
         selectSample(app, index: 2)
         setSwitch(app.switches["demo.fillToggle"], isOn: true)
@@ -92,7 +105,12 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         setSlider(app.sliders["demo.scaleSlider"], normalizedValue: 0.25)
         setSlider(app.sliders["demo.offsetXSlider"], normalizedValue: 0.75)
         setSlider(app.sliders["demo.offsetYSlider"], normalizedValue: 0.25)
-        assertCanvasBaseline(app, name: "route_offset")
+        assertCanvasBaseline(
+            app,
+            name: "route_offset",
+            referenceDirectory: referenceDirectory,
+            comparisonTolerance: referenceImageTolerance
+        )
     }
 
     @MainActor
@@ -135,6 +153,8 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
     private func assertCanvasBaseline(
         _ app: XCUIApplication,
         name: String,
+        referenceDirectory: URL?,
+        comparisonTolerance: Double = 0.0,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
@@ -145,7 +165,9 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         let mode = SnapshotMode.current(sourceFilePath: file)
         let comparator = SnapshotComparator(
             mode: mode,
-            tolerance: 0.005
+            tolerance: 0.005,
+            comparisonTolerance: comparisonTolerance,
+            referenceDirectory: referenceDirectory
         )
         comparator.assertMatchesBaseline(
             screenshot: screenshot,
@@ -153,6 +175,23 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
             file: file,
             line: line
         )
+    }
+
+    private func browserReferenceDirectory() -> URL? {
+        guard let value = ProcessInfo.processInfo.environment["SVG_BROWSER_REFERENCE_DIR"], !value.isEmpty else {
+            return nil
+        }
+        return URL(fileURLWithPath: value)
+    }
+
+    private func browserImageTolerance() -> Double {
+        guard let value = ProcessInfo.processInfo.environment["SVG_BROWSER_REFERENCE_TOLERANCE"] else {
+            return 2.0
+        }
+        guard let parsed = Double(value) else {
+            return 2.0
+        }
+        return max(0.0, parsed)
     }
 
     @MainActor
@@ -224,6 +263,8 @@ private struct SnapshotComparator {
 
     let mode: SnapshotMode
     let tolerance: Double
+    let comparisonTolerance: Double
+    let referenceDirectory: URL?
 
     private let fileManager = FileManager.default
 
@@ -234,7 +275,10 @@ private struct SnapshotComparator {
         file: StaticString,
         line: UInt
     ) {
-        let baselineURL = baselineFileURL(name: baselineName, sourceFilePath: file)
+        let baselineURL = baselineFileURL(
+            name: baselineName,
+            sourceFilePath: file
+        )
         let baselineDirectoryURL = baselineURL.deletingLastPathComponent()
         do {
             try fileManager.createDirectory(
@@ -313,6 +357,10 @@ private struct SnapshotComparator {
     }
 
     private func baselineFileURL(name: String, sourceFilePath: StaticString) -> URL {
+        if let referenceDirectory {
+            return referenceDirectory.appendingPathComponent("\(name).png")
+        }
+
         let sourcePath = String(describing: sourceFilePath)
         let sourceFileURL = URL(fileURLWithPath: sourcePath)
         let sourceDirectoryURL = sourceFileURL.deletingLastPathComponent()
@@ -395,6 +443,7 @@ private struct SnapshotComparator {
         var diffPixels = [UInt8](repeating: 0, count: pixelCount * 4)
         var offset = 0
 
+        let channelTolerance = UInt8(min(max(Int(comparisonTolerance.rounded()), 0), 255))
         for _ in 0..<pixelCount {
             let expectedRed = expectedPixels[offset]
             let expectedGreen = expectedPixels[offset + 1]
@@ -406,10 +455,10 @@ private struct SnapshotComparator {
             let actualBlue = actualPixels[offset + 2]
             let actualAlpha = actualPixels[offset + 3]
 
-            let differs = expectedRed != actualRed ||
-                expectedGreen != actualGreen ||
-                expectedBlue != actualBlue ||
-                expectedAlpha != actualAlpha
+            let differs = absDifference(expectedRed, actualRed) > channelTolerance
+                || absDifference(expectedGreen, actualGreen) > channelTolerance
+                || absDifference(expectedBlue, actualBlue) > channelTolerance
+                || absDifference(expectedAlpha, actualAlpha) > channelTolerance
 
             if differs {
                 mismatchPixelCount += 1
@@ -453,6 +502,12 @@ private struct SnapshotComparator {
             return nil
         }
         return CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
+    }
+
+    private func absDifference(_ lhs: UInt8, _ rhs: UInt8) -> UInt8 {
+        let left = Int(lhs)
+        let right = Int(rhs)
+        return UInt8(abs(left - right))
     }
 
     private func rgba8Pixels(from image: CGImage) -> [UInt8]? {

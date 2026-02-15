@@ -111,8 +111,24 @@ jobs:
           echo "Resolved destination: $DESTINATION"
           echo "destination=$DESTINATION" >> "$GITHUB_OUTPUT"
 
+      - name: Install browser oracle tooling
+        run: |
+          cd Scripts/browser-oracle
+          npm ci
+          npx playwright install chromium
+
+      - name: Generate browser oracle baselines
+        run: |
+          BROWSER_BASELINE_DIR="Examples/SVGSwiftUIDemo/UITests/BrowserBaselines"
+          mkdir -p "$BROWSER_BASELINE_DIR"
+          ./Scripts/browser-oracle/generate-browser-baselines.sh \
+            --output "$BROWSER_BASELINE_DIR" \
+            --reference-baseline-dir "Examples/SVGSwiftUIDemo/UITests/Baselines/iPhone_17/26.2"
+
       - name: Run demo tests
         run: |
+          SVG_BROWSER_REFERENCE_DIR="$PWD/Examples/SVGSwiftUIDemo/UITests/BrowserBaselines" \
+          SVG_BROWSER_REFERENCE_TOLERANCE="2" \
           xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj \
             -scheme SVGSwiftUIDemo \
             -destination "${{ steps.destination.outputs.destination }}" \

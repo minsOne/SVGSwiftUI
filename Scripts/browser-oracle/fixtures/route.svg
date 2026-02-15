@@ -1,0 +1,4 @@
+<svg width="180" height="120" viewBox="0 0 180 120">
+  <polyline id="route-line" points="20,100 60,30 100,80 150,20" fill="none" stroke="#0f766e" stroke-width="8"/>
+  <polygon id="route-arrow" points="150,20 136,24 142,36" fill="#0f766e"/>
+</svg>

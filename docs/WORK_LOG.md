@@ -2,6 +2,24 @@
 
 ## 2026-02-16
 
+### Session 57
+- 작업: 브라우저 기준 시각 회귀 비교 파이프라인 추가
+- 완료:
+  - Playwright 기반 `Scripts/browser-oracle/render-browser-baselines.mjs` 및 manifest(`Scripts/browser-oracle/browser-oracle-manifest.json`) 추가
+  - demo 샘플 fixture(badge/panel/route) 기반 브라우저 기준 PNG 생성 스크립트 추가:
+    - `Scripts/browser-oracle/fixtures/badge.svg`
+    - `Scripts/browser-oracle/fixtures/panel.svg`
+    - `Scripts/browser-oracle/fixtures/route.svg`
+    - `Scripts/browser-oracle/generate-browser-baselines.sh`
+  - 의존성 고정으로 `Scripts/browser-oracle/package.json`, `Scripts/browser-oracle/package-lock.json` 추가 (`playwright`)
+  - Demo UITest에서 브라우저 기준 비교 경로(`SVG_BROWSER_REFERENCE_DIR`) + 채널 오차 허용값(`SVG_BROWSER_REFERENCE_TOLERANCE`) 지원
+  - CI demo job에 브라우저 기준 생성/비교 단계 추가
+- 검증:
+  - `.github/workflows/ci.yml` 단계 정합성 검토
+  - `node` 스크립트 파싱 경로/옵션 검증
+- 리스크:
+  - 현재 대상이 demo 샘플 3개로 제한되어 있어 WebKit/W3C 전체 커버리지와의 직접 비교는 다음 단계 과제
+
 ### Session 56
 - 작업: `A16-3` `feComposite` 경계/시각 회귀 확장
 - 완료:

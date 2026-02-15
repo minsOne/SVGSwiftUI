@@ -1,0 +1,12 @@
+{
+  "name": "svg-swiftui-browser-oracle",
+  "private": true,
+  "type": "module",
+  "description": "Playwright-based browser oracle generator for SVGSwiftUI visual checks.",
+  "scripts": {
+    "render": "node render-browser-baselines.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.52.0"
+  }
+}

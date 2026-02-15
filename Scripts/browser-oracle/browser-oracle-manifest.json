@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "name": "badge_default",
+      "svg": "fixtures/badge.svg",
+      "size": {
+        "width": 1058,
+        "height": 1134
+      },
+      "targetNodeID": "main-path",
+      "overrides": {
+        "fill": "#ff3f3f",
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "name": "panel_stroke",
+      "svg": "fixtures/panel.svg",
+      "size": {
+        "width": 842,
+        "height": 902
+      },
+      "targetNodeID": "panel-base",
+      "overrides": {
+        "fill": "#ff3f3f",
+        "stroke": "#0d40f2",
+        "strokeWidth": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "name": "route_offset",
+      "svg": "fixtures/route.svg",
+      "size": {
+        "width": 1058,
+        "height": 1134
+      },
+      "targetNodeID": "route-line",
+      "overrides": {
+        "fill": "#ff3f3f",
+        "offset": {
+          "x": 30,
+          "y": -30
+        }
+      }
+    }
+  ]
+}
