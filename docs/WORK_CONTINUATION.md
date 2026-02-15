@@ -3,9 +3,9 @@
 ## 현재 상태 (2026-02-16)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3 완료
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3/A16-4 완료
 - 추가 진행: Demo UITest 브라우저 기준 비교 파이프라인 추가
-- 다음 단계: `A16-4` unsupported 정책 고도화 후보 수집 및 브라우저 오라클 WebKit/W3C 확장
+- 다음 단계: A16-4 완료로 `unsupported` 집계 데이터를 conformance `unsupported` 카테고리와 연동
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 
@@ -22,8 +22,23 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. `A16-4`로 unsupported 경로 정책(`fallback`/`unsupported` 분기) 고도화 후보 수집
-2. 브라우저 오라클 manifest(= demo fixtures)을 WebKit/W3C fixture 매핑으로 확장
+1. `A16-4` 결과를 conformance manifest strict 규칙에 반영 및 `unsupported` 분포 추적 리포트 보강
+2. 브라우저 오라클 manifest(`demo oracle`)을 WebKit/W3C 후보군과 매핑해 미지원 경로 정합성 비교를 강화
+
+### 2026-02-16 (Session 58)
+- 작업: `A16-4` unsupported 정책 고도화
+- 완료:
+  - `SVGDocument`에 `unsupportedFeatures: [String: Int]` 추가 및 `hasUnsupportedFeatures` 계산 속성 추가
+  - `SVGParser`가 XML 파서 결과와 embedded SVG 재귀 파싱 결과의 미지원 항목을 누적 병합하도록 갱신
+  - `SVGXMLDocumentParser`에서 알 수 없는 요소/미지원 filter primitive를 `element:*`, `filter:*` 키로 카운트 집계
+  - 미지원 추적 보장을 위한 parser regression 테스트 3건 추가
+- 리스크:
+  - 현재 집계는 지원/비지원 분류의 1차 지표로, 렌더 경로 fallback 품질과의 직접 정합은 conformance fixture 레벨에서 추가로 확인 필요
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel`
+  - `swift test --no-parallel`
+- 다음 액션:
+  - conformance manifest 예상값에서 unsupported 분류와 집계 키 정합성 규칙을 자동 검증하는 스크립트 강화
 
 ### 2026-02-16 (Session 57)
 - 작업: 브라우저 기준 시각 비교 기반 추가

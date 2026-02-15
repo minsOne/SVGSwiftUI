@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (A16-3 경계/시각 회귀 보강 완료)
+Last Updated: 2026-02-16 (A16-4 unsupported 정책 고도화 완료)
 
 ## Status Legend
 - `todo`: not started
@@ -68,6 +68,7 @@ Last Updated: 2026-02-16 (A16-3 경계/시각 회귀 보강 완료)
 | A16-1 | A16 | feComposite 지원 | done | `feComposite` 파서/그래프/오프스크린 CI 렌더 경로 및 체인 테스트 보강 |
 | A16-2 | A16 | feComposite `arithmetic` 지원 | done | `arithmetic` 연산을 CIColorKernel 기반으로 수식대로 합성하도록 구현, 파서/그래프/렌더 테스트 보강 |
 | A16-3 | A16 | feComposite 경계/시각 회귀 확장 | done | `in`/`in2` 조합과 unsupported fallback 케이스 정량화 |
+| A16-4 | A16 | unsupported 추적 정책 고도화 | done | 미지원 요소/primitive를 카운팅해 `SVGDocument.unsupportedFeatures`에 기록하고 커버리지/manifest 기대값 정합성 개선 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

@@ -5,6 +5,11 @@ struct SVGDocument: Sendable, Equatable {
     var styleRules: [SVGStyleRule]
     var clipPaths: [String: [SVGNode]]
     var filterDefinitions: [String: SVGFilterDefinition]
+    var unsupportedFeatures: [String: Int]
+
+    var hasUnsupportedFeatures: Bool {
+        !unsupportedFeatures.isEmpty
+    }
 
     init(
         size: SVGSize? = nil,
@@ -12,7 +17,8 @@ struct SVGDocument: Sendable, Equatable {
         nodes: [SVGNode] = [],
         styleRules: [SVGStyleRule] = [],
         clipPaths: [String: [SVGNode]] = [:],
-        filterDefinitions: [String: SVGFilterDefinition] = [:]
+        filterDefinitions: [String: SVGFilterDefinition] = [:],
+        unsupportedFeatures: [String: Int] = [:]
     ) {
         self.size = size
         self.viewBox = viewBox
@@ -20,5 +26,6 @@ struct SVGDocument: Sendable, Equatable {
         self.styleRules = styleRules
         self.clipPaths = clipPaths
         self.filterDefinitions = filterDefinitions
+        self.unsupportedFeatures = unsupportedFeatures
     }
 }

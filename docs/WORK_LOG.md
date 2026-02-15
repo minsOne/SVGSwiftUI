@@ -2,6 +2,22 @@
 
 ## 2026-02-16
 
+### Session 58
+- 작업: `A16-4` unsupported 추적 정책 고도화
+- 완료:
+  - `SVGDocument`에 `unsupportedFeatures` 카운팅 필드를 추가해 파서/임베디드 결과를 통합 노출
+  - `SVGParser`의 `parse` 서명을 확장해 embedded SVG 재귀 파싱 결과를 단일 집계 맵으로 병합
+  - `SVGXMLDocumentParser`에서 알 수 없는 요소(`element:*`) 및 미지원 filter primitive(`filter:*`)를 구조화된 키로 집계
+  - parser regression 테스트를 3건 추가해 미지원 요소/primitive/embedded SVG 전파를 검증
+- 리스크:
+  - 미지원 집계는 렌더 경로 fallback 수렴과 완전히 일치하지 않음(시각 오차는 conformance fixture로 추가 검증 필요)
+  - `unsupported` 키 스키마 정규화 정책(예: `filter:` vs `element:` 네임스페이스 규칙)은 fixture 기대값과 지속 정렬 필요
+- 다음 액션:
+  - `A16-4` 결과를 기준으로 conformance manifest expected 규칙/strict 체크 플로우 정합성 강화
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel`
+  - `swift test --no-parallel`
+
 ### Session 57
 - 작업: 브라우저 기준 시각 회귀 비교 파이프라인 추가
 - 완료:

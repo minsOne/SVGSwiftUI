@@ -629,6 +629,78 @@ final class SVGParserTests: XCTestCase {
         XCTAssertTrue(document.filterDefinitions["unsupported"]?.hasSupportedPrimitives == true)
     }
 
+    func testParseTracksUnsupportedElementFeatures() throws {
+        let svg = """
+        <svg>
+          <text id="label">unsupported tag</text>
+          <rect id="supported" x="0" y="0" width="10" height="10"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        XCTAssertEqual(document.unsupportedFeatures["element:text"], 1)
+        XCTAssertNil(pathNode(id: "label", in: document))
+
+        guard let supportedRect = shapeNode(id: "supported", in: document) else {
+            return XCTFail("Expected supported rect node")
+        }
+        XCTAssertEqual(supportedRect.kind, .rect)
+    }
+
+    func testParseTracksUnsupportedFilterPrimitivesInFeatures() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="unsupported">
+              <feFlood flood-color="red" />
+            </filter>
+          </defs>
+          <rect id="supported" x="0" y="0" width="10" height="10" filter="url(#unsupported)"/>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        XCTAssertEqual(document.unsupportedFeatures["filter:feflood"], 1)
+
+        guard let primitive = document.filterDefinitions["unsupported"]?.primitives.first else {
+            return XCTFail("Expected unsupported filter primitive")
+        }
+        guard case .unsupported = primitive else {
+            return XCTFail("Expected filter primitive to be unsupported")
+        }
+        XCTAssertEqual(document.nodes.count, 1)
+    }
+
+    func testParseTracksUnsupportedFeaturesFromEmbeddedSVG() throws {
+        let embeddedSVG = """
+        <svg>
+          <rect id="embedded-supported" x="0" y="0" width="4" height="5"/>
+          <text id="embedded-unsupported">embedded</text>
+        </svg>
+        """
+        let source = """
+        <svg>
+          <image href="\(makeDataURISource(from: embeddedSVG))"/>
+        </svg>
+        """
+
+        let document = try parser.parse(
+            source: .string(source),
+            options: SVGParserOptions(enableDataURI: true)
+        )
+
+        XCTAssertEqual(document.unsupportedFeatures["element:text"], 1)
+        XCTAssertEqual(document.nodes.count, 1)
+        XCTAssertEqual(document.nodes.first?.nodeID, "auto:/0/0")
+        guard case .group(let embeddedGroup) = document.nodes.first else {
+            return XCTFail("Expected embedded image to be expanded as group node")
+        }
+        guard case .shape(let embeddedShape) = embeddedGroup.children.first else {
+            return XCTFail("Expected embedded rect shape")
+        }
+        XCTAssertEqual(embeddedShape.base.id, "embedded-supported")
+    }
+
     func testParseReadsFilterPrimitiveChainInputsAndResults() throws {
         let svg = """
         <svg>

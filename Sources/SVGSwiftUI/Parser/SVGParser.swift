@@ -79,13 +79,20 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             maxEmbeddedImageCount: options.maxEmbeddedImageCount,
             maxEmbeddedImageDepth: options.maxEmbeddedImageDepth
         )
-        return try parse(data: data, options: options, embeddedImageState: state)
+        var unsupportedFeatures: [String: Int] = [:]
+        return try parse(
+            data: data,
+            options: options,
+            embeddedImageState: state,
+            unsupportedFeatures: &unsupportedFeatures
+        )
     }
 
     fileprivate func parse(
         data: Data,
         options: SVGParserOptions,
-        embeddedImageState: SVGEmbeddedImageState
+        embeddedImageState: SVGEmbeddedImageState,
+        unsupportedFeatures: inout [String: Int]
     ) throws -> SVGDocument {
         guard !data.isEmpty else {
             throw SVGParserError.emptyInput
@@ -101,10 +108,15 @@ struct SVGParser: SVGDocumentParsing, Sendable {
 
         let xmlParser = SVGXMLDocumentParser(options: options)
         let parsedDocument = try xmlParser.parse(data: data)
+        mergeUnsupportedFeatures(
+            parsedDocument.unsupportedFeatures,
+            into: &unsupportedFeatures
+        )
         let expandedNodes = try expandEmbeddedImageNodes(
             in: parsedDocument.nodes,
             options: options,
-            state: embeddedImageState
+            state: embeddedImageState,
+            unsupportedFeatures: &unsupportedFeatures
         )
         return SVGDocument(
             size: parsedDocument.size,
@@ -112,18 +124,36 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             nodes: expandedNodes,
             styleRules: parsedDocument.styleRules,
             clipPaths: parsedDocument.clipPaths,
-            filterDefinitions: parsedDocument.filterDefinitions
+            filterDefinitions: parsedDocument.filterDefinitions,
+            unsupportedFeatures: unsupportedFeatures
         )
+    }
+
+    private func mergeUnsupportedFeatures(
+        _ source: [String: Int],
+        into target: inout [String: Int]
+    ) {
+        for (feature, count) in source {
+            target[feature, default: 0] += count
+        }
     }
 
     private func expandEmbeddedImageNodes(
         in nodes: [SVGNode],
         options: SVGParserOptions,
-        state: SVGEmbeddedImageState
+        state: SVGEmbeddedImageState,
+        unsupportedFeatures: inout [String: Int]
     ) throws -> [SVGNode] {
         var output: [SVGNode] = []
         for node in nodes {
-            output.append(contentsOf: try expandEmbeddedImageNode(node, options: options, state: state))
+            output.append(
+                contentsOf: try expandEmbeddedImageNode(
+                    node,
+                    options: options,
+                    state: state,
+                    unsupportedFeatures: &unsupportedFeatures
+                )
+            )
         }
         return output
     }
@@ -131,7 +161,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
     private func expandEmbeddedImageNode(
         _ node: SVGNode,
         options: SVGParserOptions,
-        state: SVGEmbeddedImageState
+        state: SVGEmbeddedImageState,
+        unsupportedFeatures: inout [String: Int]
     ) throws -> [SVGNode] {
         switch node {
         case .group(let sourceGroup):
@@ -140,7 +171,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
                     source: embeddedSource,
                     parentSyntheticID: sourceGroup.base.syntheticID,
                     options: options,
-                    state: state
+                    state: state,
+                    unsupportedFeatures: &unsupportedFeatures
                 ) {
                     return [.group(.init(base: sourceGroup.base, children: expandedChildren))]
                 }
@@ -157,7 +189,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             let children = try expandEmbeddedImageNodes(
                 in: sourceGroup.children,
                 options: options,
-                state: state
+                state: state,
+                unsupportedFeatures: &unsupportedFeatures
             )
             return [.group(.init(base: sourceGroup.base, children: children))]
         case .path(let sourcePath):
@@ -182,7 +215,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
         source: String,
         parentSyntheticID: String,
         options: SVGParserOptions,
-        state: SVGEmbeddedImageState
+        state: SVGEmbeddedImageState,
+        unsupportedFeatures: inout [String: Int]
     ) throws -> [SVGNode]? {
         let normalizedSource = source.trimmingCharacters(in: .whitespacesAndNewlines)
         guard normalizedSource.hasPrefix("data:") else {
@@ -231,7 +265,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             embeddedDocument = try parse(
                 data: payload.data,
                 options: options,
-                embeddedImageState: state
+                embeddedImageState: state,
+                unsupportedFeatures: &unsupportedFeatures
             )
             didEmbed = true
         } catch {
@@ -418,6 +453,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     private var styleRules: [SVGStyleRule] = []
     private var clipPathDefinitions: [String: [SVGNode]] = [:]
     private var filterDefinitions: [String: SVGFilterDefinition] = [:]
+    private var unsupportedFeatures: [String: Int] = [:]
     private var parseError: SVGParserError?
     private var rootDocument: SVGDocument?
 
@@ -433,6 +469,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         styleRules.removeAll(keepingCapacity: false)
         clipPathDefinitions.removeAll(keepingCapacity: false)
         filterDefinitions.removeAll(keepingCapacity: false)
+        unsupportedFeatures.removeAll(keepingCapacity: false)
         parseError = nil
         rootDocument = nil
 
@@ -473,15 +510,15 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             styleDepth += 1
             return
         }
+        if ignoreDepth > 0 {
+            ignoreDepth += 1
+            return
+        }
         if let filterPrimitive = parseFilterPrimitive(
             name: normalizedName,
             attributes: attributeDict
         ) {
             appendFilterPrimitive(filterPrimitive)
-            return
-        }
-        if ignoreDepth > 0 {
-            ignoreDepth += 1
             return
         }
 
@@ -496,6 +533,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         }
 
         guard let frameKind = frameKind(for: normalizedName, stackDepth: frames.count) else {
+            recordUnsupportedFeature("element:\(normalizedName)")
             ignoreDepth = 1
             return
         }
@@ -578,7 +616,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 nodes: frame.children,
                 styleRules: styleRules,
                 clipPaths: clipPathDefinitions,
-                filterDefinitions: filterDefinitions
+                filterDefinitions: filterDefinitions,
+                unsupportedFeatures: unsupportedFeatures
             )
         case .group:
             appendNode(.group(.init(base: frame.base, children: frame.children)), parser: parser)
@@ -731,6 +770,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             )
         default:
             if name.hasPrefix("fe") {
+                recordUnsupportedFeature("filter:\(name)")
                 return .unsupported(
                     type: name,
                     attributes: normalizePrimitiveAttributes(attributes)
@@ -833,6 +873,10 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         parent.filterPrimitives.append(primitive)
         frames.append(parent)
         ignoreDepth = 1
+    }
+
+    private func recordUnsupportedFeature(_ feature: String) {
+        unsupportedFeatures[feature, default: 0] += 1
     }
 
     private func appendNode(_ node: SVGNode, parser: XMLParser) {
