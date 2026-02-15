@@ -102,6 +102,46 @@ final class SVGFilterGraphExecutionTests: XCTestCase {
         XCTAssertTrue(availableSources.contains("masked"))
     }
 
+    func testFilterGraphCanExecuteCompositePrimitiveWithWhitespaceTrimmedInputs() {
+        let primitive: SVGFilterPrimitive = .composite(
+            operatorType: "in",
+            inSource: " SourceGraphic ",
+            inSourceTwo: " SourceAlpha ",
+            k1: 1,
+            k2: 0,
+            k3: 0,
+            k4: 0,
+            result: " trimmed "
+        )
+
+        let canExecute: Bool = SVGFilterGraphExecutor.canExecute(
+            primitive,
+            availableSources: SVGFilterGraphExecutor.defaultAvailableSources()
+        )
+        XCTAssertTrue(canExecute)
+
+        let resolvedResult: String? = SVGFilterGraphExecutor.resolvedResultName(for: primitive)
+        XCTAssertEqual(resolvedResult, "trimmed")
+    }
+
+    func testFilterGraphSkipsCompositeWhenOnlyWhitespaceSourceMissing() {
+        let primitive: SVGFilterPrimitive = .composite(
+            operatorType: "in",
+            inSource: "   ",
+            inSourceTwo: "ghost",
+            k1: 1,
+            k2: 0,
+            k3: 0,
+            k4: 0,
+            result: "ignored"
+        )
+        let canExecute: Bool = SVGFilterGraphExecutor.canExecute(
+            primitive,
+            availableSources: SVGFilterGraphExecutor.defaultAvailableSources()
+        )
+        XCTAssertFalse(canExecute)
+    }
+
     func testFilterGraphCanExecuteArithmeticCompositePrimitiveWithResult() {
         let primitives: [SVGFilterPrimitive] = [
             .composite(

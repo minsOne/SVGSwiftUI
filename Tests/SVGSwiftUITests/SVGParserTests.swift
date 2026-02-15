@@ -516,6 +516,80 @@ final class SVGParserTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    func testParseDefaultsCompositeOperatorAndTrimmedSources() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="composite-defaults">
+              <feComposite in=" SourceGraphic " in2=" SourceAlpha " k1="0.5" />
+            </filter>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" filter="url(#composite-defaults)" />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["composite-defaults"]?.primitives)
+        XCTAssertEqual(primitives.count, 1)
+        guard case .composite(
+            let operatorType,
+            let inSource,
+            let inSourceTwo,
+            let k1,
+            let k2,
+            let k3,
+            let k4,
+            let result
+        ) = primitives[0] else {
+            return XCTFail("Expected composite filter primitive")
+        }
+        XCTAssertEqual(operatorType, "over")
+        XCTAssertEqual(inSource, "SourceGraphic")
+        XCTAssertEqual(inSourceTwo, "SourceAlpha")
+        XCTAssertEqual(k1, 0.5)
+        XCTAssertEqual(k2, 0)
+        XCTAssertEqual(k3, 0)
+        XCTAssertEqual(k4, 0)
+        XCTAssertNil(result)
+    }
+
+    func testParseIgnoresWhitespaceOnlyCompositeResultName() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="composite-result-space">
+              <feComposite operator="in" in="SourceGraphic" in2="SourceAlpha" result="   "/>
+            </filter>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" filter="url(#composite-result-space)" />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["composite-result-space"]?.primitives)
+        XCTAssertEqual(primitives.count, 1)
+        guard case .composite(
+            let operatorType,
+            let inSource,
+            let inSourceTwo,
+            let k1,
+            let k2,
+            let k3,
+            let k4,
+            let result
+        ) = primitives[0] else {
+            return XCTFail("Expected composite filter primitive")
+        }
+        XCTAssertEqual(operatorType, "in")
+        XCTAssertEqual(inSource, "SourceGraphic")
+        XCTAssertEqual(inSourceTwo, "SourceAlpha")
+        XCTAssertEqual(k1, 0)
+        XCTAssertEqual(k2, 0)
+        XCTAssertEqual(k3, 0)
+        XCTAssertEqual(k4, 0)
+        XCTAssertNil(result)
+    }
+
     func testParseKeepsUnsupportedFilterPrimitives() throws {
         let svg = """
         <svg>

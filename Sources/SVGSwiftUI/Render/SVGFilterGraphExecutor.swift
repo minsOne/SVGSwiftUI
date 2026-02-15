@@ -31,21 +31,21 @@ internal enum SVGFilterGraphExecutor {
     static func requiredSourceNames(for primitive: SVGFilterPrimitive) -> Set<String> {
         switch primitive {
         case .gaussianBlur(_, _, let inSource, _):
-            let resolvedSource: String = inSource ?? sourceGraphicName
+            let resolvedSource: String = normalizedSourceName(inSource, defaultName: sourceGraphicName)
             return [resolvedSource]
         case .offset(_, _, let inSource, _):
-            let resolvedSource: String = inSource ?? sourceGraphicName
+            let resolvedSource: String = normalizedSourceName(inSource, defaultName: sourceGraphicName)
             return [resolvedSource]
         case .blend(_, let inSource, let inSourceTwo, _):
-            let resolvedSourceOne: String = inSource ?? sourceGraphicName
-            let resolvedSourceTwo: String = inSourceTwo ?? sourceGraphicName
+            let resolvedSourceOne: String = normalizedSourceName(inSource, defaultName: sourceGraphicName)
+            let resolvedSourceTwo: String = normalizedSourceName(inSourceTwo, defaultName: sourceGraphicName)
             return [resolvedSourceOne, resolvedSourceTwo]
         case .composite(_, let inSource, let inSourceTwo, _, _, _, _, _):
-            let resolvedSourceOne: String = inSource ?? sourceGraphicName
-            let resolvedSourceTwo: String = inSourceTwo ?? sourceGraphicName
+            let resolvedSourceOne: String = normalizedSourceName(inSource, defaultName: sourceGraphicName)
+            let resolvedSourceTwo: String = normalizedSourceName(inSourceTwo, defaultName: sourceGraphicName)
             return [resolvedSourceOne, resolvedSourceTwo]
         case .colorMatrix(_, let inSource, _):
-            let resolvedSource: String = inSource ?? sourceGraphicName
+            let resolvedSource: String = normalizedSourceName(inSource, defaultName: sourceGraphicName)
             return [resolvedSource]
         case .unsupported:
             return []
@@ -83,5 +83,12 @@ internal enum SVGFilterGraphExecutor {
             return nil
         }
         return trimmedName
+    }
+
+    private static func normalizedSourceName(
+        _ value: String?,
+        defaultName: String
+    ) -> String {
+        normalizedSourceName(from: value) ?? defaultName
     }
 }

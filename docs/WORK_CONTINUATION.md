@@ -4,7 +4,7 @@
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1 완료, A16-2 완료
-- 다음 단계: `A16-3` 진행 (`feComposite` 경계/시각 회귀 확장)
+- 다음 단계: `A16-3` 완료 후 다음 필터 고급 항목의 unsupported 정책 고도화 검토
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 
@@ -21,7 +21,19 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. `A16-3` `feComposite` 경계 및 `unsupported` fallback 조합 2~3건 추가
+1. `A16-4`로 unsupported 경로 정책(`fallback`/`unsupported` 분기) 고도화 후보 수집
+
+### 2026-02-16 (Session 56)
+- 작업: `A16-3` `feComposite` 경계/시각 회귀 확장
+- 완료:
+  - `feComposite` 파서에서 `operator` 기본값/공백 처리/빈 `result` 정규화 규칙을 테스트로 고정
+  - `SVGFilterGraphExecutor`에서 whitespace가 포함된 소스명/`SourceGraphic` 기본값 적용이 실행 판단과 일치하도록 경계 테스트 추가
+  - 렌더 경로에서 미지원 composite 연산자(`unknown`) fallback(source-over) 후 체인 전달을 시각적으로 검증하는 테스트 추가
+- 리스크:
+  - 시각 보강은 기존 샘플 기준 한정이므로 unsupported 케이스 전반은 WebKit/W3C fixture 확장으로 이어져야 함
+- 검증:
+  - `swift test --filter 'SVGParserTests|SVGFilterGraphExecutionTests|SVGFilterImageRendererTests' --no-parallel`
+  - `swift test --no-parallel`
 
 ## 작업 진행 루프(재작업 방지)
 - Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환

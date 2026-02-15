@@ -130,6 +130,61 @@ final class SVGFilterImageRendererTests: XCTestCase {
         XCTAssertEqual(pixel.a, 255)
     }
 
+    func testRenderFilteredImageFallsBackUnknownCompositeOperatorAndPreservesChain() throws {
+        let sourceColor: Color = Color(red: 0.1, green: 0.2, blue: 0.8, opacity: 1)
+        let imageSize: CGSize = CGSize(width: 20, height: 20)
+        let primitives: [SVGFilterPrimitive] = [
+            .composite(
+                operatorType: "not-a-merge",
+                inSource: " SourceGraphic ",
+                inSourceTwo: " SourceAlpha ",
+                k1: 0,
+                k2: 0,
+                k3: 0,
+                k4: 0,
+                result: " masked "
+            ),
+            .composite(
+                operatorType: "in",
+                inSource: "masked",
+                inSourceTwo: "SourceGraphic",
+                k1: 1,
+                k2: 0,
+                k3: 0,
+                k4: 0,
+                result: nil
+            )
+        ]
+
+        guard let renderedImage = SVGFilterImageRenderer.renderFilteredImage(
+            path: Path(CGRect(origin: .zero, size: imageSize)),
+            fillColor: sourceColor,
+            fillStyle: FillStyle(eoFill: false),
+            strokeColor: nil,
+            strokeWidth: 0,
+            lineCap: .round,
+            lineJoin: .miter,
+            miterLimit: 10,
+            dash: [],
+            dashPhase: 0,
+            opacity: 1.0,
+            size: imageSize,
+            primitives: primitives
+        ) else {
+            XCTFail("Expected rendered image")
+            return
+        }
+
+        let center = CGPoint(x: 10, y: 10)
+        guard let pixel = pixel(from: renderedImage, at: center) else {
+            XCTFail("Expected non-nil pixel")
+            return
+        }
+        XCTAssertGreaterThan(pixel.r, 20)
+        XCTAssertGreaterThan(pixel.b, 180)
+        XCTAssertGreaterThan(pixel.a, 240)
+    }
+
     func testRenderFilteredImageUsesSourceAlphaBlendInput() throws {
         let sourceColor: Color = Color(red: 1, green: 0, blue: 0, opacity: 1)
         let imageSize: CGSize = CGSize(width: 18, height: 18)
