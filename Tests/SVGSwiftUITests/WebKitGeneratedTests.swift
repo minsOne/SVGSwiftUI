@@ -166,7 +166,7 @@ final class WebKitGeneratedTests: XCTestCase {
             FixtureExpectation(
                 id: "webkit-1.1-filters-gauss-01-b",
                 mode: .parse,
-                expected: .unsupported,
+                expected: .pass,
                 svgPath: "fixtures/webkit-filters-gauss-01-b.svg",
                 referencePath: ""
             ),

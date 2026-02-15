@@ -645,21 +645,33 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         }
         switch name {
         case "fegaussianblur":
-            let stdDeviation: SVGFilterPrimitive? = parseStdDeviation(attributes["stdDeviation"])
+            let stdDeviation: SVGFilterPrimitive? = parseStdDeviation(
+                attributes["stdDeviation"]
+            )
             if let stdDeviation {
                 return stdDeviation
             }
-            let stdX = parseNumeric(attributes["stdDeviationX"] ?? "") ?? 0.0
-            let stdY = parseNumeric(attributes["stdDeviationY"] ?? "") ?? stdX
+            let stdXAttribute: String = attributes["stdDeviationX"] ?? ""
+            let stdYAttribute: String = attributes["stdDeviationY"] ?? ""
+            let stdX: Double = parseNumeric(stdXAttribute) ?? 0.0
+            let stdY: Double = parseNumeric(stdYAttribute) ?? stdX
             return .gaussianBlur(
                 stdDeviationX: stdX,
                 stdDeviationY: stdY
             )
         case "feoffset":
-            let dx: Double = parseNumeric(attributes["dx"] ?? "") ?? 0.0
-            let dy: Double = parseNumeric(attributes["dy"] ?? "") ?? 0.0
+            let dxAttribute: String = attributes["dx"] ?? ""
+            let dyAttribute: String = attributes["dy"] ?? ""
+            let dx: Double = parseNumeric(dxAttribute) ?? 0.0
+            let dy: Double = parseNumeric(dyAttribute) ?? 0.0
             return .offset(dx: dx, dy: dy)
         default:
+            if name.hasPrefix("fe") {
+                return .unsupported(
+                    type: name,
+                    attributes: normalizePrimitiveAttributes(attributes)
+                )
+            }
             return nil
         }
     }
@@ -681,6 +693,16 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         let stdDeviationX: Double = values[0]
         let stdDeviationY: Double = values.count > 1 ? values[1] : values[0]
         return .gaussianBlur(stdDeviationX: stdDeviationX, stdDeviationY: stdDeviationY)
+    }
+
+    private func normalizePrimitiveAttributes(_ attributes: [String: String]) -> [String: String] {
+        var output: [String: String] = [:]
+        for pair in attributes {
+            let key: String = pair.key.lowercased()
+            let value: String = pair.value
+            output[key] = value
+        }
+        return output
     }
 
     private func appendFilterPrimitive(_ primitive: SVGFilterPrimitive) {

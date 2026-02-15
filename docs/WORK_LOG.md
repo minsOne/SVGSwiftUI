@@ -2,6 +2,44 @@
 
 ## 2026-02-15
 
+### Session 45
+- 작업: `A12 filter` 고급 primitive 분류 정책 정리
+- 완료:
+  - `<filter>` 파싱 단계에서 `fe` 접두사 미지원 primitive를 `SVGFilterDefinition`에 보존(`.unsupported`)하도록 변경
+  - `SVGFilterDefinition`에 `hasUnsupportedPrimitives` / `hasSupportedPrimitives` / `hasNoPrimitives` 보조 계산 프로퍼티 추가
+  - `SVGParserTests`에 `unsupported + supported` 혼합 primitive 순서 보존 검증 테스트 2건 추가
+  - `testWebKitGeneratedSuite`, `testW3CGeneratedSuite`, 전체 `swift test --parallel` 실행으로 conformance 파이프라인 재검증
+  - `WebKit` 매니페스트 동기화(`filters-gauss-01-b` pass 전환) 후 `WebKitGeneratedTests.swift` 및 `docs/WEBKIT_COVERAGE.md` 재생성
+- 리스크:
+  - 아직 `unsupported` primitive는 렌더 단계에서 no-op 처리되므로 실제 시각 결과 차이는 여전히 측정되지 않음
+  - `unsupported` 케이스를 사용자 진단 로그/메트릭으로 외부 노출하려면 별도 리포팅 경로가 필요
+- 다음 액션:
+  - `unsupported` primitive 추적 정보를 테스트/리포트에 노출할 수 있도록 진단 API 또는 fixture 분류 지표를 확장
+  - `A12` 완료 처리 후 다음 단계로 filter 고급 기능(예: `feBlend`, `feColorMatrix`) 최소 지원 계획 수립
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (43 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (pass)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+  - `swift test --parallel` (133 tests, 0 failures)
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
+### Session 46
+- 작업: `A12 filter` 정리 완료 후 최종 검증 정리
+- 완료:
+  - `swift test --parallel` 재실행 (133 tests, 0 failures)
+  - `swift test --filter SVGParserTests --no-parallel` 재실행
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (pass)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+  - `./Scripts/w3c/w3c-coverage.sh ... --strict` + `./Scripts/webkit/webkit-coverage.sh ... --strict` 재실행 (pass)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test` (5 tests, 0 failures)
+- 리스크:
+  - `unsupported` primitive는 현재 no-op 정책이라 사용자 관점에서 보이는 시각적 동작/오류 메시지 차이는 제한적
+  - `normalizePrimitiveAttributes`는 단순 키 정규화만 수행하고 값 정규화/단위 파싱은 추후 확장 필요
+- 다음 액션:
+  - 다음 단계로 `A13` 후보(예: `feBlend`/`feColorMatrix` 최소 지원 또는 W3C/WebKit 고급 spec 추적 강화)를 결정해 착수
+- 검증:
+  - 데모 UI UITest 결과 스냅샷 비교 포함 5개 모두 pass
 ### Session 44
 - 작업: `A11-2 filter` 렌더 패스 연동
 - 완료:

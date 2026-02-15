@@ -1,6 +1,18 @@
 enum SVGFilterPrimitive: Sendable, Equatable {
     case gaussianBlur(stdDeviationX: Double, stdDeviationY: Double)
     case offset(dx: Double, dy: Double)
+    case unsupported(type: String, attributes: [String: String])
+}
+
+extension SVGFilterPrimitive {
+    var isSupported: Bool {
+        switch self {
+        case .gaussianBlur, .offset:
+            true
+        case .unsupported:
+            false
+        }
+    }
 }
 
 struct SVGFilterDefinition: Sendable, Equatable {
@@ -16,5 +28,27 @@ struct SVGFilterDefinition: Sendable, Equatable {
         self.id = id
         self.attributes = attributes
         self.primitives = primitives
+    }
+
+    var hasUnsupportedPrimitives: Bool {
+        for primitive in primitives {
+            if !primitive.isSupported {
+                return true
+            }
+        }
+        return false
+    }
+
+    var hasSupportedPrimitives: Bool {
+        for primitive in primitives {
+            if primitive.isSupported {
+                return true
+            }
+        }
+        return false
+    }
+
+    var hasNoPrimitives: Bool {
+        primitives.isEmpty
     }
 }

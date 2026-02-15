@@ -292,7 +292,7 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(primitives[0], .gaussianBlur(stdDeviationX: 3.25, stdDeviationY: 3.25))
     }
 
-    func testParseIgnoresUnknownFilterPrimitives() throws {
+    func testParseTracksUnsupportedFilterPrimitives() throws {
         let svg = """
         <svg>
           <defs>
@@ -314,8 +314,64 @@ final class SVGParserTests: XCTestCase {
 
         let document = try parser.parse(source: .string(svg))
         let primitives = try XCTUnwrap(document.filterDefinitions["unsupported"]?.primitives)
-        XCTAssertEqual(primitives.count, 1)
-        XCTAssertEqual(primitives[0], .gaussianBlur(stdDeviationX: 1, stdDeviationY: 1))
+        XCTAssertEqual(primitives.count, 2)
+        guard case .unsupported(let unsupportedType, let unsupportedAttributes) = primitives[0] else {
+            return XCTFail("Expected unsupported filter primitive first")
+        }
+        XCTAssertEqual(unsupportedType, "fecolormatrix")
+        XCTAssertEqual(unsupportedAttributes["values"], "0.5")
+
+        XCTAssertEqual(primitives[1], .gaussianBlur(stdDeviationX: 1, stdDeviationY: 1))
+        XCTAssertTrue(document.filterDefinitions["unsupported"]?.hasUnsupportedPrimitives == true)
+        XCTAssertTrue(document.filterDefinitions["unsupported"]?.hasSupportedPrimitives == true)
+    }
+
+    func testParseTracksUnsupportedFilterPrimitivesWithMultipleMix() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="mixed">
+              <feColorMatrix values="1"/>
+              <feOffset dx="7" dy="-4"/>
+              <feBlend in="SourceGraphic" in2="SourceGraphic" mode="multiply"/>
+            </filter>
+          </defs>
+          <rect
+            id="foreground"
+            x="0"
+            y="0"
+            width="20"
+            height="20"
+            filter="url(#mixed)"
+          />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["mixed"]?.primitives)
+        XCTAssertEqual(primitives.count, 3)
+        guard case .unsupported(let colorMatrixType, let colorMatrixAttributes) = primitives[0] else {
+            return XCTFail("Expected unsupported color matrix as first primitive")
+        }
+        XCTAssertEqual(colorMatrixType, "fecolormatrix")
+        XCTAssertEqual(colorMatrixAttributes["values"], "1")
+
+        XCTAssertEqual(primitives[1], .offset(dx: 7, dy: -4))
+
+        guard case .unsupported(let blendType, _) = primitives[2] else {
+            return XCTFail("Expected unsupported blend as third primitive")
+        }
+        XCTAssertEqual(blendType, "feblend")
+
+        XCTAssertEqual(
+            document.filterDefinitions["mixed"]?.primitives.filter { primitive in
+                if case .unsupported = primitive {
+                    return true
+                }
+                return false
+            }.count,
+            2
+        )
     }
 
     func testParseIgnoresFilterAndMaskElementsButKeepsSupportedSiblings() throws {

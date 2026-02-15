@@ -531,6 +531,8 @@ private struct SVGStaticPlaceholderView: View {
                 context.addFilter(.blur(radius: CGFloat(radius)))
             case .offset(let dx, let dy):
                 context.translateBy(x: CGFloat(dx), y: CGFloat(dy))
+            case .unsupported:
+                continue
             }
         }
     }
