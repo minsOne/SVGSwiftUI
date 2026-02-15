@@ -28,6 +28,24 @@
             "reference": "fixtures/1.1F2/ref/paths-move-line.expected.txt"
         },
         {
+            "id": "w3c-1.1F2-filters-blend-01-b-min",
+            "suite": "1.1F2",
+            "category": "filter",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/filters-blend-01-b-min.svg",
+            "reference": "fixtures/1.1F2/ref/filters-blend-01-b-min.expected.txt"
+        },
+        {
+            "id": "w3c-1.1F2-filters-colormatrix-01-b-min",
+            "suite": "1.1F2",
+            "category": "filter",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/filters-colormatrix-01-b-min.svg",
+            "reference": "fixtures/1.1F2/ref/filters-colormatrix-01-b-min.expected.txt"
+        },
+        {
             "id": "w3c-1.1F2-shapes-rect-circle",
             "suite": "1.1F2",
             "category": "shapes",

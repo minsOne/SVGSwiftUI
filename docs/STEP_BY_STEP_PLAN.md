@@ -50,6 +50,8 @@
 | A11-1 | filter 파싱/스타일 전달 | `<filter>` 정의 및 `filter` 속성/스타일 전달 | `filter` AST/스타일 경로 보존 테스트 통과 |
 | A11-2 | filter 렌더 패스 연동 | blur/offset 최소 필터 렌더 체인 구축 | `filter` primitive 참조 및 렌더 적용 회귀 테스트 통과 |
 | A12 | filter 고급 primitive 분류 | parser 단계에서 미지원 primitive 추적 + `unsupported` 정책 정렬 | `unsupported` 유형이 기록되며 manifest/coverage 정합성 업데이트 |
+| A13-1 | filter 고급 primitive 확장 | `feBlend`/`feColorMatrix` 파서 지원 및 추적/분류 반영 | 렌더 경로에서 고급 primitive 최소 지원 시그니처 검증 |
+| A13-2 | conformance 정렬 | WebKit/W3C fixture와 매니페스트 기대치 정합성 갱신 | filter 후보군 pass 전환 및 coverage strict 재생성 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

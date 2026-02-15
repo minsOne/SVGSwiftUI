@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (A12 done)
+Last Updated: 2026-02-15 (A13-2 done)
 
 ## Status Legend
 - `todo`: not started
@@ -58,6 +58,8 @@ Last Updated: 2026-02-15 (A12 done)
 | A11-1 | A11 | `filter` 정의 파싱 및 스타일/리졸버 전달 기초 | done | `filter` 속성/요소를 AST/스타일 경로에 보존 |
 | A11-2 | A11 | `filter` 렌더 패스 연동 | done | `filter` primitive(blur/offset) 파싱 결과를 `GraphicsContext` 렌더 체인에 연결 |
 | A12 | A12 | filter 고급 primitive 분류 정책 | done | 미지원 primitive(`fe*`) 추적, `manifest`/coverage 정합성 업데이트 완료 |
+| A13-1 | A13 | filter 고급 primitive 확장 | done | `feBlend`, `feColorMatrix` 파서/지원 분류 반영 |
+| A13-2 | A13 | conformance 정렬 및 커버리지 업데이트 | done | WebKit expected 변경, W3C filter 최소 케이스 추가 및 coverage 재생성 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

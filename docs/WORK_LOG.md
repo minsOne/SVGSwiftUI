@@ -40,6 +40,29 @@
   - 다음 단계로 `A13` 후보(예: `feBlend`/`feColorMatrix` 최소 지원 또는 W3C/WebKit 고급 spec 추적 강화)를 결정해 착수
 - 검증:
   - 데모 UI UITest 결과 스냅샷 비교 포함 5개 모두 pass
+
+### Session 47
+- 작업: `A13 filter` 고급 primitive 확장 완료
+- 완료:
+  - `SVGFilterPrimitive`에 `feBlend`/`feColorMatrix` 케이스 추가 및 `isSupported` 반영
+  - `SVGParser`에 `feBlend`/`feColorMatrix` 파싱 및 속성 정규화/리스트 파싱 로직 추가
+  - `SVGView`에 `feBlend` 최소 렌더 반영(`GraphicsContext.BlendMode` 매핑), `feColorMatrix`는 현재 no-op로 플레이스홀더 유지
+  - `SVGParserTests`에 지원/미지원 혼합 케이스를 구분하는 테스트 3건 추가
+  - W3C fixture 2건(`filters-blend-01-b-min`, `filters-colormatrix-01-b-min`) 추가 및 매니페스트/생성테스트 갱신
+  - WebKit fixture 기대치 `filters-blend-01-b`를 `unsupported`에서 `pass`로 전환
+  - `docs/STEP_BY_STEP_PLAN.md`에 `A13-1/A13-2` 완료 항목 반영
+- 리스크:
+  - `feBlend`는 현재 blend mode 매핑이 소수로 제한되며(`normal` 외 기본 blend만 지원), `feColorMatrix`는 파싱만 반영되고 실제 색공간 연산은 미구현
+  - 실제 렌더 정합성은 W3C/WebKit fixture 기반으로 최소 경로만 커버됨
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (44 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (pass)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+  - `swift test --parallel` (134 tests, 0 failures)
+  - `./Scripts/w3c/w3c-coverage.sh ... --strict`
+  - `./Scripts/webkit/webkit-coverage.sh ... --strict`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination id=CA606231-D9E3-453A-83EB-930148F67AED -parallel-testing-enabled NO test` (5 tests, 0 failures)
+
 ### Session 44
 - 작업: `A11-2 filter` 렌더 패스 연동
 - 완료:

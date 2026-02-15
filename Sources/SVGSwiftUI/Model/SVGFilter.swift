@@ -1,13 +1,15 @@
 enum SVGFilterPrimitive: Sendable, Equatable {
     case gaussianBlur(stdDeviationX: Double, stdDeviationY: Double)
     case offset(dx: Double, dy: Double)
+    case blend(mode: String, inSource: String?, inSourceTwo: String?)
+    case colorMatrix(values: [Double])
     case unsupported(type: String, attributes: [String: String])
 }
 
 extension SVGFilterPrimitive {
     var isSupported: Bool {
         switch self {
-        case .gaussianBlur, .offset:
+        case .gaussianBlur, .offset, .blend, .colorMatrix:
             true
         case .unsupported:
             false

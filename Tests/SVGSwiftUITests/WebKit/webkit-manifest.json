@@ -415,7 +415,7 @@
       "suite": "W3C-SVG-1.1",
       "category": "filter",
       "mode": "parse",
-      "expected": "unsupported",
+      "expected": "pass",
       "svg": "fixtures/webkit-filters-blend-01-b.svg",
       "reference": "",
       "source": "LayoutTests/svg/W3C-SVG-1.1/filters-blend-01-b.svg"

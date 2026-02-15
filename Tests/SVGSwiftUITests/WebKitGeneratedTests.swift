@@ -159,7 +159,7 @@ final class WebKitGeneratedTests: XCTestCase {
             FixtureExpectation(
                 id: "webkit-1.1-filters-blend-01-b",
                 mode: .parse,
-                expected: .unsupported,
+                expected: .pass,
                 svgPath: "fixtures/webkit-filters-blend-01-b.svg",
                 referencePath: ""
             ),

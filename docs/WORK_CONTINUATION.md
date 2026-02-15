@@ -3,10 +3,10 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
-- 다음 단계: `A12` `filter` 고급 primitive 추적 정책 정리(`unsupported` AST 보존/manifest 정렬)
+- 다음 단계: `A14` 또는 `WebKit/W3C 고급 filter` 실질 구현(색공간/알파 보존) 우선순위 재정의
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -64,6 +64,8 @@
 - [x] A11-1 `filter` 정의 파싱/스타일 전달 기초
 - [x] A11-2 `filter` 렌더 패스 연동
 - [x] A12 `filter` 고급 primitive 분류 정책 정리
+- [x] A13-1 `feBlend`/`feColorMatrix` 지원으로 분류/렌더 경로 확장
+- [x] A13-2 WebKit/W3C conformance 수치 및 fixture 정렬
 
 
 ## 구현 중 준수 규칙

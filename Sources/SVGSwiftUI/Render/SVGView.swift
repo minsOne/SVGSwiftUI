@@ -531,9 +531,46 @@ private struct SVGStaticPlaceholderView: View {
                 context.addFilter(.blur(radius: CGFloat(radius)))
             case .offset(let dx, let dy):
                 context.translateBy(x: CGFloat(dx), y: CGFloat(dy))
+            case .blend(let blendMode, _, _):
+                if let blendFilterMode = parseBlendFilterMode(blendMode) {
+                    context.blendMode = blendFilterMode
+                }
+            case .colorMatrix:
+                continue
             case .unsupported:
                 continue
             }
+        }
+    }
+
+    private func parseBlendFilterMode(_ value: String) -> GraphicsContext.BlendMode? {
+        switch value {
+        case "multiply":
+            return .multiply
+        case "screen":
+            return .screen
+        case "darken":
+            return .darken
+        case "lighten":
+            return .lighten
+        case "color-dodge":
+            return .colorDodge
+        case "color-burn":
+            return .colorBurn
+        case "hard-light":
+            return .hardLight
+        case "soft-light":
+            return .softLight
+        case "difference":
+            return .difference
+        case "exclusion":
+            return .exclusion
+        case "hue", "saturation", "color", "luminosity":
+            return nil
+        case "normal", "":
+            return nil
+        default:
+            return nil
         }
     }
 

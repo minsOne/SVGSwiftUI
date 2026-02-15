@@ -1,7 +1,7 @@
 # W3C Conformance Coverage
-Generated: 2026-02-15 14:50:32Z UTC
+Generated: 2026-02-15 14:56:44Z UTC
 Manifest: `Tests/SVGSwiftUITests/W3C/w3c-manifest.json`
-- Total fixtures: 8
+- Total fixtures: 10
 - Missing SVG resources: 0
 - Missing reference resources: 0
 
@@ -9,6 +9,7 @@ Manifest: `Tests/SVGSwiftUITests/W3C/w3c-manifest.json`
 | Suite | Category | Total | Pass | Fail | Unsupported | Missing SVG | Missing Reference |
 |---|---|---:|---:|---:|---:|---:|---:|
 | 1.1F2 | coords | 1 | 1 | 0 | 0 | 0 | 0 |
+| 1.1F2 | filter | 2 | 2 | 0 | 0 | 0 | 0 |
 | 1.1F2 | paths | 1 | 1 | 0 | 0 | 0 | 0 |
 | 1.1F2 | shapes | 2 | 2 | 0 | 0 | 0 | 0 |
 | 1.1F2 | styling | 2 | 2 | 0 | 0 | 0 | 0 |
@@ -18,7 +19,7 @@ Manifest: `Tests/SVGSwiftUITests/W3C/w3c-manifest.json`
 ## Coverage by Expected Result
 | Result | Count | Coverage |
 |---|---:|---:|
-| pass | 8 | 100.0% |
+| pass | 10 | 100.0% |
 | fail | 0 | 0.0% |
 | unsupported | 0 | 0.0% |
 
@@ -35,6 +36,8 @@ Manifest: `Tests/SVGSwiftUITests/W3C/w3c-manifest.json`
 | w3c-1.1F2-coords-skew-transform | 1.1F2 | coords | parse | pass | `fixtures/1.1F2/svg/coords-skew-transform.svg` | `fixtures/1.1F2/ref/coords-skew-transform.expected.txt` | ✅ | ✅ |
 | w3c-1.1F2-shapes-rounded-rect | 1.1F2 | shapes | parse | pass | `fixtures/1.1F2/svg/shapes-rounded-rect.svg` | `fixtures/1.1F2/ref/shapes-rounded-rect.expected.txt` | ✅ | ✅ |
 | w3c-1.1F2-paths-move-line | 1.1F2 | paths | parse | pass | `fixtures/1.1F2/svg/paths-move-line.svg` | `fixtures/1.1F2/ref/paths-move-line.expected.txt` | ✅ | ✅ |
+| w3c-1.1F2-filters-blend-01-b-min | 1.1F2 | filter | parse | pass | `fixtures/1.1F2/svg/filters-blend-01-b-min.svg` | `fixtures/1.1F2/ref/filters-blend-01-b-min.expected.txt` | ✅ | ✅ |
+| w3c-1.1F2-filters-colormatrix-01-b-min | 1.1F2 | filter | parse | pass | `fixtures/1.1F2/svg/filters-colormatrix-01-b-min.svg` | `fixtures/1.1F2/ref/filters-colormatrix-01-b-min.expected.txt` | ✅ | ✅ |
 | w3c-1.1F2-shapes-rect-circle | 1.1F2 | shapes | parse | pass | `fixtures/1.1F2/svg/shapes-rect-circle.svg` | `fixtures/1.1F2/ref/shapes-rect-circle.expected.txt` | ✅ | ✅ |
 | w3c-1.2T-coords-relative-transform | 1.2T | coords | parse | pass | `fixtures/1.2T/svg/coords-relative-transform.svg` | `fixtures/1.2T/ref/coords-relative-transform.expected.txt` | ✅ | ✅ |
 | w3c-1.2T-styling-fill-stroke | 1.2T | styling | parse | pass | `fixtures/1.2T/svg/styling-fill-stroke.svg` | `fixtures/1.2T/ref/styling-fill-stroke.expected.txt` | ✅ | ✅ |

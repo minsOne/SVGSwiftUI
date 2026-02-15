@@ -639,6 +639,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         name: String,
         attributes: [String: String]
     ) -> SVGFilterPrimitive? {
+        let normalizedAttributes: [String: String] = normalizePrimitiveAttributes(attributes)
         guard let currentParent = frames.last,
               case .filter = currentParent.kind else {
             return nil
@@ -646,13 +647,13 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         switch name {
         case "fegaussianblur":
             let stdDeviation: SVGFilterPrimitive? = parseStdDeviation(
-                attributes["stdDeviation"]
+                normalizedAttributes["stddeviation"]
             )
             if let stdDeviation {
                 return stdDeviation
             }
-            let stdXAttribute: String = attributes["stdDeviationX"] ?? ""
-            let stdYAttribute: String = attributes["stdDeviationY"] ?? ""
+            let stdXAttribute: String = normalizedAttributes["stddeviationx"] ?? "0"
+            let stdYAttribute: String = normalizedAttributes["stddeviationy"] ?? stdXAttribute
             let stdX: Double = parseNumeric(stdXAttribute) ?? 0.0
             let stdY: Double = parseNumeric(stdYAttribute) ?? stdX
             return .gaussianBlur(
@@ -660,11 +661,24 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 stdDeviationY: stdY
             )
         case "feoffset":
-            let dxAttribute: String = attributes["dx"] ?? ""
-            let dyAttribute: String = attributes["dy"] ?? ""
+            let dxAttribute: String = normalizedAttributes["dx"] ?? "0"
+            let dyAttribute: String = normalizedAttributes["dy"] ?? "0"
             let dx: Double = parseNumeric(dxAttribute) ?? 0.0
             let dy: Double = parseNumeric(dyAttribute) ?? 0.0
             return .offset(dx: dx, dy: dy)
+        case "feblend":
+            let mode: String = parseBlendMode(normalizedAttributes["mode"])
+            let inSource: String? = normalizedAttributes["in"]
+            let inSourceTwo: String? = normalizedAttributes["in2"]
+            return .blend(
+                mode: mode,
+                inSource: inSource,
+                inSourceTwo: inSourceTwo
+            )
+        case "fecolormatrix":
+            let valuesAttribute: String = normalizedAttributes["values"] ?? ""
+            let values: [Double] = parseNumericList(from: valuesAttribute)
+            return .colorMatrix(values: values)
         default:
             if name.hasPrefix("fe") {
                 return .unsupported(
@@ -693,6 +707,28 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         let stdDeviationX: Double = values[0]
         let stdDeviationY: Double = values.count > 1 ? values[1] : values[0]
         return .gaussianBlur(stdDeviationX: stdDeviationX, stdDeviationY: stdDeviationY)
+    }
+
+    private func parseBlendMode(_ value: String?) -> String {
+        let mode: String = value?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased() ?? ""
+        if mode.isEmpty {
+            return "normal"
+        }
+        return mode
+    }
+
+    private func parseNumericList(from value: String) -> [Double] {
+        if value.isEmpty {
+            return []
+        }
+        return value.split(
+            whereSeparator: { separator in
+                separator == " " || separator == "," || separator == "\n" || separator == "\t"
+            }
+        )
+        .compactMap { parseNumeric(String($0)) }
     }
 
     private func normalizePrimitiveAttributes(_ attributes: [String: String]) -> [String: String] {
