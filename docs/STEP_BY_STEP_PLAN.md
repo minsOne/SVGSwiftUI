@@ -52,6 +52,9 @@
 | A12 | filter 고급 primitive 분류 | parser 단계에서 미지원 primitive 추적 + `unsupported` 정책 정렬 | `unsupported` 유형이 기록되며 manifest/coverage 정합성 업데이트 |
 | A13-1 | filter 고급 primitive 확장 | `feBlend`/`feColorMatrix` 파서 지원 및 추적/분류 반영 | 렌더 경로에서 고급 primitive 최소 지원 시그니처 검증 |
 | A13-2 | conformance 정렬 | WebKit/W3C fixture와 매니페스트 기대치 정합성 갱신 | filter 후보군 pass 전환 및 coverage strict 재생성 |
+| A14-1 | filter 체인 소스/결과 모델링 | `in`/`in2`/`result` 파싱 기본값/반영 | 파서 반환 primitive에 소스·결과 정보 보존 |
+| A14-2 | filter 체인 실행 가드 | `applyFilterPrimitives` 입력 소스 가용성 확인 | 유효하지 않은 체인은 no-op, 유효 체인만 적용 |
+| A14-3 | chain 회귀 검증 강화 | 파싱/시각 회귀 케이스 보강 | `filter` 체인 케이스 기반 conformance 범위 확장 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

@@ -262,9 +262,22 @@ final class SVGParserTests: XCTestCase {
         let second = filterDefinition.primitives[1]
         XCTAssertEqual(
             first,
-            .gaussianBlur(stdDeviationX: 2.5, stdDeviationY: 4.0)
+            .gaussianBlur(
+                stdDeviationX: 2.5,
+                stdDeviationY: 4.0,
+                inSource: "SourceGraphic",
+                result: nil
+            )
         )
-        XCTAssertEqual(second, .offset(dx: 8, dy: -3))
+        XCTAssertEqual(
+            second,
+            .offset(
+                dx: 8,
+                dy: -3,
+                inSource: "SourceGraphic",
+                result: nil
+            )
+        )
     }
 
     func testParseReadsFilterPrimitivesWithSingleStandardDeviationValue() throws {
@@ -289,7 +302,15 @@ final class SVGParserTests: XCTestCase {
         let document = try parser.parse(source: .string(svg))
         let primitives = try XCTUnwrap(document.filterDefinitions["single"]?.primitives)
         XCTAssertEqual(primitives.count, 1)
-        XCTAssertEqual(primitives[0], .gaussianBlur(stdDeviationX: 3.25, stdDeviationY: 3.25))
+        XCTAssertEqual(
+            primitives[0],
+            .gaussianBlur(
+                stdDeviationX: 3.25,
+                stdDeviationY: 3.25,
+                inSource: "SourceGraphic",
+                result: nil
+            )
+        )
     }
 
     func testParseTracksSupportedColorMatrixFilterPrimitive() throws {
@@ -315,12 +336,20 @@ final class SVGParserTests: XCTestCase {
         let document = try parser.parse(source: .string(svg))
         let primitives = try XCTUnwrap(document.filterDefinitions["unsupported"]?.primitives)
         XCTAssertEqual(primitives.count, 2)
-        guard case .colorMatrix(let values) = primitives[0] else {
+        guard case .colorMatrix(let values, _, _) = primitives[0] else {
             return XCTFail("Expected colorMatrix filter primitive first")
         }
         XCTAssertEqual(values, [0.5])
 
-        XCTAssertEqual(primitives[1], .gaussianBlur(stdDeviationX: 1, stdDeviationY: 1))
+        XCTAssertEqual(
+            primitives[1],
+            .gaussianBlur(
+                stdDeviationX: 1,
+                stdDeviationY: 1,
+                inSource: "SourceGraphic",
+                result: nil
+            )
+        )
         XCTAssertFalse(document.filterDefinitions["unsupported"]?.hasUnsupportedPrimitives == true)
         XCTAssertTrue(document.filterDefinitions["unsupported"]?.hasSupportedPrimitives == true)
     }
@@ -349,19 +378,33 @@ final class SVGParserTests: XCTestCase {
         let document = try parser.parse(source: .string(svg))
         let primitives = try XCTUnwrap(document.filterDefinitions["supported"]?.primitives)
         XCTAssertEqual(primitives.count, 3)
-        guard case .colorMatrix(let values) = primitives[0] else {
+        guard case .colorMatrix(let values, _, _) = primitives[0] else {
             return XCTFail("Expected colorMatrix as first primitive")
         }
         XCTAssertEqual(values, [1])
 
-        XCTAssertEqual(primitives[1], .offset(dx: 7, dy: -4))
+        XCTAssertEqual(
+            primitives[1],
+            .offset(
+                dx: 7,
+                dy: -4,
+                inSource: "SourceGraphic",
+                result: nil
+            )
+        )
 
-        guard case .blend(let blendMode, let inSource, let inSourceTwo) = primitives[2] else {
+        guard case .blend(
+            let blendMode,
+            let inSource,
+            let inSourceTwo,
+            let result
+        ) = primitives[2] else {
             return XCTFail("Expected blend as third primitive")
         }
         XCTAssertEqual(blendMode, "multiply")
         XCTAssertEqual(inSource, "SourceGraphic")
         XCTAssertEqual(inSourceTwo, "SourceGraphic")
+        XCTAssertNil(result)
 
         let filterDefinition = try XCTUnwrap(document.filterDefinitions["supported"])
         XCTAssertFalse(filterDefinition.hasUnsupportedPrimitives)
@@ -400,13 +443,168 @@ final class SVGParserTests: XCTestCase {
         let document = try parser.parse(source: .string(svg))
         let primitives = try XCTUnwrap(document.filterDefinitions["unsupported"]?.primitives)
         XCTAssertEqual(primitives.count, 2)
-        XCTAssertEqual(primitives[0], .colorMatrix(values: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]))
+        XCTAssertEqual(
+            primitives[0],
+            .colorMatrix(
+                values: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                inSource: "SourceGraphic",
+                result: nil
+            )
+        )
         guard case .unsupported(let unsupportedType, _) = primitives[1] else {
             return XCTFail("Expected unsupported filter primitive after supported colorMatrix")
         }
         XCTAssertEqual(unsupportedType, "feflood")
         XCTAssertTrue(document.filterDefinitions["unsupported"]?.hasUnsupportedPrimitives == true)
         XCTAssertTrue(document.filterDefinitions["unsupported"]?.hasSupportedPrimitives == true)
+    }
+
+    func testParseReadsFilterPrimitiveChainInputsAndResults() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="chain">
+              <feGaussianBlur stdDeviation="1.5" in="SourceGraphic" result="blur"/>
+              <feOffset dx="4" dy="1" in="blur" result="shifted"/>
+              <feBlend in="shifted" in2="SourceGraphic" mode="multiply" result="mixed"/>
+              <feColorMatrix in="mixed" result="final" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0"/>
+            </filter>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" filter="url(#chain)" />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["chain"]?.primitives)
+        XCTAssertEqual(primitives.count, 4)
+        XCTAssertEqual(
+            primitives[0],
+            .gaussianBlur(
+                stdDeviationX: 1.5,
+                stdDeviationY: 1.5,
+                inSource: "SourceGraphic",
+                result: "blur"
+            )
+        )
+        XCTAssertEqual(
+            primitives[1],
+            .offset(
+                dx: 4,
+                dy: 1,
+                inSource: "blur",
+                result: "shifted"
+            )
+        )
+        XCTAssertEqual(
+            primitives[2],
+            .blend(
+                mode: "multiply",
+                inSource: "shifted",
+                inSourceTwo: "SourceGraphic",
+                result: "mixed"
+            )
+        )
+        guard case .colorMatrix(let values, let inSource, let result) = primitives[3] else {
+            return XCTFail("Expected colorMatrix as chain fourth primitive")
+        }
+        XCTAssertEqual(
+            values,
+            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+        )
+        XCTAssertEqual(inSource, "mixed")
+        XCTAssertEqual(result, "final")
+    }
+
+    func testParseReadsFilterChainSourcesWithWhitespaceTrimmed() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="chain-space">
+              <feGaussianBlur stdDeviation="1" in=" SourceGraphic " result=" blurred "/>
+              <feOffset dx="2" dy="1" in="blurred" result=" shifted "/>
+              <feBlend in="shifted" in2=" SourceGraphic " mode="multiply"/>
+            </filter>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" filter="url(#chain-space)" />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["chain-space"]?.primitives)
+        XCTAssertEqual(primitives.count, 3)
+        XCTAssertEqual(
+            primitives[0],
+            .gaussianBlur(
+                stdDeviationX: 1,
+                stdDeviationY: 1,
+                inSource: "SourceGraphic",
+                result: "blurred"
+            )
+        )
+        XCTAssertEqual(
+            primitives[1],
+            .offset(
+                dx: 2,
+                dy: 1,
+                inSource: "blurred",
+                result: "shifted"
+            )
+        )
+        XCTAssertEqual(
+            primitives[2],
+            .blend(
+                mode: "multiply",
+                inSource: "shifted",
+                inSourceTwo: "SourceGraphic",
+                result: nil
+            )
+        )
+    }
+
+    func testParseRetainsChainResultNamesForRendererInputs() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <filter id="chain-guard">
+              <feGaussianBlur stdDeviation="1.5" in="SourceAlpha" result="shadow"/>
+              <feOffset dx="1" dy="2" in="ghost" result="shifted"/>
+              <feBlend in="shifted" in2="shadow" mode="screen" result="merged"/>
+            </filter>
+          </defs>
+          <rect id="foreground" x="0" y="0" width="20" height="20" filter="url(#chain-guard)" />
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let primitives = try XCTUnwrap(document.filterDefinitions["chain-guard"]?.primitives)
+        XCTAssertEqual(primitives.count, 3)
+        XCTAssertEqual(
+            primitives[0],
+            .gaussianBlur(
+                stdDeviationX: 1.5,
+                stdDeviationY: 1.5,
+                inSource: "SourceAlpha",
+                result: "shadow"
+            )
+        )
+        XCTAssertEqual(
+            primitives[1],
+            .offset(
+                dx: 1,
+                dy: 2,
+                inSource: "ghost",
+                result: "shifted"
+            )
+        )
+        XCTAssertEqual(
+            primitives[2],
+            .blend(
+                mode: "screen",
+                inSource: "shifted",
+                inSourceTwo: "shadow",
+                result: "merged"
+            )
+        )
     }
 
     func testParseIgnoresFilterAndMaskElementsButKeepsSupportedSiblings() throws {

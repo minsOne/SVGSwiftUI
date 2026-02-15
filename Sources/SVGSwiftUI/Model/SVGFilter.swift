@@ -1,8 +1,27 @@
 enum SVGFilterPrimitive: Sendable, Equatable {
-    case gaussianBlur(stdDeviationX: Double, stdDeviationY: Double)
-    case offset(dx: Double, dy: Double)
-    case blend(mode: String, inSource: String?, inSourceTwo: String?)
-    case colorMatrix(values: [Double])
+    case gaussianBlur(
+        stdDeviationX: Double,
+        stdDeviationY: Double,
+        inSource: String?,
+        result: String?
+    )
+    case offset(
+        dx: Double,
+        dy: Double,
+        inSource: String?,
+        result: String?
+    )
+    case blend(
+        mode: String,
+        inSource: String?,
+        inSourceTwo: String?,
+        result: String?
+    )
+    case colorMatrix(
+        values: [Double],
+        inSource: String?,
+        result: String?
+    )
     case unsupported(type: String, attributes: [String: String])
 }
 

@@ -644,13 +644,25 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
               case .filter = currentParent.kind else {
             return nil
         }
+        let inSourceDefault: String = "SourceGraphic"
+        let inSourceFromAttribute: String? = normalizedAttributes["in"]
+        let inSource: String = parseFilterSourceReference(
+            from: inSourceFromAttribute,
+            defaultValue: inSourceDefault
+        )
+        let result: String? = parseFilterSourceReference(from: normalizedAttributes["result"])
         switch name {
         case "fegaussianblur":
-            let stdDeviation: SVGFilterPrimitive? = parseStdDeviation(
+            let parsedStdDeviation: (x: Double, y: Double)? = parseStdDeviation(
                 normalizedAttributes["stddeviation"]
             )
-            if let stdDeviation {
-                return stdDeviation
+            if let parsedStdDeviation {
+                return .gaussianBlur(
+                    stdDeviationX: parsedStdDeviation.x,
+                    stdDeviationY: parsedStdDeviation.y,
+                    inSource: inSource,
+                    result: result
+                )
             }
             let stdXAttribute: String = normalizedAttributes["stddeviationx"] ?? "0"
             let stdYAttribute: String = normalizedAttributes["stddeviationy"] ?? stdXAttribute
@@ -658,27 +670,45 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             let stdY: Double = parseNumeric(stdYAttribute) ?? stdX
             return .gaussianBlur(
                 stdDeviationX: stdX,
-                stdDeviationY: stdY
+                stdDeviationY: stdY,
+                inSource: inSource,
+                result: result
             )
         case "feoffset":
             let dxAttribute: String = normalizedAttributes["dx"] ?? "0"
             let dyAttribute: String = normalizedAttributes["dy"] ?? "0"
             let dx: Double = parseNumeric(dxAttribute) ?? 0.0
             let dy: Double = parseNumeric(dyAttribute) ?? 0.0
-            return .offset(dx: dx, dy: dy)
+            return .offset(
+                dx: dx,
+                dy: dy,
+                inSource: inSource,
+                result: result
+            )
         case "feblend":
             let mode: String = parseBlendMode(normalizedAttributes["mode"])
-            let inSource: String? = normalizedAttributes["in"]
-            let inSourceTwo: String? = normalizedAttributes["in2"]
+            let inSource: String = parseFilterSourceReference(
+                from: inSourceFromAttribute,
+                defaultValue: inSourceDefault
+            )
+            let inSourceTwo: String = parseFilterSourceReference(
+                from: normalizedAttributes["in2"],
+                defaultValue: inSourceDefault
+            )
             return .blend(
                 mode: mode,
                 inSource: inSource,
-                inSourceTwo: inSourceTwo
+                inSourceTwo: inSourceTwo,
+                result: result
             )
         case "fecolormatrix":
             let valuesAttribute: String = normalizedAttributes["values"] ?? ""
             let values: [Double] = parseNumericList(from: valuesAttribute)
-            return .colorMatrix(values: values)
+            return .colorMatrix(
+                values: values,
+                inSource: inSource,
+                result: result
+            )
         default:
             if name.hasPrefix("fe") {
                 return .unsupported(
@@ -690,7 +720,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         }
     }
 
-    private func parseStdDeviation(_ value: String?) -> SVGFilterPrimitive? {
+    private func parseStdDeviation(_ value: String?) -> (x: Double, y: Double)? {
         guard let value else {
             return nil
         }
@@ -700,13 +730,35 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                     separator == " " || separator == "," || separator == "\n" || separator == "\t"
                 }
             )
-            .compactMap { parseNumeric(String($0)) }
+                .compactMap { parseNumeric(String($0)) }
         if values.isEmpty {
             return nil
         }
         let stdDeviationX: Double = values[0]
         let stdDeviationY: Double = values.count > 1 ? values[1] : values[0]
-        return .gaussianBlur(stdDeviationX: stdDeviationX, stdDeviationY: stdDeviationY)
+        return (x: stdDeviationX, y: stdDeviationY)
+    }
+
+    private func parseFilterSourceReference(
+        from value: String?,
+        defaultValue: String? = nil
+    ) -> String {
+        guard let rawValue: String = value else {
+            return defaultValue ?? ""
+        }
+        let trimmed: String = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return defaultValue ?? ""
+        }
+        return trimmed
+    }
+
+    private func parseFilterSourceReference(from value: String?) -> String? {
+        let trimmed: String = parseFilterSourceReference(from: value, defaultValue: nil)
+        if trimmed.isEmpty {
+            return nil
+        }
+        return trimmed
     }
 
     private func parseBlendMode(_ value: String?) -> String {

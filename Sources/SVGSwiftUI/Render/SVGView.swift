@@ -524,23 +524,96 @@ private struct SVGStaticPlaceholderView: View {
         _ primitives: [SVGFilterPrimitive],
         to context: inout GraphicsContext
     ) {
+        let sourceGraphic: String = "SourceGraphic"
+        let sourceAlpha: String = "SourceAlpha"
+        var availableSources: Set<String> = [sourceGraphic, sourceAlpha]
         for primitive in primitives {
             switch primitive {
-            case .gaussianBlur(let stdDeviationX, let stdDeviationY):
+            case .gaussianBlur(
+                let stdDeviationX,
+                let stdDeviationY,
+                let inSource,
+                let result
+            ):
+                let inputSource: String = inSource ?? sourceGraphic
+                if !isFilterSourceAvailable(inputSource, availableSources: availableSources) {
+                    continue
+                }
                 let radius = max(stdDeviationX, stdDeviationY)
                 context.addFilter(.blur(radius: CGFloat(radius)))
-            case .offset(let dx, let dy):
+                if let resultName: String = resolvedFilterResultName(from: result) {
+                    availableSources.insert(resultName)
+                }
+            case .offset(
+                let dx,
+                let dy,
+                let inSource,
+                let result
+            ):
+                let inputSource: String = inSource ?? sourceGraphic
+                if !isFilterSourceAvailable(inputSource, availableSources: availableSources) {
+                    continue
+                }
                 context.translateBy(x: CGFloat(dx), y: CGFloat(dy))
-            case .blend(let blendMode, _, _):
+                if let resultName: String = resolvedFilterResultName(from: result) {
+                    availableSources.insert(resultName)
+                }
+            case .blend(
+                let blendMode,
+                let inSource,
+                let inSourceTwo,
+                let result
+            ):
+                let sourceOne: String = inSource ?? sourceGraphic
+                let sourceTwo: String = inSourceTwo ?? sourceGraphic
+                if !isFilterSourceAvailable(sourceOne, availableSources: availableSources) {
+                    continue
+                }
+                if !isFilterSourceAvailable(sourceTwo, availableSources: availableSources) {
+                    continue
+                }
                 if let blendFilterMode = parseBlendFilterMode(blendMode) {
                     context.blendMode = blendFilterMode
+                    if let resultName: String = resolvedFilterResultName(from: result) {
+                        availableSources.insert(resultName)
+                    }
                 }
-            case .colorMatrix:
-                continue
+            case .colorMatrix(
+                _,
+                let inSource,
+                let result
+            ):
+                let inputSource: String = inSource ?? sourceGraphic
+                if !isFilterSourceAvailable(inputSource, availableSources: availableSources) {
+                    continue
+                }
+                if let resultName: String = resolvedFilterResultName(from: result) {
+                    availableSources.insert(resultName)
+                }
             case .unsupported:
                 continue
             }
         }
+    }
+
+    private func isFilterSourceAvailable(
+        _ source: String,
+        availableSources: Set<String>
+    ) -> Bool {
+        let normalizedSource: String = source
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if normalizedSource.isEmpty {
+            return false
+        }
+        return availableSources.contains(normalizedSource)
+    }
+
+    private func resolvedFilterResultName(from result: String?) -> String? {
+        let rawResult: String = result?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if rawResult.isEmpty {
+            return nil
+        }
+        return rawResult
     }
 
     private func parseBlendFilterMode(_ value: String) -> GraphicsContext.BlendMode? {

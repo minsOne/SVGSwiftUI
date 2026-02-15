@@ -52,6 +52,13 @@ final class W3CGeneratedTests: XCTestCase {
                 referencePath: "fixtures/1.1F2/ref/filters-blend-01-b-min.expected.txt"
             ),
             FixtureExpectation(
+                id: "w3c-1.1F2-filters-chain-01-b-min",
+                mode: .parse,
+                expected: .pass,
+                svgPath: "fixtures/1.1F2/svg/filters-chain-01-b-min.svg",
+                referencePath: "fixtures/1.1F2/ref/filters-chain-01-b-min.expected.txt"
+            ),
+            FixtureExpectation(
                 id: "w3c-1.1F2-filters-colormatrix-01-b-min",
                 mode: .parse,
                 expected: .pass,

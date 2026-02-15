@@ -1,6 +1,41 @@
 # SVGSwiftUI Work Log
 
-## 2026-02-15
+## 2026-02-16
+
+### Session 49
+- 작업: `A14-3` filter chain 회귀 테스트 강화
+- 완료:
+  - W3C chain fixture(`w3c-1.1F2-filters-chain-01-b-min`) 추가
+  - WebKit chain fixture(`webkit-filters-chain-01-b.svg`) 추가
+  - parser 테스트 `testParseReadsFilterChainSourcesWithWhitespaceTrimmed`, `testParseRetainsChainResultNamesForRendererInputs` 추가
+  - W3C/WebKit generated tests 및 coverage 재생성
+- 리스크:
+  - conformance suite는 parse 중심이므로 체인 결과의 시각 일치까지 검증 불충분
+  - `SourceAlpha` 경로 및 unsupported primitive가 체인에 미치는 렌더 영향은 추적 기반 테스트로만 보완됨
+- 다음 액션:
+  - 필요 시 `A14-4`로 WebKit/W3C 체인 케이스에 대한 snapshot/비교 경로를 분리 검토
+- 검증:
+  - `swift test --no-parallel` (137 tests, 0 failures)
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
+### Session 48
+- 작업: `A14-1/A14-2` filter 체인 소스 및 렌더 가드 구현
+- 완료:
+  - `SVGFilterPrimitive`의 `in`/`in2`/`result`를 반영한 파서 경로 정비(`SourceGraphic` 기본 `in` 적용)
+  - `SVGView.applyFilterPrimitives`에서 `SourceGraphic`/`SourceAlpha`/`result` 기반 체인 유효성 검사 후 지원 primitive만 적용
+  - `SVGParserTests`에 `in`/`result` 유지 검증 케이스 추가
+- 리스크:
+  - 체인 기반 렌더는 현재 `Color`/`GraphicsContext` 제한으로 완전한 파이프라인 재현이 어려움
+  - `unsupported` primitive가 중간 결과를 만든 경우 시각 결과 추정치가 제한됨
+- 다음 액션:
+  - `A14-3`에서 chain 체인 fixture(특히 `in` 참조가 결과를 소비하는 케이스) 중심으로 W3C/WebKit 회귀 시나리오를 확대
+- 검증:
+  - `swift test --no-parallel` (135 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel` (pass)
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel` (pass)
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
 
 ### Session 45
 - 작업: `A12 filter` 고급 primitive 분류 정책 정리

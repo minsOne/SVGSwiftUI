@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-15 (A13-2 done)
+Last Updated: 2026-02-16 (A14-3 done)
 
 ## Status Legend
 - `todo`: not started
@@ -60,6 +60,9 @@ Last Updated: 2026-02-15 (A13-2 done)
 | A12 | A12 | filter 고급 primitive 분류 정책 | done | 미지원 primitive(`fe*`) 추적, `manifest`/coverage 정합성 업데이트 완료 |
 | A13-1 | A13 | filter 고급 primitive 확장 | done | `feBlend`, `feColorMatrix` 파서/지원 분류 반영 |
 | A13-2 | A13 | conformance 정렬 및 커버리지 업데이트 | done | WebKit expected 변경, W3C filter 최소 케이스 추가 및 coverage 재생성 |
+| A14-1 | A14 | filter 체인 소스/결과 모델링 | done | `in`/`in2`/`result` 파싱/보존 및 기본값 적용 |
+| A14-2 | A14 | filter 체인 렌더 가드 | done | 입력 소스 가용성 검사 기반 `applyFilterPrimitives` 로직 적용 |
+| A14-3 | A14 | filter chain 회귀 테스트 강화 | done | WebKit/W3C `in`/`result` 체인 케이스 보강 및 conformance 범위 확장 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

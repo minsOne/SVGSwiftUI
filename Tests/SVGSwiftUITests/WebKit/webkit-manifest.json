@@ -421,6 +421,16 @@
       "source": "LayoutTests/svg/W3C-SVG-1.1/filters-blend-01-b.svg"
     },
     {
+      "id": "webkit-1.1-filters-chain-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "filter",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-filters-chain-01-b.svg",
+      "reference": "",
+      "source": ""
+    },
+    {
       "id": "webkit-1.1-filters-gauss-01-b",
       "suite": "W3C-SVG-1.1",
       "category": "filter",

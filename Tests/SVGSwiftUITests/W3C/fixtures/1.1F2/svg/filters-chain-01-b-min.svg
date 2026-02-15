@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10">
+  <defs>
+    <filter id="chain-filter">
+      <feGaussianBlur stdDeviation="1.5" in="SourceGraphic" result="blurred"/>
+      <feOffset dx="2" dy="1" in="blurred" result="shifted"/>
+      <feBlend in="shifted" in2="SourceGraphic" mode="multiply"/>
+      <feColorMatrix
+        in="shifted"
+        values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 1"
+      />
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="10" height="10" fill="#ff0000" filter="url(#chain-filter)"/>
+</svg>

@@ -1,12 +1,13 @@
 # 작업 연속성 문서
 
-## 현재 상태 (2026-02-15)
+## 현재 상태 (2026-02-16)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2 완료
+- 다음 단계: `A14-3` 완료 처리 후 다음 고급 렌더 후보(예: `filter` 알파/색공간 보존 경로) 사전 설계
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
-- 다음 단계: `A14` 또는 `WebKit/W3C 고급 filter` 실질 구현(색공간/알파 보존) 우선순위 재정의
+- 다음 단계: `A14-3` (`in`/`in2`/`result` chain 회귀 검증 강화)
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -21,7 +22,7 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. 다음 단계: `A12` 완료 처리 후 다음 우선순위 후보 기능 탐색 (`A13` 또는 `WebKit/W3C` 고급 spec 확대)
+1. 다음 단계: `A14-3` 완료 검수 후 `A15` 후보 기능(필터 결과 블렌딩 정확도 강화) 반영 검토
 
 ## 작업 진행 루프(재작업 방지)
 - Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환
@@ -66,7 +67,42 @@
 - [x] A12 `filter` 고급 primitive 분류 정책 정리
 - [x] A13-1 `feBlend`/`feColorMatrix` 지원으로 분류/렌더 경로 확장
 - [x] A13-2 WebKit/W3C conformance 수치 및 fixture 정렬
+- [x] A14-1 `in`/`in2`/`result` 파싱/저장 보강
+- [x] A14-2 체인 렌더 가드 적용
+- [x] A14-3 chain 회귀 검증 강화
 
+### 2026-02-16 (Session 48)
+- 작업: `A14-1/A14-2` filter 체인 메타데이터 파싱 + 렌더 체인 가드 구현
+- 완료:
+  - `SVGFilterPrimitive`에 `in`/`in2`/`result`를 반영한 채 필터 파싱 경로 기본값(`in`=`SourceGraphic`) 적용
+  - `SVGView`에서 `applyFilterPrimitives`를 체인 소스 가용성(`SourceGraphic`, `SourceAlpha`, `result`) 중심으로 개선
+  - 기존 filter 회귀 45개 케이스에 `in`/`in2`/`result` 반영 검증 테스트 추가
+- 리스크:
+  - `blend`/`colorMatrix`는 현재 `Color` 렌더 체인으로 완전 복원되지 않아 시각 정확도 제한
+  - 지원되지 않는 primitive가 결과를 생성한 경우 체인 추적 시 시각적 누락 가능
+- 다음 액션:
+  - `A14-3`로 WebKit/W3C의 `in`/`result` 체인 기반 fixture를 선별 추가하고 coverage 정책 정리
+- 검증:
+  - `swift test --no-parallel` (135 tests, 0 failures)
+  - `swift test --filter testW3CGeneratedSuite --no-parallel`
+  - `swift test --filter testWebKitGeneratedSuite --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
+### 2026-02-16 (Session 49)
+- 작업: `A14-3` filter chain 회귀 테스트 강화
+- 완료:
+  - W3C chain fixture(`w3c-1.1F2-filters-chain-01-b-min`) 추가 및 reference metadata 정렬
+  - WebKit chain fixture(`webkit-filters-chain-01-b.svg`) 추가 및 WebKit manifest 등록
+  - `testParseReadsFilterChainSourcesWithWhitespaceTrimmed`/`testParseRetainsChainResultNamesForRendererInputs` 추가
+  - W3C/WebKit generated tests 및 coverage 문서 재생성
+- 리스크:
+  - conformance suite는 parse 기반이므로 체인 시각 일치성까지는 검증되지 않음
+  - `SourceAlpha` 소스 경로는 현재 파서 메타데이터/가드 동작 관점에서만 보장되며 blend 결과 합성의 완전성은 추후 과제
+- 검증:
+  - `swift test --no-parallel` (137 tests, 0 failures)
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
 
 ## 구현 중 준수 규칙
 - 파서/모델 계층은 UI 타입(`Color`) 의존을 피하고 값 타입 중심으로 유지
