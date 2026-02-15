@@ -58,6 +58,8 @@
 | A15-1 | 필터 체인 실행 그래프 분리 | `SourceGraphic`/`SourceAlpha`/`result` 상태머신 추상화 | renderer/파서 체인 가용성 규칙 정합성 보강 |
 | A15-2 | 오프스크린 필터 합성 정밀도 강화 | `feBlend`/`feColorMatrix`를 CI 기반 합성으로 정착 | 시각 정합성 회귀 케이스 기반 오프스크린 정확도 확장 |
 | A16-1 | feComposite 지원 | `feComposite` 파서/그래프/오프스크린 렌더 지원 | `feComposite` 기본 연산(`over`, `in`)과 체인 결과 처리 검증 |
+| A16-2 | feComposite arithmetic 지원 | `arithmetic` 수식(`k1~k4`) 계산 경로 추가 | 수식 연산(`arithmetic`)과 체인/기대값 분기 검증 |
+| A16-3 | feComposite 경계 시각 회귀 | `in`/`in2` 경계 조합과 unsupported fallback | 경계/시각 시나리오 회귀 검증 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

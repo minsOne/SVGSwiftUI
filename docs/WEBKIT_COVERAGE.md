@@ -1,7 +1,7 @@
 # WebKit LayoutTests Conformance Coverage
-Generated: 2026-02-15 15:39:10Z UTC
+Generated: 2026-02-15 15:42:14Z UTC
 Manifest: `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`
-- Total fixtures: 53
+- Total fixtures: 54
 - Missing SVG resources: 0
 - Missing reference resources: 0
 
@@ -9,7 +9,7 @@ Manifest: `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`
 | Suite | Category | Total | Pass | Fail | Unsupported | Missing SVG | Missing Reference |
 |---|---|---:|---:|---:|---:|---:|---:|
 | W3C-SVG-1.1 | coords | 14 | 14 | 0 | 0 | 0 | 0 |
-| W3C-SVG-1.1 | filter | 3 | 3 | 0 | 0 | 0 | 0 |
+| W3C-SVG-1.1 | filter | 4 | 3 | 0 | 1 | 0 | 0 |
 | W3C-SVG-1.1 | image | 1 | 0 | 0 | 1 | 0 | 0 |
 | W3C-SVG-1.1 | marker | 2 | 0 | 0 | 2 | 0 | 0 |
 | W3C-SVG-1.1 | mask | 2 | 0 | 0 | 2 | 0 | 0 |
@@ -21,9 +21,9 @@ Manifest: `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`
 ## Coverage by Expected Result
 | Result | Count | Coverage |
 |---|---:|---:|
-| pass | 43 | 81.1% |
+| pass | 43 | 79.6% |
 | fail | 0 | 0.0% |
-| unsupported | 10 | 18.9% |
+| unsupported | 11 | 20.4% |
 
 ## Conformance Health Check
 - Invalid fixture mode values: 0
@@ -31,7 +31,7 @@ Manifest: `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`
 - Empty fixture IDs: 0
 - Duplicate fixture IDs: 0
 - Strict mode: enabled
-- Source field valid count: 52
+- Source field valid count: 53
 
 ## Fixture Table
 | ID | Suite | Category | Mode | Expected | SVG | Reference | Source | SVG Resource | Reference Resource |
@@ -80,6 +80,7 @@ Manifest: `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`
 | webkit-1.1-filters-blend-01-b | W3C-SVG-1.1 | filter | parse | pass | `fixtures/webkit-filters-blend-01-b.svg` | `` | `LayoutTests/svg/W3C-SVG-1.1/filters-blend-01-b.svg` | ✅ | N/A |
 | webkit-1.1-filters-chain-01-b | W3C-SVG-1.1 | filter | parse | pass | `fixtures/webkit-filters-chain-01-b.svg` | `` | `` | ✅ | N/A |
 | webkit-1.1-filters-gauss-01-b | W3C-SVG-1.1 | filter | parse | pass | `fixtures/webkit-filters-gauss-01-b.svg` | `` | `LayoutTests/svg/W3C-SVG-1.1/filters-gauss-01-b.svg` | ✅ | N/A |
+| webkit-1.1-filters-composite-02-b | W3C-SVG-1.1 | filter | parse | unsupported | `fixtures/webkit-filters-composite-02-b.svg` | `` | `LayoutTests/svg/W3C-SVG-1.1/filters-composite-02-b.svg` | ✅ | N/A |
 | webkit-1.1-fonts-elem-01-t | W3C-SVG-1.1 | text | parse | unsupported | `fixtures/webkit-fonts-elem-01-t.svg` | `` | `LayoutTests/svg/W3C-SVG-1.1/fonts-elem-01-t.svg` | ✅ | N/A |
 | webkit-1.1-fonts-glyph-02-t | W3C-SVG-1.1 | text | parse | unsupported | `fixtures/webkit-fonts-glyph-02-t.svg` | `` | `LayoutTests/svg/W3C-SVG-1.1/fonts-glyph-02-t.svg` | ✅ | N/A |
 | webkit-1.1-masking-intro-01-f | W3C-SVG-1.1 | mask | parse | unsupported | `fixtures/webkit-masking-intro-01-f.svg` | `` | `LayoutTests/svg/W3C-SVG-1.1/masking-intro-01-f.svg` | ✅ | N/A |

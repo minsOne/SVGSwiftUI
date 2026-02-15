@@ -4,10 +4,9 @@
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1 완료, A16-2 완료
-- 다음 단계: 다음 과제 선별
+- 다음 단계: `A16-3` 진행 (`feComposite` 경계/시각 회귀 확장)
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
-- 다음 단계: 다음 과제 선별
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -22,7 +21,7 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. 다음 단계: 다음 과제 선별
+1. `A16-3` `feComposite` 경계 및 `unsupported` fallback 조합 2~3건 추가
 
 ## 작업 진행 루프(재작업 방지)
 - Task 시작 시 `TASK_BOARD` 상태를 `in_progress`로 전환
@@ -170,6 +169,22 @@
   - `swift test --filter testFilterGraphCanExecuteArithmeticCompositePrimitiveWithResult --no-parallel`
   - `swift test --filter testRenderFilteredImageAppliesCompositeArithmeticOperator --no-parallel`
   - `swift test --no-parallel`
+
+### 2026-02-16 (Session 55)
+- 작업: `A16-2` conformance fixture 확장
+- 완료:
+  - W3C arithmetic fixture 1건 추가 및 reference 메타데이터 정렬
+  - WebKit `filters-composite-02-b` fixture 수집/동기화 및 expected 분류(unsupported) 반영
+  - W3C/WebKit generated suite 재생성 및 coverage 문서 strict 재생성
+- 리스크:
+  - `arithmetic` 시각 정합성은 `unsupported` 경로의 경계 사례가 있어 fixture 종류별 분류 정책을 계속 정교화해야 함
+- 다음 액션:
+  - `A16-3`에서 `in`/`in2` 기본/비정상 조합과 fallback 동작을 fixture로 정량화
+- 검증:
+  - `swift test --filter testW3CGeneratedSuite --filter testWebKitGeneratedSuite --no-parallel`
+  - `swift test --filter testParseTracksCompositeArithmeticPrimitive --filter testFilterGraphCanExecuteArithmeticCompositePrimitiveWithResult --filter testRenderFilteredImageAppliesCompositeArithmeticOperator --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
 
 ## 구현 중 준수 규칙
 - 파서/모델 계층은 UI 타입(`Color`) 의존을 피하고 값 타입 중심으로 유지

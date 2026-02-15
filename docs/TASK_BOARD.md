@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (A16-2 done)
+Last Updated: 2026-02-16 (A16-2 fixture extension done)
 
 ## Status Legend
 - `todo`: not started
@@ -67,6 +67,7 @@ Last Updated: 2026-02-16 (A16-2 done)
 | A15-2 | A15 | 오프스크린 필터 합성 정밀도 강화 | done | `feBlend`/`feColorMatrix`를 CI 기반 렌더 경로로 수행해 `result` 체인 시각 정합성 강화 |
 | A16-1 | A16 | feComposite 지원 | done | `feComposite` 파서/그래프/오프스크린 CI 렌더 경로 및 체인 테스트 보강 |
 | A16-2 | A16 | feComposite `arithmetic` 지원 | done | `arithmetic` 연산을 CIColorKernel 기반으로 수식대로 합성하도록 구현, 파서/그래프/렌더 테스트 보강 |
+| A16-3 | A16 | feComposite 경계/시각 회귀 확장 | todo | `in`/`in2` 조합과 unsupported fallback 케이스 정량화 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

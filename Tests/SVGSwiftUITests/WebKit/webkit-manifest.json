@@ -441,6 +441,16 @@
       "source": "LayoutTests/svg/W3C-SVG-1.1/filters-gauss-01-b.svg"
     },
     {
+      "id": "webkit-1.1-filters-composite-02-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "filter",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-filters-composite-02-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/filters-composite-02-b.svg"
+    },
+    {
       "id": "webkit-1.1-fonts-elem-01-t",
       "suite": "W3C-SVG-1.1",
       "category": "text",

@@ -55,6 +55,15 @@
             "reference": "fixtures/1.1F2/ref/filters-chain-01-b-min.expected.txt"
         },
         {
+            "id": "w3c-1.1F2-filters-composite-arithmetic-01-b-min",
+            "suite": "1.1F2",
+            "category": "filter",
+            "mode": "parse",
+            "expected": "pass",
+            "svg": "fixtures/1.1F2/svg/filters-composite-arithmetic-01-b-min.svg",
+            "reference": "fixtures/1.1F2/ref/filters-composite-arithmetic-01-b-min.expected.txt"
+        },
+        {
             "id": "w3c-1.1F2-shapes-rect-circle",
             "suite": "1.1F2",
             "category": "shapes",
