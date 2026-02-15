@@ -355,3 +355,37 @@
 - Next:
   1. `P8-1` 샘플 fixture 확장 및 통합 회귀 테스트 보강
   2. `P9-1` README/사용 가이드 정리
+
+### Session 16
+- Scope:
+  - `P8-3` GitHub CI 파이프라인 구성
+  - `swift test` + demo UITest를 CI로 연결
+- Completed:
+  - `.github/workflows/ci.yml` 신규 작성:
+    - `swift test` Job(`ubuntu-latest`)
+    - `Demo UITests` Job(`macos-latest`)
+    - Demo `xcodebuild test` 실행 전 iOS simulator 대상 자동 탐색 추가
+  - 작업 문서 업데이트:
+    - `docs/STEP_BY_STEP_PLAN.md`에 `P8-3` 항목 추가
+    - `docs/TASK_BOARD.md`에 `P8-3` 상태 반영(`in_progress`)
+    - `docs/WORK_CONTINUATION.md` 다음 순서/세션 로그 갱신
+- Next:
+ 1. `P8-1` 샘플 fixture 추가 및 통합 테스트 보강
+ 2. CI에서 fixture 회귀 파이프라인 통과 기준 확정
+
+### Session 17
+- Scope:
+  - `P8-1` fixture 통합 테스트 추가 및 `P8-3` CI 재현성 보강
+- Completed:
+  - `Tests/SVGSwiftUITests/Fixtures` 폴더 추가 및 `scene_transforms.svg`, `style_overrides.svg`, `shape_commands.svg` 등록
+  - `Tests/SVGSwiftUITests/SVGFixtureRegressionTests.swift` 3개 회귀 테스트 추가
+  - `Package.swift`에 `SVGSwiftUITests` 리소스 빌드 등록 (`.process("Fixtures")`)
+  - CI workflow 업데이트:
+    - destination 파싱에서 `id:` 기반 전달
+    - `-parallel-testing-enabled NO` 추가로 안정성 강화
+- Validation:
+  - `swift test --parallel` 통과 (`63` tests)
+  - `xcodebuild ... test -destination id=<iPhone_17>` 통과 (`All tests` 5개, 0 failures)
+- Next:
+  - `P9-1` README/사용 가이드 정리
+  - v2 W3C fixture subset(1.1F2/1.2T) 테스트 전략 수립

@@ -21,7 +21,10 @@ let package = Package(
         ),
         .testTarget(
             name: "SVGSwiftUITests",
-            dependencies: ["SVGSwiftUI"]
+            dependencies: ["SVGSwiftUI"],
+            resources: [
+                .process("Fixtures")
+            ]
         ),
     ]
 )

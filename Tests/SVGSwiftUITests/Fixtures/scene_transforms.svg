@@ -1,0 +1,8 @@
+<svg width="120" height="120" viewBox="0 0 120 120">
+  <g id="panel" transform="translate(4 6) scale(2)">
+    <rect id="panel-rect" x="5" y="5" width="10" height="8" />
+    <g id="nested-group" transform="translate(2 2)">
+      <circle id="nested-circle" cx="5" cy="6" r="3" />
+    </g>
+  </g>
+</svg>

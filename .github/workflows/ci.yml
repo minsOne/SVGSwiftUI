@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  swift-tests:
+    name: Swift Package Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run swift test
+        run: |
+          swift --version
+          swift test --parallel
+
+  demo-uitests:
+    name: Demo UITests
+    runs-on: macos-latest
+    timeout-minutes: 45
+    needs: swift-tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve iOS simulator destination
+        id: destination
+        run: |
+          set -euo pipefail
+          SHOW_DESTINATIONS=$(xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -showdestinations)
+          DESTINATION_LINE=$(printf '%s\n' "$SHOW_DESTINATIONS" \
+            | awk 'index($0, "platform:iOS Simulator") && /OS:/ && /name:iPhone 17/ && !/placeholder/ { print; exit }')
+
+          if [ -z "$DESTINATION_LINE" ]; then
+            echo "Fallback: iPhone 17 simulator not found, using first supported iOS Simulator."
+            DESTINATION_LINE=$(printf '%s\n' "$SHOW_DESTINATIONS" \
+              | awk 'index($0, "platform:iOS Simulator") && /OS:/ && !/placeholder/ { print; exit }')
+          fi
+
+          DESTINATION_ID=$(printf '%s\n' "$DESTINATION_LINE" | sed -nE 's/.*id:([^,]+).*/\1/p')
+
+          if [ -z "$DESTINATION_ID" ]; then
+            echo "No iOS simulator destination found."
+            printf '%s\n' "$SHOW_DESTINATIONS"
+            exit 1
+          fi
+
+          DESTINATION="id=$DESTINATION_ID"
+          echo "Resolved destination: $DESTINATION"
+          echo "destination=$DESTINATION" >> "$GITHUB_OUTPUT"
+
+      - name: Run demo tests
+        run: |
+          xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj \
+            -scheme SVGSwiftUIDemo \
+            -destination "${{ steps.destination.outputs.destination }}" \
+            -parallel-testing-enabled NO \
+            test

@@ -28,6 +28,7 @@
 | P6 | 렌더러 | `SVGView` + transform 적용 | 샘플 SVG 시각 확인 가능 |
 | P7 | Demo 앱 | 노드 제어 UI + 캐시 통계 화면 + UITest 타깃 | 인터랙션 반영 + 샘플 화면 UITest 실행 가능 |
 | P8 | 테스트 강화 | 파서/렌더/캐시/통합 테스트 + 시각 회귀 비교 | `swift test` 통과 + UITest 기준 비교 통과 |
+| P8-3 | CI 파이프라인 | GitHub Actions | `swift test` + Demo UITest가 CI에서 통과 |
 | P9 | 문서화 | README, 지원 범위, 제한 사항 | 신규 사용자가 예제로 실행 가능 |
 
 ## 4. 단계별 계획 (v2 고급 기능)

@@ -1,0 +1,7 @@
+<svg width="80" height="80">
+  <path id="relative-shape" d="M5 5 l10 0 l0 10 l-10 0 z"/>
+  <polyline id="polyline" points="0,0 10,10 20,5"/>
+  <polygon id="polygon" points="30,0 40,10 50,0 40,-10"/>
+  <line id="line" x1="60" y1="0" x2="70" y2="10"/>
+  <ellipse id="ellipse" cx="40" cy="40" rx="10" ry="5"/>
+</svg>

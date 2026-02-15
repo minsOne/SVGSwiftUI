@@ -3,7 +3,7 @@
 ## 현재 상태 (2026-02-15)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, node/group transform 누적 렌더 적용 완료, 패키지 테스트 60개 + Demo UITest 5개(시각 회귀 포함) 통과
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, node/group transform 누적 렌더 적용 완료, 패키지 테스트 63개 + Demo UITest 5개(시각 회귀 포함) 통과
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 
 ## 잠금된 의사결정
@@ -19,9 +19,8 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. 샘플 SVG fixture 추가 후 렌더/파서 통합 테스트 보강(`P8-1`)
-2. README/사용 가이드 정리(`P9-1`)
-3. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
+1. README/사용 가이드 정리(`P9-1`)
+2. v2 진입 시 W3C fixture subset + coverage 리포트 파이프라인 추가
 
 ## 체크리스트 (진행 시 갱신)
 - [x] P0 부트스트랩 완료
@@ -120,3 +119,27 @@
 - 결정: transform 결합 순서는 `local` 후 `inherited`로 고정하여 SVG 계층 transform 의미를 유지
 - 리스크: clipPath/mask/filter 등 고급 렌더 규칙은 v1 범위 외라 이후 확장 단계에서 처리 필요
 - 다음 액션: `P8-1` fixture 기반 통합 회귀 테스트 확장
+
+### 2026-02-15 (Session 16)
+- 작업: `P8-3` GitHub CI 기본 파이프라인 구성
+- 결정: CI에서 `swift test`와 Demo UITest를 동일 워크플로우에서 병렬/의존 실행으로 분리
+- 리스크: 시뮬레이터 이름 자동 선택 로직이 runner 환경별로 달라질 수 있어 실패 원인 로그를 남겨 추적 필요
+- 다음 액션:
+- 샘플 fixture 기반 P8-1 통합 테스트 보강
+- CI에서 샘플 fixture 회귀 케이스 실행 보강
+
+### 2026-02-15 (Session 17)
+- 작업:
+  - `P8-1` fixture 통합 테스트 3건 추가 및 실행 검증
+  - `P8-3` 데모 UITest 안정화(동시 테스트 비활성화) 및 destination id 기반 고정
+  - fixture 번들 리소스 등록 및 워크플로우 통합
+- 결정:
+  - CI에서 UITest는 재현성 보장을 위해 `-parallel-testing-enabled NO` 적용
+  - destination은 `name:iPhone 17` 선호 + fallback 방식으로 `id` 지정
+- 검증:
+  - `swift test --parallel` 통과 (`63` tests)
+  - `xcodebuild ... test` 통과 (`5` tests, `0` failures)
+- 리스크: Runner별 iPhone 17 장치 미설치 시 fallback id에 따라 분산 실행될 수 있음
+- 다음 액션:
+  - `P9-1` README/사용 가이드 정리
+  - W3C fixture subset 확장 계획 수립
