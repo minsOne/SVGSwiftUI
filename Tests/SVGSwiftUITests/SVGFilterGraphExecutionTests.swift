@@ -102,6 +102,33 @@ final class SVGFilterGraphExecutionTests: XCTestCase {
         XCTAssertTrue(availableSources.contains("masked"))
     }
 
+    func testFilterGraphCanExecuteArithmeticCompositePrimitiveWithResult() {
+        let primitives: [SVGFilterPrimitive] = [
+            .composite(
+                operatorType: "arithmetic",
+                inSource: "SourceGraphic",
+                inSourceTwo: "SourceAlpha",
+                k1: 1,
+                k2: 0,
+                k3: 0.5,
+                k4: 0,
+                result: "combined"
+            )
+        ]
+        var availableSources: Set<String> = SVGFilterGraphExecutor.defaultAvailableSources()
+        for primitive in primitives {
+            let canExecute: Bool = SVGFilterGraphExecutor.canExecute(
+                primitive,
+                availableSources: availableSources
+            )
+            XCTAssertTrue(canExecute)
+            if let resultName = SVGFilterGraphExecutor.resolvedResultName(for: primitive) {
+                availableSources.insert(resultName)
+            }
+        }
+        XCTAssertTrue(availableSources.contains("combined"))
+    }
+
     func testFilterGraphDefaultsSourceInputsWhenMissingIn() {
         let primitive: SVGFilterPrimitive = .offset(
             dx: 2,

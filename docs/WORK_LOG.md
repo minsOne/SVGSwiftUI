@@ -2,6 +2,25 @@
 
 ## 2026-02-16
 
+### Session 54
+- 작업: `A16-2` `feComposite` arithmetic 정밀도 구현
+- 완료:
+  - `arithmetic` 모드에서 `CIColorKernel` 수식(`k1*in*in2 + k2*in + k3*in2 + k4`)을 계산하도록 분기 처리
+  - `SVGFilterImageRenderer`에서 `operator="arithmetic"`과 일반 모드 분기(`compositeFilterName`) 정리
+  - 파서/그래프/렌더 테스트에 arithmetic 회귀 케이스 추가
+- 리스크:
+  - `CIColorKernel` 계산은 clamp 동작을 사용해 미세 오차 허용 구간이 넓어질 수 있음
+  - 지원/미지원 fixture에서의 정합성은 추가 WebKit/W3C 시각 fixture 수집 후 추가 검증 필요
+- 다음 액션:
+  - `A16-3` 후보로 `feComposite` 추가 속성(`in`/`in2` 조합, fallback behavior) 경계 케이스 정합성 수집
+- 검증:
+  - `swift test --filter testParseTracksCompositeArithmeticPrimitive --no-parallel`
+  - `swift test --filter testFilterGraphCanExecuteArithmeticCompositePrimitiveWithResult --no-parallel`
+  - `swift test --filter testRenderFilteredImageAppliesCompositeArithmeticOperator --no-parallel`
+  - `swift test --no-parallel`
+  - `./Scripts/w3c/w3c-coverage.sh Tests/SVGSwiftUITests/W3C/w3c-manifest.json docs/W3C_COVERAGE.md --strict`
+  - `./Scripts/webkit/webkit-coverage.sh Tests/SVGSwiftUITests/WebKit/webkit-manifest.json docs/WEBKIT_COVERAGE.md --strict`
+
 ### Session 53
 - 작업: `A16-1` `feComposite` 지원
 - 완료:

@@ -1,5 +1,5 @@
 # W3C Conformance Coverage
-Generated: 2026-02-15 15:20:56Z UTC
+Generated: 2026-02-15 15:39:10Z UTC
 Manifest: `Tests/SVGSwiftUITests/W3C/w3c-manifest.json`
 - Total fixtures: 11
 - Missing SVG resources: 0

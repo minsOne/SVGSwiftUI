@@ -16,6 +16,27 @@ internal enum SVGFilterImageRenderer {
         options: [CIContextOption.useSoftwareRenderer: false]
     )
 
+    private static let arithmeticCompositeKernel: CIColorKernel? = {
+        let kernelSource: String = """
+        kernel vec4 arithmeticComposite(
+            __sample source,
+            __sample destination,
+            float k1,
+            float k2,
+            float k3,
+            float k4
+        ) {
+            vec4 multiplied = source * destination * k1;
+            vec4 sourceContribution = source * k2;
+            vec4 destinationContribution = destination * k3;
+            vec4 constantContribution = vec4(k4);
+            vec4 result = multiplied + sourceContribution + destinationContribution + constantContribution;
+            return clamp(result, 0.0, 1.0);
+        }
+        """
+        return CIColorKernel(source: kernelSource)
+    }()
+
     static func requiresOffscreenProcessing(_ primitives: [SVGFilterPrimitive]) -> Bool {
         for primitive in primitives {
             switch primitive {
@@ -258,7 +279,10 @@ internal enum SVGFilterImageRenderer {
             let operatorType,
             let inSource,
             let inSourceTwo,
-            _, _, _, _,
+            let k1,
+            let k2,
+            let k3,
+            let k4,
             _
         ):
             let firstSourceName: String = normalizedFilterSourceName(inSource, default: sourceGraphicName)
@@ -271,7 +295,17 @@ internal enum SVGFilterImageRenderer {
                 name: secondSourceName,
                 availableSources: availableSources
             )
-            let filterName: String = compositeFilterName(for: operatorType)
+            guard let filterName: String = compositeFilterName(for: operatorType) else {
+                return applyArithmeticComposite(
+                    firstSource: firstSource,
+                    secondSource: secondSource,
+                    k1: k1,
+                    k2: k2,
+                    k3: k3,
+                    k4: k4,
+                    extent: fallbackExtent
+                )
+            }
             guard let compositeFilter: CIFilter = CIFilter(name: filterName) else {
                 return nil
             }
@@ -373,7 +407,7 @@ internal enum SVGFilterImageRenderer {
         }
     }
 
-    private static func compositeFilterName(for operatorType: String) -> String {
+    private static func compositeFilterName(for operatorType: String) -> String? {
         let normalizedOperator: String = operatorType
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
@@ -391,10 +425,43 @@ internal enum SVGFilterImageRenderer {
         case "lighter":
             return "CIAdditionCompositing"
         case "arithmetic":
-            return "CISourceOverCompositing"
+            return nil
         default:
             return "CISourceOverCompositing"
         }
+    }
+
+    private static func applyArithmeticComposite(
+        firstSource: CIImage,
+        secondSource: CIImage,
+        k1: Double,
+        k2: Double,
+        k3: Double,
+        k4: Double,
+        extent: CGRect
+    ) -> CIImage? {
+        let firstCoefficient: Double = k1
+        let secondCoefficient: Double = k2
+        let thirdCoefficient: Double = k3
+        let fourthCoefficient: Double = k4
+        let kernel: CIColorKernel? = arithmeticCompositeKernel
+        guard let kernel else {
+            return nil
+        }
+        let k1Value: NSNumber = NSNumber(value: firstCoefficient)
+        let k2Value: NSNumber = NSNumber(value: secondCoefficient)
+        let k3Value: NSNumber = NSNumber(value: thirdCoefficient)
+        let k4Value: NSNumber = NSNumber(value: fourthCoefficient)
+        let arguments: [Any] = [
+            firstSource,
+            secondSource,
+            k1Value,
+            k2Value,
+            k3Value,
+            k4Value
+        ]
+        let filtered: CIImage? = kernel.apply(extent: extent, arguments: arguments)
+        return filtered
     }
 
     private static func applyColorMatrix(

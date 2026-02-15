@@ -290,6 +290,53 @@ final class SVGFilterImageRendererTests: XCTestCase {
         XCTAssertEqual(pixel.a, 255)
     }
 
+    func testRenderFilteredImageAppliesCompositeArithmeticOperator() throws {
+        let sourceColor: Color = Color(red: 0.2, green: 0.1, blue: 0.0, opacity: 1)
+        let imageSize: CGSize = CGSize(width: 20, height: 20)
+        guard let renderedImage = SVGFilterImageRenderer.renderFilteredImage(
+            path: Path(CGRect(origin: .zero, size: imageSize)),
+            fillColor: sourceColor,
+            fillStyle: FillStyle(eoFill: false),
+            strokeColor: nil,
+            strokeWidth: 0,
+            lineCap: .round,
+            lineJoin: .miter,
+            miterLimit: 10,
+            dash: [],
+            dashPhase: 0,
+            opacity: 1.0,
+            size: imageSize,
+            primitives: [
+                .composite(
+                    operatorType: "arithmetic",
+                    inSource: "SourceGraphic",
+                    inSourceTwo: "SourceAlpha",
+                    k1: 0,
+                    k2: 0,
+                    k3: 0,
+                    k4: 0.5,
+                    result: nil
+                )
+            ]
+        ) else {
+            XCTFail("Expected rendered image")
+            return
+        }
+
+        let center = CGPoint(x: 10, y: 10)
+        guard let pixel = pixel(from: renderedImage, at: center) else {
+            XCTFail("Expected non-nil pixel")
+            return
+        }
+        XCTAssertGreaterThan(pixel.r, 120)
+        XCTAssertGreaterThan(pixel.g, 120)
+        XCTAssertGreaterThan(pixel.b, 120)
+        XCTAssertLessThan(pixel.r, 160)
+        XCTAssertLessThan(pixel.g, 160)
+        XCTAssertLessThan(pixel.b, 160)
+        XCTAssertEqual(pixel.a, 128)
+    }
+
     func testRequiresOffscreenProcessingForCompositePrimitive() {
         XCTAssertTrue(
             SVGFilterImageRenderer.requiresOffscreenProcessing(
