@@ -7,12 +7,15 @@
 - 완료:
   - `WORK_CONTINUATION.md`에 작업 루프(재작업 방지) 및 커밋 단계 추가
   - `TASK_BOARD.md`에 커밋 중심 운영 규칙 추가
+  - `docs/STEP_BY_STEP_PLAN.md` 반복 작업 규칙 항목 추가
 - 리스크:
   - 없음(문서 반영)
 - 다음 액션:
-  - 변경사항 정리 후 세션 단위 커밋 수행
+  - 다음 세션부터 문서/코드 변경은 동일 루틴으로 커밋해 중복 작업 방지
 - 검증:
-  - `git status --short`로 추적 파일 범위 확인
+  - `swift test --parallel` (126 tests, 0 failures)
+  - `git commit -m \"chore: finalize docs and conformance pipeline\"` (`101f31d`)
+  - `git push` (`origin/codex/bootstrap` 반영)
 
 ### Session 41
 - 작업: `S3-2` 성능 실측 근거 수집 단계 시작
