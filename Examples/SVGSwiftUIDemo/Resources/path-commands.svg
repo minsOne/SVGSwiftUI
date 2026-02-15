@@ -1,0 +1,6 @@
+<svg width="240" height="160" viewBox="0 0 240 160">
+  <path id="cmd-move-line" d="M20 20 L90 20 L90 60" fill="none" stroke="#111827" stroke-width="2" />
+  <path id="cmd-bezier" d="M20 80 C50 20, 130 20, 160 80 S220 140, 190 120" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+  <path id="cmd-arc" d="M20 130 A30 30 0 1 1 80 130" fill="none" stroke="#16a34a" stroke-width="3"/>
+  <path id="cmd-close" d="M120 120 L150 120 L150 150 L120 150 Z" fill="#f97316" stroke="#7c2d12" />
+</svg>

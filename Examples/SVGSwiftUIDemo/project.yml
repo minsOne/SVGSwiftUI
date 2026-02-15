@@ -15,6 +15,27 @@ targets:
     deploymentTarget: "15.0"
     sources:
       - path: Sources
+    resources:
+      - path: Resources/animation-drift.svg
+      - path: Resources/animation-pulse.svg
+      - path: Resources/animation-luminous-core.svg
+      - path: Resources/aurora-wave.svg
+      - path: Resources/constellation-grid.svg
+      - path: Resources/mesh-network.svg
+      - path: Resources/badge.svg
+      - path: Resources/geometry.svg
+      - path: Resources/dense-grid-world.svg
+      - path: Resources/orbital-lattice.svg
+      - path: Resources/nested-groups.svg
+      - path: Resources/panel.svg
+      - path: Resources/path-commands.svg
+      - path: Resources/polyline-ribbon.svg
+      - path: Resources/polygon-polyline.svg
+      - path: Resources/route.svg
+      - path: Resources/spiral-paths.svg
+      - path: Resources/style-inline.svg
+      - path: Resources/style-sheet.svg
+      - path: Resources/transform-radial-spiral.svg
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.minsone.SVGSwiftUIDemo

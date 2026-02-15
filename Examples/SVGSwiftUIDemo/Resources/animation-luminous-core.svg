@@ -1,0 +1,120 @@
+<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .halo-bg { fill: #ecfeff; stroke: #0f172a; stroke-width: 2 }
+    .halo-shell { fill: none; stroke: #7dd3fc; stroke-width: 3 }
+    .halo-arc { fill: none; stroke: #a855f7; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 6 5 }
+    .halo-point { fill: #14b8a6; stroke: #134e4a; stroke-width: 1.4 }
+  </style>
+
+  <rect id="luminous-bg" x="8" y="8" width="304" height="204" class="halo-bg" />
+
+  <g id="luminous-stage" transform="translate(160,110)">
+    <circle id="luminous-core" class="halo-point" cx="0" cy="0" r="9" />
+    <circle id="luminous-ring-1" class="halo-shell" cx="0" cy="0" r="32" />
+    <circle id="luminous-ring-2" class="halo-shell" cx="0" cy="0" r="56" />
+    <circle id="luminous-ring-3" class="halo-shell" cx="0" cy="0" r="82" />
+
+    <path id="luminous-arc-1" class="halo-arc" d="M-84 0 C -82 -22 -60 -56 -20 -72 S40 -72 56 -36 S42 12 0 28" />
+    <path id="luminous-arc-2" class="halo-arc" d="M84 0 C 82 22 60 56 20 72 S-40 72 -56 36 S-42 -12 0 -28" />
+    <path id="luminous-sweep" class="halo-arc" d="M-82 -24 S-24 -82 24 -82 S82 -20 82 20 S40 92 -24 84 S-96 26 -82 -24" />
+
+    <g id="point-cluster">
+      <g id="luminous-cluster-0" transform="rotate(0)">
+        <line class="halo-arc" x1="0" y1="-12" x2="0" y2="-2" />
+        <circle id="luminous-node-0" class="halo-point" cx="0" cy="-12" r="4" />
+      </g>
+      <g id="luminous-cluster-1" transform="rotate(15)">
+        <line class="halo-arc" x1="0" y1="-24" x2="0" y2="-14" />
+        <circle id="luminous-node-1" class="halo-point" cx="0" cy="-24" r="3" />
+      </g>
+      <g id="luminous-cluster-2" transform="rotate(30)">
+        <line class="halo-arc" x1="0" y1="-36" x2="0" y2="-26" />
+        <circle id="luminous-node-2" class="halo-point" cx="0" cy="-36" r="4" />
+      </g>
+      <g id="luminous-cluster-3" transform="rotate(45)">
+        <line class="halo-arc" x1="0" y1="-48" x2="0" y2="-38" />
+        <circle id="luminous-node-3" class="halo-point" cx="0" cy="-48" r="3" />
+      </g>
+      <g id="luminous-cluster-4" transform="rotate(60)">
+        <line class="halo-arc" x1="0" y1="-60" x2="0" y2="-50" />
+        <circle id="luminous-node-4" class="halo-point" cx="0" cy="-60" r="4" />
+      </g>
+      <g id="luminous-cluster-5" transform="rotate(75)">
+        <line class="halo-arc" x1="0" y1="-12" x2="0" y2="-2" />
+        <circle id="luminous-node-5" class="halo-point" cx="0" cy="-12" r="3" />
+      </g>
+      <g id="luminous-cluster-6" transform="rotate(90)">
+        <line class="halo-arc" x1="0" y1="-24" x2="0" y2="-14" />
+        <circle id="luminous-node-6" class="halo-point" cx="0" cy="-24" r="4" />
+      </g>
+      <g id="luminous-cluster-7" transform="rotate(105)">
+        <line class="halo-arc" x1="0" y1="-36" x2="0" y2="-26" />
+        <circle id="luminous-node-7" class="halo-point" cx="0" cy="-36" r="3" />
+      </g>
+      <g id="luminous-cluster-8" transform="rotate(120)">
+        <line class="halo-arc" x1="0" y1="-48" x2="0" y2="-38" />
+        <circle id="luminous-node-8" class="halo-point" cx="0" cy="-48" r="4" />
+      </g>
+      <g id="luminous-cluster-9" transform="rotate(135)">
+        <line class="halo-arc" x1="0" y1="-60" x2="0" y2="-50" />
+        <circle id="luminous-node-9" class="halo-point" cx="0" cy="-60" r="3" />
+      </g>
+      <g id="luminous-cluster-10" transform="rotate(150)">
+        <line class="halo-arc" x1="0" y1="-12" x2="0" y2="-2" />
+        <circle id="luminous-node-10" class="halo-point" cx="0" cy="-12" r="4" />
+      </g>
+      <g id="luminous-cluster-11" transform="rotate(165)">
+        <line class="halo-arc" x1="0" y1="-24" x2="0" y2="-14" />
+        <circle id="luminous-node-11" class="halo-point" cx="0" cy="-24" r="3" />
+      </g>
+      <g id="luminous-cluster-12" transform="rotate(180)">
+        <line class="halo-arc" x1="0" y1="-36" x2="0" y2="-26" />
+        <circle id="luminous-node-12" class="halo-point" cx="0" cy="-36" r="4" />
+      </g>
+      <g id="luminous-cluster-13" transform="rotate(195)">
+        <line class="halo-arc" x1="0" y1="-48" x2="0" y2="-38" />
+        <circle id="luminous-node-13" class="halo-point" cx="0" cy="-48" r="3" />
+      </g>
+      <g id="luminous-cluster-14" transform="rotate(210)">
+        <line class="halo-arc" x1="0" y1="-60" x2="0" y2="-50" />
+        <circle id="luminous-node-14" class="halo-point" cx="0" cy="-60" r="4" />
+      </g>
+      <g id="luminous-cluster-15" transform="rotate(225)">
+        <line class="halo-arc" x1="0" y1="-12" x2="0" y2="-2" />
+        <circle id="luminous-node-15" class="halo-point" cx="0" cy="-12" r="3" />
+      </g>
+      <g id="luminous-cluster-16" transform="rotate(240)">
+        <line class="halo-arc" x1="0" y1="-24" x2="0" y2="-14" />
+        <circle id="luminous-node-16" class="halo-point" cx="0" cy="-24" r="4" />
+      </g>
+      <g id="luminous-cluster-17" transform="rotate(255)">
+        <line class="halo-arc" x1="0" y1="-36" x2="0" y2="-26" />
+        <circle id="luminous-node-17" class="halo-point" cx="0" cy="-36" r="3" />
+      </g>
+      <g id="luminous-cluster-18" transform="rotate(270)">
+        <line class="halo-arc" x1="0" y1="-48" x2="0" y2="-38" />
+        <circle id="luminous-node-18" class="halo-point" cx="0" cy="-48" r="4" />
+      </g>
+      <g id="luminous-cluster-19" transform="rotate(285)">
+        <line class="halo-arc" x1="0" y1="-60" x2="0" y2="-50" />
+        <circle id="luminous-node-19" class="halo-point" cx="0" cy="-60" r="3" />
+      </g>
+      <g id="luminous-cluster-20" transform="rotate(300)">
+        <line class="halo-arc" x1="0" y1="-12" x2="0" y2="-2" />
+        <circle id="luminous-node-20" class="halo-point" cx="0" cy="-12" r="4" />
+      </g>
+      <g id="luminous-cluster-21" transform="rotate(315)">
+        <line class="halo-arc" x1="0" y1="-24" x2="0" y2="-14" />
+        <circle id="luminous-node-21" class="halo-point" cx="0" cy="-24" r="3" />
+      </g>
+      <g id="luminous-cluster-22" transform="rotate(330)">
+        <line class="halo-arc" x1="0" y1="-36" x2="0" y2="-26" />
+        <circle id="luminous-node-22" class="halo-point" cx="0" cy="-36" r="4" />
+      </g>
+      <g id="luminous-cluster-23" transform="rotate(345)">
+        <line class="halo-arc" x1="0" y1="-48" x2="0" y2="-38" />
+        <circle id="luminous-node-23" class="halo-point" cx="0" cy="-48" r="3" />
+      </g>
+    </g>
+  </g>
+</svg>

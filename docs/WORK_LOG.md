@@ -2,6 +2,25 @@
 
 ## 2026-02-16
 
+### Session 60
+- 작업: 데모 샘플을 통한 고난도 SVG 검증 확장
+- 완료:
+  - `polyline-ribbon.svg`의 잘못된 `circle` 속성 형식을 정정 (`cx`, `cy`를 따옴표로 감쌈)
+  - 노드 밀집 + 화려한 SVG 2종 추가:
+    - `constellation-grid.svg`
+    - `transform-radial-spiral.svg`
+  - 샘플 목록에 두 케이스 등록 후 기본 노드 기본값/카테고리/메모 업데이트
+    - `constellation-grid`(default: `star-00-00`)
+    - `transform-radial-spiral`(default: `blade-spine-0`)
+  - Demo UITest가 새 샘플 캔버스를 확인하도록 목록 추가
+  - 리소스 구성 파일(`project.yml`)에 신규 샘플 파일 등록
+- 검증:
+  - `xmllint --noout`으로 새/기존 5개 SVG XML 검사 통과
+  - `swift test --no-parallel` 통과 (전체 162 tests)
+- 리스크:
+  - `Examples/SVGSwiftUIDemo/Resources/` 전체가 신규 추가 상태이므로 데모 전용 리소스는 아직 git에서 미추가 상태가 유지됨
+  - iOS UI 스냅샷 테스트는 현재 CI/iOS 실행 환경 여부에 따라 별도 확인 필요
+
 ### Session 59
 - 작업: `A16-4` strict 보강 적용
 - 완료:

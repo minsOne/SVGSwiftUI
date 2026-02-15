@@ -1,0 +1,175 @@
+<svg width="360" height="240" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .track-bg { fill: #ecfeff; stroke: #0f172a; stroke-width: 2 }
+    .ribbon-a { fill: none; stroke: #0ea5e9; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round }
+    .ribbon-b { fill: none; stroke: #f59e0b; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 8 3; }
+    .ribbon-c { fill: none; stroke: #0d9488; stroke-width: 1.6; stroke-linecap: round }
+    .tile { fill: #e0f2fe; stroke: #0c4a6e; stroke-width: 1; }
+    .node { fill: #4f46e5; stroke: #312e81; stroke-width: 1.2 }
+  </style>
+
+  <rect id="ribbon-bg" class="track-bg" x="10" y="10" width="340" height="220" />
+
+  <g id="ribbon-grid" transform="translate(0,10)">
+    <polyline id="ribbon-poly-0" class="ribbon-a" points="18 28, 32 58, 56 68, 86 72, 112 112, 150 74" />
+    <polyline id="ribbon-poly-0-mirror" class="ribbon-a" points="342 74, 328 112, 304 72, 274 68, 248 58, 210 28" />
+    <polyline id="ribbon-poly-1" class="ribbon-a" points="32 48, 46 78, 70 84, 100 84, 126 70, 164 90" />
+    <polyline id="ribbon-poly-2" class="ribbon-a" points="46 68, 60 98, 84 100, 114 96, 140 84, 178 106" />
+    <polyline id="ribbon-poly-2-mirror" class="ribbon-a" points="314 106, 300 84, 276 96, 246 100, 220 98, 182 68" />
+    <polyline id="ribbon-poly-3" class="ribbon-a" points="60 88, 74 38, 98 116, 128 108, 154 98, 192 122" />
+    <polyline id="ribbon-poly-4" class="ribbon-a" points="74 30, 88 60, 112 132, 142 48, 168 112, 206 58" />
+    <polyline id="ribbon-poly-4-mirror" class="ribbon-a" points="286 58, 272 112, 248 48, 218 132, 192 60, 154 30" />
+    <polyline id="ribbon-poly-5" class="ribbon-a" points="88 50, 102 80, 126 68, 156 60, 182 70, 220 74" />
+    <polyline id="ribbon-poly-6" class="ribbon-a" points="102 70, 116 100, 140 84, 170 72, 196 84, 234 90" />
+    <polyline id="ribbon-poly-6-mirror" class="ribbon-a" points="258 90, 244 84, 220 72, 190 84, 164 100, 126 70" />
+    <polyline id="ribbon-poly-7" class="ribbon-a" points="116 90, 130 40, 154 100, 184 84, 210 98, 248 106" />
+    <polyline id="ribbon-poly-8" class="ribbon-a" points="130 32, 144 62, 168 116, 198 96, 224 112, 262 122" />
+    <polyline id="ribbon-poly-8-mirror" class="ribbon-a" points="230 122, 216 112, 192 96, 162 116, 136 62, 98 32" />
+    <polyline id="ribbon-poly-9" class="ribbon-a" points="144 52, 158 82, 182 132, 212 108, 238 70, 276 58" />
+    <polyline id="ribbon-poly-10" class="ribbon-a" points="158 72, 172 102, 196 68, 226 48, 252 84, 290 74" />
+    <polyline id="ribbon-poly-10-mirror" class="ribbon-a" points="202 74, 188 84, 164 48, 134 68, 108 102, 70 72" />
+    <polyline id="ribbon-poly-11" class="ribbon-a" points="172 92, 186 42, 210 84, 240 60, 266 98, 304 90" />
+    <polyline id="ribbon-poly-12" class="ribbon-a" points="186 34, 200 64, 224 100, 254 72, 280 112, 318 106" />
+    <polyline id="ribbon-poly-12-mirror" class="ribbon-a" points="174 106, 160 112, 136 72, 106 100, 80 64, 42 34" />
+    <polyline id="ribbon-poly-13" class="ribbon-a" points="200 54, 214 84, 238 116, 268 84, 294 70, 332 122" />
+    <polyline id="ribbon-poly-14" class="ribbon-a" points="214 74, 228 104, 252 132, 282 96, 308 84, 346 58" />
+    <polyline id="ribbon-poly-14-mirror" class="ribbon-a" points="146 58, 132 84, 108 96, 78 132, 52 104, 14 74" />
+    <polyline id="ribbon-poly-15" class="ribbon-a" points="228 94, 242 44, 266 68, 296 108, 322 98, 360 74" />
+    <polyline id="ribbon-poly-16" class="ribbon-b" points="242 36, 256 66, 280 84, 310 48, 336 112, 374 90" />
+    <polyline id="ribbon-poly-16-mirror" class="ribbon-b" points="118 90, 104 112, 80 48, 50 84, 24 66, -14 36" />
+    <polyline id="ribbon-poly-17" class="ribbon-b" points="256 56, 270 86, 294 100, 324 60, 350 70, 388 106" />
+    <polyline id="ribbon-poly-18" class="ribbon-c" points="270 76, 284 106, 308 116, 338 72, 364 84, 402 122" />
+    <polyline id="ribbon-poly-18-mirror" class="ribbon-c" points="90 122, 76 84, 52 72, 22 116, -4 106, -42 76" />
+    <polyline id="ribbon-poly-19" class="ribbon-c" points="284 96, 298 46, 322 132, 352 84, 378 98, 416 58" />
+    <polyline id="ribbon-poly-20" class="ribbon-c" points="298 38, 312 68, 336 68, 366 96, 392 112, 430 74" />
+    <polyline id="ribbon-poly-20-mirror" class="ribbon-c" points="62 74, 48 112, 24 96, -6 68, -32 68, -70 38" />
+    <polyline id="ribbon-poly-21" class="ribbon-c" points="312 58, 326 88, 350 84, 380 108, 406 70, 444 90" />
+    <polyline id="ribbon-poly-22" class="ribbon-c" points="326 78, 340 108, 364 100, 394 48, 420 84, 458 106" />
+    <polyline id="ribbon-poly-22-mirror" class="ribbon-c" points="34 106, 20 84, -4 48, -34 100, -60 108, -98 78" />
+    <polyline id="ribbon-poly-23" class="ribbon-c" points="340 98, 354 48, 378 116, 408 60, 434 98, 472 122" />
+
+    <g id="ribbon-tiles" opacity="0.75" transform="translate(0,5)">
+      <polygon id="tile-0-0" class="tile" points="20,160 44,160 44,168 20,168" />
+      <circle id="tile-node-0-0" class="node" cx="32" cy="164" r="2.2" />
+      <polygon id="tile-0-1" class="tile" points="51,160 69,160 69,170 51,170" />
+      <polygon id="tile-0-2" class="tile" points="82,160 106,160 106,168 82,168" />
+      <circle id="tile-node-0-2" class="node" cx="94" cy="164" r="2.2" />
+      <polygon id="tile-0-3" class="tile" points="113,160 131,160 131,170 113,170" />
+      <polygon id="tile-0-4" class="tile" points="144,160 168,160 168,168 144,168" />
+      <circle id="tile-node-0-4" class="node" cx="156" cy="164" r="2.2" />
+      <polygon id="tile-0-5" class="tile" points="175,160 193,160 193,170 175,170" />
+      <polygon id="tile-0-6" class="tile" points="206,160 230,160 230,168 206,168" />
+      <circle id="tile-node-0-6" class="node" cx="218" cy="164" r="2.2" />
+      <polygon id="tile-0-7" class="tile" points="237,160 255,160 255,170 237,170" />
+      <polygon id="tile-0-8" class="tile" points="268,160 292,160 292,168 268,168" />
+      <circle id="tile-node-0-8" class="node" cx="280" cy="164" r="2.2" />
+      <polygon id="tile-0-9" class="tile" points="299,160 317,160 317,170 299,170" />
+      <polygon id="tile-0-10" class="tile" points="330,160 354,160 354,168 330,168" />
+      <circle id="tile-node-0-10" class="node" cx="342" cy="164" r="2.2" />
+      <polygon id="tile-1-0" class="tile" points="20,170 38,170 38,180 20,180" />
+      <polygon id="tile-1-1" class="tile" points="51,170 75,170 75,178 51,178" />
+      <circle id="tile-node-1-1" class="node" cx="63" cy="174" r="2.2" />
+      <polygon id="tile-1-2" class="tile" points="82,170 100,170 100,180 82,180" />
+      <polygon id="tile-1-3" class="tile" points="113,170 137,170 137,178 113,178" />
+      <circle id="tile-node-1-3" class="node" cx="125" cy="174" r="2.2" />
+      <polygon id="tile-1-4" class="tile" points="144,170 162,170 162,180 144,180" />
+      <polygon id="tile-1-5" class="tile" points="175,170 199,170 199,178 175,178" />
+      <circle id="tile-node-1-5" class="node" cx="187" cy="174" r="2.2" />
+      <polygon id="tile-1-6" class="tile" points="206,170 224,170 224,180 206,180" />
+      <polygon id="tile-1-7" class="tile" points="237,170 261,170 261,178 237,178" />
+      <circle id="tile-node-1-7" class="node" cx="249" cy="174" r="2.2" />
+      <polygon id="tile-1-8" class="tile" points="268,170 286,170 286,180 268,180" />
+      <polygon id="tile-1-9" class="tile" points="299,170 323,170 323,178 299,178" />
+      <circle id="tile-node-1-9" class="node" cx="311" cy="174" r="2.2" />
+      <polygon id="tile-1-10" class="tile" points="330,170 348,170 348,180 330,180" />
+      <polygon id="tile-2-0" class="tile" points="20,180 44,180 44,188 20,188" />
+      <circle id="tile-node-2-0" class="node" cx="32" cy="184" r="2.2" />
+      <polygon id="tile-2-1" class="tile" points="51,180 69,180 69,190 51,190" />
+      <polygon id="tile-2-2" class="tile" points="82,180 106,180 106,188 82,188" />
+      <circle id="tile-node-2-2" class="node" cx="94" cy="184" r="2.2" />
+      <polygon id="tile-2-3" class="tile" points="113,180 131,180 131,190 113,190" />
+      <polygon id="tile-2-4" class="tile" points="144,180 168,180 168,188 144,188" />
+      <circle id="tile-node-2-4" class="node" cx="156" cy="184" r="2.2" />
+      <polygon id="tile-2-5" class="tile" points="175,180 193,180 193,190 175,190" />
+      <polygon id="tile-2-6" class="tile" points="206,180 230,180 230,188 206,188" />
+      <circle id="tile-node-2-6" class="node" cx="218" cy="184" r="2.2" />
+      <polygon id="tile-2-7" class="tile" points="237,180 255,180 255,190 237,190" />
+      <polygon id="tile-2-8" class="tile" points="268,180 292,180 292,188 268,188" />
+      <circle id="tile-node-2-8" class="node" cx="280" cy="184" r="2.2" />
+      <polygon id="tile-2-9" class="tile" points="299,180 317,180 317,190 299,190" />
+      <polygon id="tile-2-10" class="tile" points="330,180 354,180 354,188 330,188" />
+      <circle id="tile-node-2-10" class="node" cx="342" cy="184" r="2.2" />
+      <polygon id="tile-3-0" class="tile" points="20,190 38,190 38,200 20,200" />
+      <polygon id="tile-3-1" class="tile" points="51,190 75,190 75,198 51,198" />
+      <circle id="tile-node-3-1" class="node" cx="63" cy="194" r="2.2" />
+      <polygon id="tile-3-2" class="tile" points="82,190 100,190 100,200 82,200" />
+      <polygon id="tile-3-3" class="tile" points="113,190 137,190 137,198 113,198" />
+      <circle id="tile-node-3-3" class="node" cx="125" cy="194" r="2.2" />
+      <polygon id="tile-3-4" class="tile" points="144,190 162,190 162,200 144,200" />
+      <polygon id="tile-3-5" class="tile" points="175,190 199,190 199,198 175,198" />
+      <circle id="tile-node-3-5" class="node" cx="187" cy="194" r="2.2" />
+      <polygon id="tile-3-6" class="tile" points="206,190 224,190 224,200 206,200" />
+      <polygon id="tile-3-7" class="tile" points="237,190 261,190 261,198 237,198" />
+      <circle id="tile-node-3-7" class="node" cx="249" cy="194" r="2.2" />
+      <polygon id="tile-3-8" class="tile" points="268,190 286,190 286,200 268,200" />
+      <polygon id="tile-3-9" class="tile" points="299,190 323,190 323,198 299,198" />
+      <circle id="tile-node-3-9" class="node" cx="311" cy="194" r="2.2" />
+      <polygon id="tile-3-10" class="tile" points="330,190 348,190 348,200 330,200" />
+      <polygon id="tile-4-0" class="tile" points="20,200 44,200 44,208 20,208" />
+      <circle id="tile-node-4-0" class="node" cx="32" cy="204" r="2.2" />
+      <polygon id="tile-4-1" class="tile" points="51,200 69,200 69,210 51,210" />
+      <polygon id="tile-4-2" class="tile" points="82,200 106,200 106,208 82,208" />
+      <circle id="tile-node-4-2" class="node" cx="94" cy="204" r="2.2" />
+      <polygon id="tile-4-3" class="tile" points="113,200 131,200 131,210 113,210" />
+      <polygon id="tile-4-4" class="tile" points="144,200 168,200 168,208 144,208" />
+      <circle id="tile-node-4-4" class="node" cx="156" cy="204" r="2.2" />
+      <polygon id="tile-4-5" class="tile" points="175,200 193,200 193,210 175,210" />
+      <polygon id="tile-4-6" class="tile" points="206,200 230,200 230,208 206,208" />
+      <circle id="tile-node-4-6" class="node" cx="218" cy="204" r="2.2" />
+      <polygon id="tile-4-7" class="tile" points="237,200 255,200 255,210 237,210" />
+      <polygon id="tile-4-8" class="tile" points="268,200 292,200 292,208 268,208" />
+      <circle id="tile-node-4-8" class="node" cx="280" cy="204" r="2.2" />
+      <polygon id="tile-4-9" class="tile" points="299,200 317,200 317,210 299,210" />
+      <polygon id="tile-4-10" class="tile" points="330,200 354,200 354,208 330,208" />
+      <circle id="tile-node-4-10" class="node" cx="342" cy="204" r="2.2" />
+      <polygon id="tile-5-0" class="tile" points="20,210 38,210 38,220 20,220" />
+      <polygon id="tile-5-1" class="tile" points="51,210 75,210 75,218 51,218" />
+      <circle id="tile-node-5-1" class="node" cx="63" cy="214" r="2.2" />
+      <polygon id="tile-5-2" class="tile" points="82,210 100,210 100,220 82,220" />
+      <polygon id="tile-5-3" class="tile" points="113,210 137,210 137,218 113,218" />
+      <circle id="tile-node-5-3" class="node" cx="125" cy="214" r="2.2" />
+      <polygon id="tile-5-4" class="tile" points="144,210 162,210 162,220 144,220" />
+      <polygon id="tile-5-5" class="tile" points="175,210 199,210 199,218 175,218" />
+      <circle id="tile-node-5-5" class="node" cx="187" cy="214" r="2.2" />
+      <polygon id="tile-5-6" class="tile" points="206,210 224,210 224,220 206,220" />
+      <polygon id="tile-5-7" class="tile" points="237,210 261,210 261,218 237,218" />
+      <circle id="tile-node-5-7" class="node" cx="249" cy="214" r="2.2" />
+      <polygon id="tile-5-8" class="tile" points="268,210 286,210 286,220 268,220" />
+      <polygon id="tile-5-9" class="tile" points="299,210 323,210 323,218 299,218" />
+      <circle id="tile-node-5-9" class="node" cx="311" cy="214" r="2.2" />
+      <polygon id="tile-5-10" class="tile" points="330,210 348,210 348,220 330,220" />
+      <polygon id="tile-6-0" class="tile" points="20,220 44,220 44,228 20,228" />
+      <circle id="tile-node-6-0" class="node" cx="32" cy="224" r="2.2" />
+      <polygon id="tile-6-1" class="tile" points="51,220 69,220 69,230 51,230" />
+      <polygon id="tile-6-2" class="tile" points="82,220 106,220 106,228 82,228" />
+      <circle id="tile-node-6-2" class="node" cx="94" cy="224" r="2.2" />
+      <polygon id="tile-6-3" class="tile" points="113,220 131,220 131,230 113,230" />
+      <polygon id="tile-6-4" class="tile" points="144,220 168,220 168,228 144,228" />
+      <circle id="tile-node-6-4" class="node" cx="156" cy="224" r="2.2" />
+      <polygon id="tile-6-5" class="tile" points="175,220 193,220 193,230 175,230" />
+      <polygon id="tile-6-6" class="tile" points="206,220 230,220 230,228 206,228" />
+      <circle id="tile-node-6-6" class="node" cx="218" cy="224" r="2.2" />
+      <polygon id="tile-6-7" class="tile" points="237,220 255,220 255,230 237,230" />
+      <polygon id="tile-6-8" class="tile" points="268,220 292,220 292,228 268,228" />
+      <circle id="tile-node-6-8" class="node" cx="280" cy="224" r="2.2" />
+      <polygon id="tile-6-9" class="tile" points="299,220 317,220 317,230 299,230" />
+      <polygon id="tile-6-10" class="tile" points="330,220 354,220 354,228 330,228" />
+      <circle id="tile-node-6-10" class="node" cx="342" cy="224" r="2.2" />
+    </g>
+  </g>
+
+  <g id="ribbon-halo" opacity="0.35">
+    <line id="ribbon-halo-top" x1="10" y1="10" x2="350" y2="10" stroke="#0369a1" stroke-width="4" />
+    <line id="ribbon-halo-mid" x1="10" y1="230" x2="350" y2="230" stroke="#0369a1" stroke-width="4" />
+  </g>
+</svg>

@@ -5,221 +5,185 @@ import SwiftUI
 struct ContentView: View {
     private let samples = DemoSamples.all
 
-    @StateObject private var cacheStats = SVGCacheStats()
-    @State private var selectedIndex = 0
-    @State private var targetNodeID = DemoSamples.all.first?.defaultNodeID ?? ""
-    @State private var fillEnabled = true
-    @State private var strokeEnabled = false
-    @State private var scale = 1.0
-    @State private var offsetX = 0.0
-    @State private var offsetY = 0.0
-
-    private var selectedSample: SampleSVG {
-        samples[selectedIndex]
-    }
-
-    private var renderConfiguration: SVGRenderConfiguration {
-        let targetNodeID = self.targetNodeID
-        let fillEnabled = self.fillEnabled
-        let strokeEnabled = self.strokeEnabled
-        let scale = self.scale
-        let offsetX = self.offsetX
-        let offsetY = self.offsetY
-
-        let mapOverride = NodeOverride(
-            fill: fillEnabled ? .color(.init(red: 1, green: 0.25, blue: 0.25, alpha: 1)) : nil,
-            scale: .init(width: scale, height: scale),
-            offset: .init(x: offsetX, y: offsetY)
-        )
-
-        let resolver: NodeStyleResolver?
-        if strokeEnabled {
-            resolver = { context in
-                guard context.id == targetNodeID || context.syntheticID == targetNodeID else {
-                    return nil
-                }
-                return NodeOverride(
-                    stroke: .color(.init(red: 0.05, green: 0.25, blue: 0.95, alpha: 1)),
-                    strokeWidth: 3
-                )
-            }
-        } else {
-            resolver = nil
-        }
-
-        let overrides: NodeOverrideMap = targetNodeID.isEmpty ? [:] : [targetNodeID: mapOverride]
-        return SVGRenderConfiguration(idOverrides: overrides, resolver: resolver)
-    }
+    @State private var expandedSources: Set<String> = []
+    @State private var runningAnimations: Set<String> = {
+        let animatedSamples = DemoSamples.all.filter { $0.animation.isAnimated }
+        let animatedIDs = animatedSamples.map { $0.id }
+        return Set<String>(animatedIDs)
+    }()
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    sampleSelector
-                    canvasSection
-                    controlsSection
+            TimelineView(.animation) { timeline in
+                let timestamp = timeline.date.timeIntervalSinceReferenceDate
+
+                List {
+                    sectionHeader
+                    Section("SVG 샘플 목록") {
+                        ForEach(samples) { sample in
+                            sampleRow(for: sample, at: timestamp)
+                        }
+                    }
                 }
-                .padding(20)
+                .listStyle(.insetGrouped)
+                .navigationTitle("SVGSwiftUI Demo")
+                .accessibilityIdentifier("demo.content")
             }
-            .navigationTitle("SVGSwiftUI Demo")
         }
         .navigationViewStyle(.stack)
-        .accessibilityIdentifier("demo.content")
-        .onChange(of: selectedSample.id) { _ in
-            targetNodeID = selectedSample.defaultNodeID
-            scale = 1.0
-            offsetX = 0
-            offsetY = 0
+    }
+
+    private var sectionHeader: some View {
+        Section {
+            Text("List 방식으로 여러 SVG를 동시에 확인할 수 있습니다. 각 카드에서 코드 보기 버튼을 눌러 SVG 소스와 렌더 결과를 함께 확인하세요.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.vertical, 6)
+        } header: {
+            Text("Demo 가이드")
         }
     }
 
-    private var sampleSelector: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Sample")
-                .font(.headline)
-            Picker("Sample", selection: $selectedIndex) {
-                ForEach(samples.indices, id: \.self) { index in
-                    Text(samples[index].title).tag(index)
+    private func sampleRow(for sample: SampleSVG, at timestamp: TimeInterval) -> some View {
+        let configuration = renderConfiguration(for: sample, at: timestamp)
+        let source = DemoSamples.source(for: sample)
+        let sourceBinding = sourceExpandedBinding(for: sample.id)
+        let animationBinding = animationEnabledBinding(for: sample.id)
+
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(sample.title)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text(sample.category)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-            }
-            .pickerStyle(.segmented)
-            .accessibilityIdentifier("demo.sampleList")
-        }
-    }
 
-    private var canvasSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Canvas")
-                .font(.headline)
+                Spacer()
+
+                Text(sample.id)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(white: 0.92))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
+
+            Text(sample.notes)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             SVGView(
-                source: .string(selectedSample.svg),
-                configuration: renderConfiguration,
-                cacheStats: cacheStats
+                source: .string(source),
+                configuration: configuration
             )
-            .frame(height: 300)
+            .frame(height: 210)
             .background(Color(white: 0.97))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1)
             )
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("SVG Canvas")
-            .accessibilityIdentifier("demo.canvas")
+            .accessibilityLabel("\(sample.title) canvas")
+            .accessibilityIdentifier("demo.canvas.\(sample.id)")
 
-            Text("Target Node: \(targetNodeID)")
+            if sample.animation != .none {
+                Toggle(
+                    "애니메이션 재생",
+                    isOn: animationBinding
+                )
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .accessibilityIdentifier("demo.animationToggle.\(sample.id)")
+            }
+
+            DisclosureGroup(
+                isExpanded: sourceBinding,
+                content: {
+                    Text(source)
+                        .font(.system(.caption2, design: .monospaced))
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 8)
+                        .accessibilityIdentifier("demo.source.\(sample.id)")
+                },
+                label: {
+                    Label("SVG 코드 보기", systemImage: "doc.plaintext")
+                        .font(.caption)
+                }
+            )
+            .accessibilityIdentifier("demo.codeDisclosure.\(sample.id)")
+            .padding(.vertical, 4)
         }
+        .padding(.vertical, 6)
+        .accessibilityIdentifier("demo.sampleRow.\(sample.id)")
+        .id(sample.id)
     }
 
-    private var controlsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Controls")
-                .font(.headline)
+    private func renderConfiguration(for sample: SampleSVG, at timestamp: TimeInterval) -> SVGRenderConfiguration {
+        let isAnimationEnabled = runningAnimations.contains(sample.id)
+        var overrides: NodeOverrideMap = [:]
 
-            HStack {
-                Text("Node ID")
-                TextField("main-path", text: $targetNodeID)
-                    .textFieldStyle(.roundedBorder)
-                    .accessibilityLabel("Node ID Field")
-                    .accessibilityIdentifier("demo.nodeIDField")
+        if isAnimationEnabled {
+            switch sample.animation {
+            case .none:
+                break
+            case let .pulse(nodeID: nodeID, minScale: minScale, maxScale: maxScale, duration: duration):
+                let progress = animationProgress(for: timestamp, duration: duration)
+                let scale = minScale + ((maxScale - minScale) * progress)
+                overrides[nodeID] = NodeOverride(scale: .init(width: scale, height: scale))
+            case let .drift(nodeID: nodeID, offsetX: offsetX, offsetY: offsetY, duration: duration):
+                let progress = animationProgress(for: timestamp, duration: duration)
+                let phaseOffset = (progress - 0.5) * 2.0
+                let x = offsetX * phaseOffset
+                let y = offsetY * phaseOffset
+                overrides[nodeID] = NodeOverride(offset: .init(x: x, y: y))
+            case let .opacity(nodeID: nodeID, minOpacity: minOpacity, maxOpacity: maxOpacity, duration: duration):
+                let progress = animationProgress(for: timestamp, duration: duration)
+                let alpha = minOpacity + ((maxOpacity - minOpacity) * progress)
+                overrides[nodeID] = NodeOverride(opacity: alpha)
             }
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier("demo.nodeIDRow")
-
-            Toggle("Apply Fill Override (Map)", isOn: $fillEnabled)
-                .accessibilityIdentifier("demo.fillToggle")
-            Toggle("Apply Stroke Override (Resolver)", isOn: $strokeEnabled)
-                .accessibilityIdentifier("demo.strokeToggle")
-
-            VStack(alignment: .leading) {
-                Text("Scale: \(scale, specifier: "%.2f")")
-                Slider(value: $scale, in: 0.5...2.5, step: 0.1)
-                    .accessibilityIdentifier("demo.scaleSlider")
-            }
-
-            VStack(alignment: .leading) {
-                Text("Offset X: \(offsetX, specifier: "%.0f")")
-                Slider(value: $offsetX, in: -60...60, step: 1)
-                    .accessibilityIdentifier("demo.offsetXSlider")
-            }
-
-            VStack(alignment: .leading) {
-                Text("Offset Y: \(offsetY, specifier: "%.0f")")
-                Slider(value: $offsetY, in: -60...60, step: 1)
-                    .accessibilityIdentifier("demo.offsetYSlider")
-            }
-
-            cacheStatsSection
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("demo.controls")
+
+        return SVGRenderConfiguration(idOverrides: overrides)
     }
 
-    private var cacheStatsSection: some View {
-        let metrics = cacheStats.metrics
-        let hitRatePercent = metrics.hitRate * 100.0
-        let hitRateText = String(format: "%.2f%%", hitRatePercent)
-        let totalCostValue = Int64(metrics.totalCost)
-        let totalCostText = ByteCountFormatter.string(
-            fromByteCount: totalCostValue,
-            countStyle: .memory
+    private func animationProgress(for timestamp: TimeInterval, duration: Double) -> Double {
+        let safeDuration = max(duration, 0.1)
+        let normalized = timestamp.truncatingRemainder(dividingBy: safeDuration) / safeDuration
+        let phase = normalized * 2.0 * Double.pi
+        let sineValue = sin(phase)
+        return (sineValue + 1.0) / 2.0
+    }
+
+    private func sourceExpandedBinding(for sampleID: String) -> Binding<Bool> {
+        Binding(
+            get: { expandedSources.contains(sampleID) },
+            set: { isExpanded in
+                if isExpanded {
+                    expandedSources.insert(sampleID)
+                } else {
+                    expandedSources.remove(sampleID)
+                }
+            }
         )
-
-        return VStack(alignment: .leading, spacing: 6) {
-            Text("Cache Metrics")
-                .font(.headline)
-
-            metricRow(
-                label: "Requests",
-                value: "\(metrics.requests)",
-                valueIdentifier: "demo.cache.requests"
-            )
-            metricRow(
-                label: "Hits",
-                value: "\(metrics.hits)",
-                valueIdentifier: "demo.cache.hits"
-            )
-            metricRow(
-                label: "Misses",
-                value: "\(metrics.misses)",
-                valueIdentifier: "demo.cache.misses"
-            )
-            metricRow(
-                label: "Hit Rate",
-                value: hitRateText,
-                valueIdentifier: "demo.cache.hitRate"
-            )
-            metricRow(
-                label: "Entries",
-                value: "\(metrics.entries)",
-                valueIdentifier: "demo.cache.entries"
-            )
-            metricRow(
-                label: "Total Cost",
-                value: totalCostText,
-                valueIdentifier: "demo.cache.cost"
-            )
-        }
-        .padding(12)
-        .background(Color(white: 0.95))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("demo.cacheStats")
     }
 
-    private func metricRow(label: String, value: String, valueIdentifier: String) -> some View {
-        HStack {
-            Text(label)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text(value)
-                .font(.system(.body, design: .monospaced))
-                .accessibilityIdentifier(valueIdentifier)
-        }
-        .font(.caption)
+    private func animationEnabledBinding(for sampleID: String) -> Binding<Bool> {
+        Binding(
+            get: { runningAnimations.contains(sampleID) },
+            set: { isEnabled in
+                if isEnabled {
+                    runningAnimations.insert(sampleID)
+                } else {
+                    runningAnimations.remove(sampleID)
+                }
+            }
+        )
     }
 }
 

@@ -1,0 +1,15 @@
+<svg width="240" height="160" viewBox="0 0 240 160">
+  <g id="root-group" transform="translate(20,20)">
+    <g id="inner-layer-1" transform="rotate(8)" opacity="0.95">
+      <rect id="nested-bg" x="0" y="0" width="80" height="60" fill="#fde68a"/>
+      <g id="inner-layer-2" transform="translate(100,20)">
+        <circle id="nested-a" cx="30" cy="30" r="28" fill="#0ea5e9"/>
+        <circle id="nested-b" cx="70" cy="70" r="18" fill="#f43f5e"/>
+      </g>
+    </g>
+    <g id="inner-layer-3" transform="translate(20,95)">
+      <line id="nested-line-1" x1="0" y1="0" x2="160" y2="0" stroke="#0f172a" stroke-width="4"/>
+      <line id="nested-line-2" x1="0" y1="0" x2="0" y2="30" stroke="#0f172a" stroke-width="4"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,643 @@
+<svg width="380" height="260" viewBox="0 0 380 260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="constellation-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="1.4" result="glow" />
+      <feColorMatrix in="glow" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.35 0" result="colored" />
+      <feBlend in="SourceGraphic" in2="colored" mode="screen" />
+    </filter>
+    <clipPath id="constellation-window">
+      <rect id="constellation-clip-rect" x="12" y="12" width="356" height="236" rx="10" />
+    </clipPath>
+  </defs>
+
+  <style>
+    .bg { fill: #050816 }
+    .bright { fill: #e2e8f0; stroke: #38bdf8; stroke-width: 0.7; opacity: 0.95 }
+    .soft { fill: #94a3b8; stroke: #38bdf8; stroke-width: 0.5; opacity: 0.75 }
+    .dim { fill: #64748b; stroke: #334155; stroke-width: 0.45; opacity: 0.6 }
+    .grid-line { fill: none; stroke: #1d4ed8; stroke-width: 0.7; opacity: 0.45 }
+    .arc-line { fill: none; stroke: #22d3ee; stroke-width: 0.9; opacity: 0.5 }
+    .core { fill: #f0f9ff; stroke: #7dd3fc; stroke-width: 1.4 }
+  </style>
+
+  <rect id="constellation-background" class="bg" x="0" y="0" width="380" height="260" />
+
+  <g id="constellation-root" filter="url(#constellation-glow)" clip-path="url(#constellation-window)">
+    <g id="constellation-stars">
+      <circle id="star-00-00" class="bright" cx="24" cy="18" r="2.0" />
+      <line id="hline-00-00" class="grid-line" x1="24" y1="18" x2="40" y2="18" />
+      <line id="vline-00-00" class="grid-line" x1="24" y1="18" x2="24" y2="32" />
+      <line id="dline-00-00" class="arc-line" x1="24" y1="18" x2="40" y2="32" />
+      <circle id="star-00-01" class="dim" cx="40" cy="18" r="1.3" />
+      <circle id="star-00-02" class="soft" cx="56" cy="18" r="1.6" />
+      <circle id="star-00-03" class="bright" cx="72" cy="18" r="2.0" />
+      <circle id="star-00-04" class="soft" cx="88" cy="18" r="1.6" />
+      <line id="hline-00-04" class="grid-line" x1="88" y1="18" x2="104" y2="18" />
+      <circle id="star-00-05" class="dim" cx="104" cy="18" r="1.3" />
+      <line id="vline-00-05" class="grid-line" x1="104" y1="18" x2="104" y2="32" />
+      <circle id="star-00-06" class="bright" cx="120" cy="18" r="2.0" />
+      <circle id="star-00-07" class="dim" cx="136" cy="18" r="1.3" />
+      <circle id="star-00-08" class="soft" cx="152" cy="18" r="1.6" />
+      <line id="hline-00-08" class="grid-line" x1="152" y1="18" x2="168" y2="18" />
+      <line id="dline-00-08" class="arc-line" x1="152" y1="18" x2="168" y2="32" />
+      <circle id="star-00-09" class="bright" cx="168" cy="18" r="2.0" />
+      <circle id="star-00-10" class="soft" cx="184" cy="18" r="1.6" />
+      <line id="vline-00-10" class="grid-line" x1="184" y1="18" x2="184" y2="32" />
+      <circle id="star-00-11" class="dim" cx="200" cy="18" r="1.3" />
+      <circle id="star-00-12" class="bright" cx="216" cy="18" r="2.0" />
+      <line id="hline-00-12" class="grid-line" x1="216" y1="18" x2="232" y2="18" />
+      <circle id="star-00-13" class="dim" cx="232" cy="18" r="1.3" />
+      <circle id="star-00-14" class="soft" cx="248" cy="18" r="1.6" />
+      <circle id="star-00-15" class="bright" cx="264" cy="18" r="2.0" />
+      <line id="vline-00-15" class="grid-line" x1="264" y1="18" x2="264" y2="32" />
+      <circle id="star-00-16" class="soft" cx="280" cy="18" r="1.6" />
+      <line id="hline-00-16" class="grid-line" x1="280" y1="18" x2="296" y2="18" />
+      <line id="dline-00-16" class="arc-line" x1="280" y1="18" x2="296" y2="32" />
+      <circle id="star-00-17" class="dim" cx="296" cy="18" r="1.3" />
+      <circle id="star-00-18" class="bright" cx="312" cy="18" r="2.0" />
+      <circle id="star-00-19" class="dim" cx="328" cy="18" r="1.3" />
+      <circle id="star-01-00" class="soft" cx="24" cy="32" r="1.6" />
+      <circle id="star-01-01" class="dim" cx="40" cy="32" r="1.3" />
+      <circle id="star-01-02" class="bright" cx="56" cy="32" r="2.0" />
+      <circle id="star-01-03" class="dim" cx="72" cy="32" r="1.3" />
+      <line id="hline-01-03" class="grid-line" x1="72" y1="32" x2="88" y2="32" />
+      <circle id="star-01-04" class="soft" cx="88" cy="32" r="1.6" />
+      <line id="vline-01-04" class="grid-line" x1="88" y1="32" x2="88" y2="46" />
+      <circle id="star-01-05" class="bright" cx="104" cy="32" r="2.0" />
+      <circle id="star-01-06" class="soft" cx="120" cy="32" r="1.6" />
+      <circle id="star-01-07" class="dim" cx="136" cy="32" r="1.3" />
+      <line id="hline-01-07" class="grid-line" x1="136" y1="32" x2="152" y2="32" />
+      <line id="dline-01-07" class="arc-line" x1="136" y1="32" x2="152" y2="46" />
+      <circle id="star-01-08" class="bright" cx="152" cy="32" r="2.0" />
+      <circle id="star-01-09" class="dim" cx="168" cy="32" r="1.3" />
+      <line id="vline-01-09" class="grid-line" x1="168" y1="32" x2="168" y2="46" />
+      <circle id="star-01-10" class="soft" cx="184" cy="32" r="1.6" />
+      <circle id="star-01-11" class="bright" cx="200" cy="32" r="2.0" />
+      <line id="hline-01-11" class="grid-line" x1="200" y1="32" x2="216" y2="32" />
+      <circle id="star-01-12" class="soft" cx="216" cy="32" r="1.6" />
+      <circle id="star-01-13" class="dim" cx="232" cy="32" r="1.3" />
+      <circle id="star-01-14" class="bright" cx="248" cy="32" r="2.0" />
+      <line id="vline-01-14" class="grid-line" x1="248" y1="32" x2="248" y2="46" />
+      <circle id="star-01-15" class="dim" cx="264" cy="32" r="1.3" />
+      <line id="hline-01-15" class="grid-line" x1="264" y1="32" x2="280" y2="32" />
+      <line id="dline-01-15" class="arc-line" x1="264" y1="32" x2="280" y2="46" />
+      <circle id="star-01-16" class="soft" cx="280" cy="32" r="1.6" />
+      <circle id="star-01-17" class="bright" cx="296" cy="32" r="2.0" />
+      <circle id="star-01-18" class="soft" cx="312" cy="32" r="1.6" />
+      <circle id="star-01-19" class="dim" cx="328" cy="32" r="1.3" />
+      <line id="vline-01-19" class="grid-line" x1="328" y1="32" x2="328" y2="46" />
+      <circle id="star-02-00" class="soft" cx="24" cy="46" r="1.6" />
+      <circle id="star-02-01" class="bright" cx="40" cy="46" r="2.0" />
+      <circle id="star-02-02" class="soft" cx="56" cy="46" r="1.6" />
+      <line id="hline-02-02" class="grid-line" x1="56" y1="46" x2="72" y2="46" />
+      <circle id="star-02-03" class="dim" cx="72" cy="46" r="1.3" />
+      <line id="vline-02-03" class="grid-line" x1="72" y1="46" x2="72" y2="60" />
+      <circle id="star-02-04" class="bright" cx="88" cy="46" r="2.0" />
+      <circle id="star-02-05" class="dim" cx="104" cy="46" r="1.3" />
+      <circle id="star-02-06" class="soft" cx="120" cy="46" r="1.6" />
+      <line id="hline-02-06" class="grid-line" x1="120" y1="46" x2="136" y2="46" />
+      <line id="dline-02-06" class="arc-line" x1="120" y1="46" x2="136" y2="60" />
+      <circle id="star-02-07" class="bright" cx="136" cy="46" r="2.0" />
+      <circle id="star-02-08" class="soft" cx="152" cy="46" r="1.6" />
+      <line id="vline-02-08" class="grid-line" x1="152" y1="46" x2="152" y2="60" />
+      <circle id="star-02-09" class="dim" cx="168" cy="46" r="1.3" />
+      <circle id="star-02-10" class="bright" cx="184" cy="46" r="2.0" />
+      <line id="hline-02-10" class="grid-line" x1="184" y1="46" x2="200" y2="46" />
+      <circle id="star-02-11" class="dim" cx="200" cy="46" r="1.3" />
+      <circle id="star-02-12" class="soft" cx="216" cy="46" r="1.6" />
+      <circle id="star-02-13" class="bright" cx="232" cy="46" r="2.0" />
+      <line id="vline-02-13" class="grid-line" x1="232" y1="46" x2="232" y2="60" />
+      <circle id="star-02-14" class="soft" cx="248" cy="46" r="1.6" />
+      <line id="hline-02-14" class="grid-line" x1="248" y1="46" x2="264" y2="46" />
+      <line id="dline-02-14" class="arc-line" x1="248" y1="46" x2="264" y2="60" />
+      <circle id="star-02-15" class="dim" cx="264" cy="46" r="1.3" />
+      <circle id="star-02-16" class="bright" cx="280" cy="46" r="2.0" />
+      <circle id="star-02-17" class="dim" cx="296" cy="46" r="1.3" />
+      <circle id="star-02-18" class="soft" cx="312" cy="46" r="1.6" />
+      <line id="hline-02-18" class="grid-line" x1="312" y1="46" x2="328" y2="46" />
+      <line id="vline-02-18" class="grid-line" x1="312" y1="46" x2="312" y2="60" />
+      <circle id="star-02-19" class="bright" cx="328" cy="46" r="2.0" />
+      <circle id="star-03-00" class="bright" cx="24" cy="60" r="2.0" />
+      <circle id="star-03-01" class="dim" cx="40" cy="60" r="1.3" />
+      <line id="hline-03-01" class="grid-line" x1="40" y1="60" x2="56" y2="60" />
+      <circle id="star-03-02" class="soft" cx="56" cy="60" r="1.6" />
+      <line id="vline-03-02" class="grid-line" x1="56" y1="60" x2="56" y2="74" />
+      <circle id="star-03-03" class="bright" cx="72" cy="60" r="2.0" />
+      <circle id="star-03-04" class="soft" cx="88" cy="60" r="1.6" />
+      <circle id="star-03-05" class="dim" cx="104" cy="60" r="1.3" />
+      <line id="hline-03-05" class="grid-line" x1="104" y1="60" x2="120" y2="60" />
+      <line id="dline-03-05" class="arc-line" x1="104" y1="60" x2="120" y2="74" />
+      <circle id="star-03-06" class="bright" cx="120" cy="60" r="2.0" />
+      <circle id="star-03-07" class="dim" cx="136" cy="60" r="1.3" />
+      <line id="vline-03-07" class="grid-line" x1="136" y1="60" x2="136" y2="74" />
+      <circle id="star-03-08" class="soft" cx="152" cy="60" r="1.6" />
+      <circle id="star-03-09" class="bright" cx="168" cy="60" r="2.0" />
+      <line id="hline-03-09" class="grid-line" x1="168" y1="60" x2="184" y2="60" />
+      <circle id="star-03-10" class="soft" cx="184" cy="60" r="1.6" />
+      <circle id="star-03-11" class="dim" cx="200" cy="60" r="1.3" />
+      <circle id="star-03-12" class="bright" cx="216" cy="60" r="2.0" />
+      <line id="vline-03-12" class="grid-line" x1="216" y1="60" x2="216" y2="74" />
+      <circle id="star-03-13" class="dim" cx="232" cy="60" r="1.3" />
+      <line id="hline-03-13" class="grid-line" x1="232" y1="60" x2="248" y2="60" />
+      <line id="dline-03-13" class="arc-line" x1="232" y1="60" x2="248" y2="74" />
+      <circle id="star-03-14" class="soft" cx="248" cy="60" r="1.6" />
+      <circle id="star-03-15" class="bright" cx="264" cy="60" r="2.0" />
+      <circle id="star-03-16" class="soft" cx="280" cy="60" r="1.6" />
+      <circle id="star-03-17" class="dim" cx="296" cy="60" r="1.3" />
+      <line id="hline-03-17" class="grid-line" x1="296" y1="60" x2="312" y2="60" />
+      <line id="vline-03-17" class="grid-line" x1="296" y1="60" x2="296" y2="74" />
+      <circle id="star-03-18" class="bright" cx="312" cy="60" r="2.0" />
+      <circle id="star-03-19" class="dim" cx="328" cy="60" r="1.3" />
+      <circle id="star-04-00" class="soft" cx="24" cy="74" r="1.6" />
+      <line id="hline-04-00" class="grid-line" x1="24" y1="74" x2="40" y2="74" />
+      <circle id="star-04-01" class="dim" cx="40" cy="74" r="1.3" />
+      <line id="vline-04-01" class="grid-line" x1="40" y1="74" x2="40" y2="88" />
+      <circle id="star-04-02" class="bright" cx="56" cy="74" r="2.0" />
+      <circle id="star-04-03" class="dim" cx="72" cy="74" r="1.3" />
+      <circle id="star-04-04" class="soft" cx="88" cy="74" r="1.6" />
+      <line id="hline-04-04" class="grid-line" x1="88" y1="74" x2="104" y2="74" />
+      <line id="dline-04-04" class="arc-line" x1="88" y1="74" x2="104" y2="88" />
+      <circle id="star-04-05" class="bright" cx="104" cy="74" r="2.0" />
+      <circle id="star-04-06" class="soft" cx="120" cy="74" r="1.6" />
+      <line id="vline-04-06" class="grid-line" x1="120" y1="74" x2="120" y2="88" />
+      <circle id="star-04-07" class="dim" cx="136" cy="74" r="1.3" />
+      <circle id="star-04-08" class="bright" cx="152" cy="74" r="2.0" />
+      <line id="hline-04-08" class="grid-line" x1="152" y1="74" x2="168" y2="74" />
+      <circle id="star-04-09" class="dim" cx="168" cy="74" r="1.3" />
+      <circle id="star-04-10" class="soft" cx="184" cy="74" r="1.6" />
+      <circle id="star-04-11" class="bright" cx="200" cy="74" r="2.0" />
+      <line id="vline-04-11" class="grid-line" x1="200" y1="74" x2="200" y2="88" />
+      <circle id="star-04-12" class="soft" cx="216" cy="74" r="1.6" />
+      <line id="hline-04-12" class="grid-line" x1="216" y1="74" x2="232" y2="74" />
+      <line id="dline-04-12" class="arc-line" x1="216" y1="74" x2="232" y2="88" />
+      <circle id="star-04-13" class="dim" cx="232" cy="74" r="1.3" />
+      <circle id="star-04-14" class="bright" cx="248" cy="74" r="2.0" />
+      <circle id="star-04-15" class="dim" cx="264" cy="74" r="1.3" />
+      <circle id="star-04-16" class="soft" cx="280" cy="74" r="1.6" />
+      <line id="hline-04-16" class="grid-line" x1="280" y1="74" x2="296" y2="74" />
+      <line id="vline-04-16" class="grid-line" x1="280" y1="74" x2="280" y2="88" />
+      <circle id="star-04-17" class="bright" cx="296" cy="74" r="2.0" />
+      <circle id="star-04-18" class="soft" cx="312" cy="74" r="1.6" />
+      <circle id="star-04-19" class="dim" cx="328" cy="74" r="1.3" />
+      <circle id="star-05-00" class="soft" cx="24" cy="88" r="1.6" />
+      <line id="vline-05-00" class="grid-line" x1="24" y1="88" x2="24" y2="102" />
+      <circle id="star-05-01" class="bright" cx="40" cy="88" r="2.0" />
+      <circle id="star-05-02" class="soft" cx="56" cy="88" r="1.6" />
+      <circle id="star-05-03" class="dim" cx="72" cy="88" r="1.3" />
+      <line id="hline-05-03" class="grid-line" x1="72" y1="88" x2="88" y2="88" />
+      <line id="dline-05-03" class="arc-line" x1="72" y1="88" x2="88" y2="102" />
+      <circle id="star-05-04" class="bright" cx="88" cy="88" r="2.0" />
+      <circle id="star-05-05" class="dim" cx="104" cy="88" r="1.3" />
+      <line id="vline-05-05" class="grid-line" x1="104" y1="88" x2="104" y2="102" />
+      <circle id="star-05-06" class="soft" cx="120" cy="88" r="1.6" />
+      <circle id="star-05-07" class="bright" cx="136" cy="88" r="2.0" />
+      <line id="hline-05-07" class="grid-line" x1="136" y1="88" x2="152" y2="88" />
+      <circle id="star-05-08" class="soft" cx="152" cy="88" r="1.6" />
+      <circle id="star-05-09" class="dim" cx="168" cy="88" r="1.3" />
+      <circle id="star-05-10" class="bright" cx="184" cy="88" r="2.0" />
+      <line id="vline-05-10" class="grid-line" x1="184" y1="88" x2="184" y2="102" />
+      <circle id="star-05-11" class="dim" cx="200" cy="88" r="1.3" />
+      <line id="hline-05-11" class="grid-line" x1="200" y1="88" x2="216" y2="88" />
+      <line id="dline-05-11" class="arc-line" x1="200" y1="88" x2="216" y2="102" />
+      <circle id="star-05-12" class="soft" cx="216" cy="88" r="1.6" />
+      <circle id="star-05-13" class="bright" cx="232" cy="88" r="2.0" />
+      <circle id="star-05-14" class="soft" cx="248" cy="88" r="1.6" />
+      <circle id="star-05-15" class="dim" cx="264" cy="88" r="1.3" />
+      <line id="hline-05-15" class="grid-line" x1="264" y1="88" x2="280" y2="88" />
+      <line id="vline-05-15" class="grid-line" x1="264" y1="88" x2="264" y2="102" />
+      <circle id="star-05-16" class="bright" cx="280" cy="88" r="2.0" />
+      <circle id="star-05-17" class="dim" cx="296" cy="88" r="1.3" />
+      <circle id="star-05-18" class="soft" cx="312" cy="88" r="1.6" />
+      <circle id="star-05-19" class="bright" cx="328" cy="88" r="2.0" />
+      <circle id="star-06-00" class="bright" cx="24" cy="102" r="2.0" />
+      <circle id="star-06-01" class="dim" cx="40" cy="102" r="1.3" />
+      <circle id="star-06-02" class="soft" cx="56" cy="102" r="1.6" />
+      <line id="hline-06-02" class="grid-line" x1="56" y1="102" x2="72" y2="102" />
+      <line id="dline-06-02" class="arc-line" x1="56" y1="102" x2="72" y2="116" />
+      <circle id="star-06-03" class="bright" cx="72" cy="102" r="2.0" />
+      <circle id="star-06-04" class="soft" cx="88" cy="102" r="1.6" />
+      <line id="vline-06-04" class="grid-line" x1="88" y1="102" x2="88" y2="116" />
+      <circle id="star-06-05" class="dim" cx="104" cy="102" r="1.3" />
+      <circle id="star-06-06" class="bright" cx="120" cy="102" r="2.0" />
+      <line id="hline-06-06" class="grid-line" x1="120" y1="102" x2="136" y2="102" />
+      <circle id="star-06-07" class="dim" cx="136" cy="102" r="1.3" />
+      <circle id="star-06-08" class="soft" cx="152" cy="102" r="1.6" />
+      <circle id="star-06-09" class="bright" cx="168" cy="102" r="2.0" />
+      <line id="vline-06-09" class="grid-line" x1="168" y1="102" x2="168" y2="116" />
+      <circle id="star-06-10" class="soft" cx="184" cy="102" r="1.6" />
+      <line id="hline-06-10" class="grid-line" x1="184" y1="102" x2="200" y2="102" />
+      <line id="dline-06-10" class="arc-line" x1="184" y1="102" x2="200" y2="116" />
+      <circle id="star-06-11" class="dim" cx="200" cy="102" r="1.3" />
+      <circle id="star-06-12" class="bright" cx="216" cy="102" r="2.0" />
+      <circle id="star-06-13" class="dim" cx="232" cy="102" r="1.3" />
+      <circle id="star-06-14" class="soft" cx="248" cy="102" r="1.6" />
+      <line id="hline-06-14" class="grid-line" x1="248" y1="102" x2="264" y2="102" />
+      <line id="vline-06-14" class="grid-line" x1="248" y1="102" x2="248" y2="116" />
+      <circle id="star-06-15" class="bright" cx="264" cy="102" r="2.0" />
+      <circle id="star-06-16" class="soft" cx="280" cy="102" r="1.6" />
+      <circle id="star-06-17" class="dim" cx="296" cy="102" r="1.3" />
+      <circle id="star-06-18" class="bright" cx="312" cy="102" r="2.0" />
+      <line id="hline-06-18" class="grid-line" x1="312" y1="102" x2="328" y2="102" />
+      <line id="dline-06-18" class="arc-line" x1="312" y1="102" x2="328" y2="116" />
+      <circle id="star-06-19" class="dim" cx="328" cy="102" r="1.3" />
+      <line id="vline-06-19" class="grid-line" x1="328" y1="102" x2="328" y2="116" />
+      <circle id="star-07-00" class="soft" cx="24" cy="116" r="1.6" />
+      <circle id="star-07-01" class="dim" cx="40" cy="116" r="1.3" />
+      <line id="hline-07-01" class="grid-line" x1="40" y1="116" x2="56" y2="116" />
+      <line id="dline-07-01" class="arc-line" x1="40" y1="116" x2="56" y2="130" />
+      <circle id="star-07-02" class="bright" cx="56" cy="116" r="2.0" />
+      <circle id="star-07-03" class="dim" cx="72" cy="116" r="1.3" />
+      <line id="vline-07-03" class="grid-line" x1="72" y1="116" x2="72" y2="130" />
+      <circle id="star-07-04" class="soft" cx="88" cy="116" r="1.6" />
+      <circle id="star-07-05" class="bright" cx="104" cy="116" r="2.0" />
+      <line id="hline-07-05" class="grid-line" x1="104" y1="116" x2="120" y2="116" />
+      <circle id="star-07-06" class="soft" cx="120" cy="116" r="1.6" />
+      <circle id="star-07-07" class="dim" cx="136" cy="116" r="1.3" />
+      <circle id="star-07-08" class="bright" cx="152" cy="116" r="2.0" />
+      <line id="vline-07-08" class="grid-line" x1="152" y1="116" x2="152" y2="130" />
+      <circle id="star-07-09" class="dim" cx="168" cy="116" r="1.3" />
+      <line id="hline-07-09" class="grid-line" x1="168" y1="116" x2="184" y2="116" />
+      <line id="dline-07-09" class="arc-line" x1="168" y1="116" x2="184" y2="130" />
+      <circle id="star-07-10" class="soft" cx="184" cy="116" r="1.6" />
+      <circle id="star-07-11" class="bright" cx="200" cy="116" r="2.0" />
+      <circle id="star-07-12" class="soft" cx="216" cy="116" r="1.6" />
+      <circle id="star-07-13" class="dim" cx="232" cy="116" r="1.3" />
+      <line id="hline-07-13" class="grid-line" x1="232" y1="116" x2="248" y2="116" />
+      <line id="vline-07-13" class="grid-line" x1="232" y1="116" x2="232" y2="130" />
+      <circle id="star-07-14" class="bright" cx="248" cy="116" r="2.0" />
+      <circle id="star-07-15" class="dim" cx="264" cy="116" r="1.3" />
+      <circle id="star-07-16" class="soft" cx="280" cy="116" r="1.6" />
+      <circle id="star-07-17" class="bright" cx="296" cy="116" r="2.0" />
+      <line id="hline-07-17" class="grid-line" x1="296" y1="116" x2="312" y2="116" />
+      <line id="dline-07-17" class="arc-line" x1="296" y1="116" x2="312" y2="130" />
+      <circle id="star-07-18" class="soft" cx="312" cy="116" r="1.6" />
+      <line id="vline-07-18" class="grid-line" x1="312" y1="116" x2="312" y2="130" />
+      <circle id="star-07-19" class="dim" cx="328" cy="116" r="1.3" />
+      <circle id="star-08-00" class="soft" cx="24" cy="130" r="1.6" />
+      <line id="hline-08-00" class="grid-line" x1="24" y1="130" x2="40" y2="130" />
+      <line id="dline-08-00" class="arc-line" x1="24" y1="130" x2="40" y2="144" />
+      <circle id="star-08-01" class="bright" cx="40" cy="130" r="2.0" />
+      <circle id="star-08-02" class="soft" cx="56" cy="130" r="1.6" />
+      <line id="vline-08-02" class="grid-line" x1="56" y1="130" x2="56" y2="144" />
+      <circle id="star-08-03" class="dim" cx="72" cy="130" r="1.3" />
+      <circle id="star-08-04" class="bright" cx="88" cy="130" r="2.0" />
+      <line id="hline-08-04" class="grid-line" x1="88" y1="130" x2="104" y2="130" />
+      <circle id="star-08-05" class="dim" cx="104" cy="130" r="1.3" />
+      <circle id="star-08-06" class="soft" cx="120" cy="130" r="1.6" />
+      <circle id="star-08-07" class="bright" cx="136" cy="130" r="2.0" />
+      <line id="vline-08-07" class="grid-line" x1="136" y1="130" x2="136" y2="144" />
+      <circle id="star-08-08" class="soft" cx="152" cy="130" r="1.6" />
+      <line id="hline-08-08" class="grid-line" x1="152" y1="130" x2="168" y2="130" />
+      <line id="dline-08-08" class="arc-line" x1="152" y1="130" x2="168" y2="144" />
+      <circle id="star-08-09" class="dim" cx="168" cy="130" r="1.3" />
+      <circle id="star-08-10" class="bright" cx="184" cy="130" r="2.0" />
+      <circle id="star-08-11" class="dim" cx="200" cy="130" r="1.3" />
+      <circle id="star-08-12" class="soft" cx="216" cy="130" r="1.6" />
+      <line id="hline-08-12" class="grid-line" x1="216" y1="130" x2="232" y2="130" />
+      <line id="vline-08-12" class="grid-line" x1="216" y1="130" x2="216" y2="144" />
+      <circle id="star-08-13" class="bright" cx="232" cy="130" r="2.0" />
+      <circle id="star-08-14" class="soft" cx="248" cy="130" r="1.6" />
+      <circle id="star-08-15" class="dim" cx="264" cy="130" r="1.3" />
+      <circle id="star-08-16" class="bright" cx="280" cy="130" r="2.0" />
+      <line id="hline-08-16" class="grid-line" x1="280" y1="130" x2="296" y2="130" />
+      <line id="dline-08-16" class="arc-line" x1="280" y1="130" x2="296" y2="144" />
+      <circle id="star-08-17" class="dim" cx="296" cy="130" r="1.3" />
+      <line id="vline-08-17" class="grid-line" x1="296" y1="130" x2="296" y2="144" />
+      <circle id="star-08-18" class="soft" cx="312" cy="130" r="1.6" />
+      <circle id="star-08-19" class="bright" cx="328" cy="130" r="2.0" />
+      <circle id="star-09-00" class="bright" cx="24" cy="144" r="2.0" />
+      <circle id="star-09-01" class="dim" cx="40" cy="144" r="1.3" />
+      <line id="vline-09-01" class="grid-line" x1="40" y1="144" x2="40" y2="158" />
+      <circle id="star-09-02" class="soft" cx="56" cy="144" r="1.6" />
+      <circle id="star-09-03" class="bright" cx="72" cy="144" r="2.0" />
+      <line id="hline-09-03" class="grid-line" x1="72" y1="144" x2="88" y2="144" />
+      <circle id="star-09-04" class="soft" cx="88" cy="144" r="1.6" />
+      <circle id="star-09-05" class="dim" cx="104" cy="144" r="1.3" />
+      <circle id="star-09-06" class="bright" cx="120" cy="144" r="2.0" />
+      <line id="vline-09-06" class="grid-line" x1="120" y1="144" x2="120" y2="158" />
+      <circle id="star-09-07" class="dim" cx="136" cy="144" r="1.3" />
+      <line id="hline-09-07" class="grid-line" x1="136" y1="144" x2="152" y2="144" />
+      <line id="dline-09-07" class="arc-line" x1="136" y1="144" x2="152" y2="158" />
+      <circle id="star-09-08" class="soft" cx="152" cy="144" r="1.6" />
+      <circle id="star-09-09" class="bright" cx="168" cy="144" r="2.0" />
+      <circle id="star-09-10" class="soft" cx="184" cy="144" r="1.6" />
+      <circle id="star-09-11" class="dim" cx="200" cy="144" r="1.3" />
+      <line id="hline-09-11" class="grid-line" x1="200" y1="144" x2="216" y2="144" />
+      <line id="vline-09-11" class="grid-line" x1="200" y1="144" x2="200" y2="158" />
+      <circle id="star-09-12" class="bright" cx="216" cy="144" r="2.0" />
+      <circle id="star-09-13" class="dim" cx="232" cy="144" r="1.3" />
+      <circle id="star-09-14" class="soft" cx="248" cy="144" r="1.6" />
+      <circle id="star-09-15" class="bright" cx="264" cy="144" r="2.0" />
+      <line id="hline-09-15" class="grid-line" x1="264" y1="144" x2="280" y2="144" />
+      <line id="dline-09-15" class="arc-line" x1="264" y1="144" x2="280" y2="158" />
+      <circle id="star-09-16" class="soft" cx="280" cy="144" r="1.6" />
+      <line id="vline-09-16" class="grid-line" x1="280" y1="144" x2="280" y2="158" />
+      <circle id="star-09-17" class="dim" cx="296" cy="144" r="1.3" />
+      <circle id="star-09-18" class="bright" cx="312" cy="144" r="2.0" />
+      <circle id="star-09-19" class="dim" cx="328" cy="144" r="1.3" />
+      <circle id="star-10-00" class="soft" cx="24" cy="158" r="1.6" />
+      <line id="vline-10-00" class="grid-line" x1="24" y1="158" x2="24" y2="172" />
+      <circle id="star-10-01" class="dim" cx="40" cy="158" r="1.3" />
+      <circle id="star-10-02" class="bright" cx="56" cy="158" r="2.0" />
+      <line id="hline-10-02" class="grid-line" x1="56" y1="158" x2="72" y2="158" />
+      <circle id="star-10-03" class="dim" cx="72" cy="158" r="1.3" />
+      <circle id="star-10-04" class="soft" cx="88" cy="158" r="1.6" />
+      <circle id="star-10-05" class="bright" cx="104" cy="158" r="2.0" />
+      <line id="vline-10-05" class="grid-line" x1="104" y1="158" x2="104" y2="172" />
+      <circle id="star-10-06" class="soft" cx="120" cy="158" r="1.6" />
+      <line id="hline-10-06" class="grid-line" x1="120" y1="158" x2="136" y2="158" />
+      <line id="dline-10-06" class="arc-line" x1="120" y1="158" x2="136" y2="172" />
+      <circle id="star-10-07" class="dim" cx="136" cy="158" r="1.3" />
+      <circle id="star-10-08" class="bright" cx="152" cy="158" r="2.0" />
+      <circle id="star-10-09" class="dim" cx="168" cy="158" r="1.3" />
+      <circle id="star-10-10" class="soft" cx="184" cy="158" r="1.6" />
+      <line id="hline-10-10" class="grid-line" x1="184" y1="158" x2="200" y2="158" />
+      <line id="vline-10-10" class="grid-line" x1="184" y1="158" x2="184" y2="172" />
+      <circle id="star-10-11" class="bright" cx="200" cy="158" r="2.0" />
+      <circle id="star-10-12" class="soft" cx="216" cy="158" r="1.6" />
+      <circle id="star-10-13" class="dim" cx="232" cy="158" r="1.3" />
+      <circle id="star-10-14" class="bright" cx="248" cy="158" r="2.0" />
+      <line id="hline-10-14" class="grid-line" x1="248" y1="158" x2="264" y2="158" />
+      <line id="dline-10-14" class="arc-line" x1="248" y1="158" x2="264" y2="172" />
+      <circle id="star-10-15" class="dim" cx="264" cy="158" r="1.3" />
+      <line id="vline-10-15" class="grid-line" x1="264" y1="158" x2="264" y2="172" />
+      <circle id="star-10-16" class="soft" cx="280" cy="158" r="1.6" />
+      <circle id="star-10-17" class="bright" cx="296" cy="158" r="2.0" />
+      <circle id="star-10-18" class="soft" cx="312" cy="158" r="1.6" />
+      <line id="hline-10-18" class="grid-line" x1="312" y1="158" x2="328" y2="158" />
+      <circle id="star-10-19" class="dim" cx="328" cy="158" r="1.3" />
+      <circle id="star-11-00" class="soft" cx="24" cy="172" r="1.6" />
+      <circle id="star-11-01" class="bright" cx="40" cy="172" r="2.0" />
+      <line id="hline-11-01" class="grid-line" x1="40" y1="172" x2="56" y2="172" />
+      <circle id="star-11-02" class="soft" cx="56" cy="172" r="1.6" />
+      <circle id="star-11-03" class="dim" cx="72" cy="172" r="1.3" />
+      <circle id="star-11-04" class="bright" cx="88" cy="172" r="2.0" />
+      <line id="vline-11-04" class="grid-line" x1="88" y1="172" x2="88" y2="186" />
+      <circle id="star-11-05" class="dim" cx="104" cy="172" r="1.3" />
+      <line id="hline-11-05" class="grid-line" x1="104" y1="172" x2="120" y2="172" />
+      <line id="dline-11-05" class="arc-line" x1="104" y1="172" x2="120" y2="186" />
+      <circle id="star-11-06" class="soft" cx="120" cy="172" r="1.6" />
+      <circle id="star-11-07" class="bright" cx="136" cy="172" r="2.0" />
+      <circle id="star-11-08" class="soft" cx="152" cy="172" r="1.6" />
+      <circle id="star-11-09" class="dim" cx="168" cy="172" r="1.3" />
+      <line id="hline-11-09" class="grid-line" x1="168" y1="172" x2="184" y2="172" />
+      <line id="vline-11-09" class="grid-line" x1="168" y1="172" x2="168" y2="186" />
+      <circle id="star-11-10" class="bright" cx="184" cy="172" r="2.0" />
+      <circle id="star-11-11" class="dim" cx="200" cy="172" r="1.3" />
+      <circle id="star-11-12" class="soft" cx="216" cy="172" r="1.6" />
+      <circle id="star-11-13" class="bright" cx="232" cy="172" r="2.0" />
+      <line id="hline-11-13" class="grid-line" x1="232" y1="172" x2="248" y2="172" />
+      <line id="dline-11-13" class="arc-line" x1="232" y1="172" x2="248" y2="186" />
+      <circle id="star-11-14" class="soft" cx="248" cy="172" r="1.6" />
+      <line id="vline-11-14" class="grid-line" x1="248" y1="172" x2="248" y2="186" />
+      <circle id="star-11-15" class="dim" cx="264" cy="172" r="1.3" />
+      <circle id="star-11-16" class="bright" cx="280" cy="172" r="2.0" />
+      <circle id="star-11-17" class="dim" cx="296" cy="172" r="1.3" />
+      <line id="hline-11-17" class="grid-line" x1="296" y1="172" x2="312" y2="172" />
+      <circle id="star-11-18" class="soft" cx="312" cy="172" r="1.6" />
+      <circle id="star-11-19" class="bright" cx="328" cy="172" r="2.0" />
+      <line id="vline-11-19" class="grid-line" x1="328" y1="172" x2="328" y2="186" />
+      <circle id="star-12-00" class="bright" cx="24" cy="186" r="2.0" />
+      <line id="hline-12-00" class="grid-line" x1="24" y1="186" x2="40" y2="186" />
+      <circle id="star-12-01" class="dim" cx="40" cy="186" r="1.3" />
+      <circle id="star-12-02" class="soft" cx="56" cy="186" r="1.6" />
+      <circle id="star-12-03" class="bright" cx="72" cy="186" r="2.0" />
+      <line id="vline-12-03" class="grid-line" x1="72" y1="186" x2="72" y2="200" />
+      <circle id="star-12-04" class="soft" cx="88" cy="186" r="1.6" />
+      <line id="hline-12-04" class="grid-line" x1="88" y1="186" x2="104" y2="186" />
+      <line id="dline-12-04" class="arc-line" x1="88" y1="186" x2="104" y2="200" />
+      <circle id="star-12-05" class="dim" cx="104" cy="186" r="1.3" />
+      <circle id="star-12-06" class="bright" cx="120" cy="186" r="2.0" />
+      <circle id="star-12-07" class="dim" cx="136" cy="186" r="1.3" />
+      <circle id="star-12-08" class="soft" cx="152" cy="186" r="1.6" />
+      <line id="hline-12-08" class="grid-line" x1="152" y1="186" x2="168" y2="186" />
+      <line id="vline-12-08" class="grid-line" x1="152" y1="186" x2="152" y2="200" />
+      <circle id="star-12-09" class="bright" cx="168" cy="186" r="2.0" />
+      <circle id="star-12-10" class="soft" cx="184" cy="186" r="1.6" />
+      <circle id="star-12-11" class="dim" cx="200" cy="186" r="1.3" />
+      <circle id="star-12-12" class="bright" cx="216" cy="186" r="2.0" />
+      <line id="hline-12-12" class="grid-line" x1="216" y1="186" x2="232" y2="186" />
+      <line id="dline-12-12" class="arc-line" x1="216" y1="186" x2="232" y2="200" />
+      <circle id="star-12-13" class="dim" cx="232" cy="186" r="1.3" />
+      <line id="vline-12-13" class="grid-line" x1="232" y1="186" x2="232" y2="200" />
+      <circle id="star-12-14" class="soft" cx="248" cy="186" r="1.6" />
+      <circle id="star-12-15" class="bright" cx="264" cy="186" r="2.0" />
+      <circle id="star-12-16" class="soft" cx="280" cy="186" r="1.6" />
+      <line id="hline-12-16" class="grid-line" x1="280" y1="186" x2="296" y2="186" />
+      <circle id="star-12-17" class="dim" cx="296" cy="186" r="1.3" />
+      <circle id="star-12-18" class="bright" cx="312" cy="186" r="2.0" />
+      <line id="vline-12-18" class="grid-line" x1="312" y1="186" x2="312" y2="200" />
+      <circle id="star-12-19" class="dim" cx="328" cy="186" r="1.3" />
+      <circle id="star-13-00" class="soft" cx="24" cy="200" r="1.6" />
+      <circle id="star-13-01" class="dim" cx="40" cy="200" r="1.3" />
+      <circle id="star-13-02" class="bright" cx="56" cy="200" r="2.0" />
+      <line id="vline-13-02" class="grid-line" x1="56" y1="200" x2="56" y2="214" />
+      <circle id="star-13-03" class="dim" cx="72" cy="200" r="1.3" />
+      <line id="hline-13-03" class="grid-line" x1="72" y1="200" x2="88" y2="200" />
+      <line id="dline-13-03" class="arc-line" x1="72" y1="200" x2="88" y2="214" />
+      <circle id="star-13-04" class="soft" cx="88" cy="200" r="1.6" />
+      <circle id="star-13-05" class="bright" cx="104" cy="200" r="2.0" />
+      <circle id="star-13-06" class="soft" cx="120" cy="200" r="1.6" />
+      <circle id="star-13-07" class="dim" cx="136" cy="200" r="1.3" />
+      <line id="hline-13-07" class="grid-line" x1="136" y1="200" x2="152" y2="200" />
+      <line id="vline-13-07" class="grid-line" x1="136" y1="200" x2="136" y2="214" />
+      <circle id="star-13-08" class="bright" cx="152" cy="200" r="2.0" />
+      <circle id="star-13-09" class="dim" cx="168" cy="200" r="1.3" />
+      <circle id="star-13-10" class="soft" cx="184" cy="200" r="1.6" />
+      <circle id="star-13-11" class="bright" cx="200" cy="200" r="2.0" />
+      <line id="hline-13-11" class="grid-line" x1="200" y1="200" x2="216" y2="200" />
+      <line id="dline-13-11" class="arc-line" x1="200" y1="200" x2="216" y2="214" />
+      <circle id="star-13-12" class="soft" cx="216" cy="200" r="1.6" />
+      <line id="vline-13-12" class="grid-line" x1="216" y1="200" x2="216" y2="214" />
+      <circle id="star-13-13" class="dim" cx="232" cy="200" r="1.3" />
+      <circle id="star-13-14" class="bright" cx="248" cy="200" r="2.0" />
+      <circle id="star-13-15" class="dim" cx="264" cy="200" r="1.3" />
+      <line id="hline-13-15" class="grid-line" x1="264" y1="200" x2="280" y2="200" />
+      <circle id="star-13-16" class="soft" cx="280" cy="200" r="1.6" />
+      <circle id="star-13-17" class="bright" cx="296" cy="200" r="2.0" />
+      <line id="vline-13-17" class="grid-line" x1="296" y1="200" x2="296" y2="214" />
+      <circle id="star-13-18" class="soft" cx="312" cy="200" r="1.6" />
+      <circle id="star-13-19" class="dim" cx="328" cy="200" r="1.3" />
+      <circle id="star-14-00" class="soft" cx="24" cy="214" r="1.6" />
+      <circle id="star-14-01" class="bright" cx="40" cy="214" r="2.0" />
+      <line id="vline-14-01" class="grid-line" x1="40" y1="214" x2="40" y2="228" />
+      <circle id="star-14-02" class="soft" cx="56" cy="214" r="1.6" />
+      <line id="hline-14-02" class="grid-line" x1="56" y1="214" x2="72" y2="214" />
+      <line id="dline-14-02" class="arc-line" x1="56" y1="214" x2="72" y2="228" />
+      <circle id="star-14-03" class="dim" cx="72" cy="214" r="1.3" />
+      <circle id="star-14-04" class="bright" cx="88" cy="214" r="2.0" />
+      <circle id="star-14-05" class="dim" cx="104" cy="214" r="1.3" />
+      <circle id="star-14-06" class="soft" cx="120" cy="214" r="1.6" />
+      <line id="hline-14-06" class="grid-line" x1="120" y1="214" x2="136" y2="214" />
+      <line id="vline-14-06" class="grid-line" x1="120" y1="214" x2="120" y2="228" />
+      <circle id="star-14-07" class="bright" cx="136" cy="214" r="2.0" />
+      <circle id="star-14-08" class="soft" cx="152" cy="214" r="1.6" />
+      <circle id="star-14-09" class="dim" cx="168" cy="214" r="1.3" />
+      <circle id="star-14-10" class="bright" cx="184" cy="214" r="2.0" />
+      <line id="hline-14-10" class="grid-line" x1="184" y1="214" x2="200" y2="214" />
+      <line id="dline-14-10" class="arc-line" x1="184" y1="214" x2="200" y2="228" />
+      <circle id="star-14-11" class="dim" cx="200" cy="214" r="1.3" />
+      <line id="vline-14-11" class="grid-line" x1="200" y1="214" x2="200" y2="228" />
+      <circle id="star-14-12" class="soft" cx="216" cy="214" r="1.6" />
+      <circle id="star-14-13" class="bright" cx="232" cy="214" r="2.0" />
+      <circle id="star-14-14" class="soft" cx="248" cy="214" r="1.6" />
+      <line id="hline-14-14" class="grid-line" x1="248" y1="214" x2="264" y2="214" />
+      <circle id="star-14-15" class="dim" cx="264" cy="214" r="1.3" />
+      <circle id="star-14-16" class="bright" cx="280" cy="214" r="2.0" />
+      <line id="vline-14-16" class="grid-line" x1="280" y1="214" x2="280" y2="228" />
+      <circle id="star-14-17" class="dim" cx="296" cy="214" r="1.3" />
+      <circle id="star-14-18" class="soft" cx="312" cy="214" r="1.6" />
+      <line id="hline-14-18" class="grid-line" x1="312" y1="214" x2="328" y2="214" />
+      <line id="dline-14-18" class="arc-line" x1="312" y1="214" x2="328" y2="228" />
+      <circle id="star-14-19" class="bright" cx="328" cy="214" r="2.0" />
+      <circle id="star-15-00" class="bright" cx="24" cy="228" r="2.0" />
+      <line id="vline-15-00" class="grid-line" x1="24" y1="228" x2="24" y2="242" />
+      <circle id="star-15-01" class="dim" cx="40" cy="228" r="1.3" />
+      <line id="hline-15-01" class="grid-line" x1="40" y1="228" x2="56" y2="228" />
+      <line id="dline-15-01" class="arc-line" x1="40" y1="228" x2="56" y2="242" />
+      <circle id="star-15-02" class="soft" cx="56" cy="228" r="1.6" />
+      <circle id="star-15-03" class="bright" cx="72" cy="228" r="2.0" />
+      <circle id="star-15-04" class="soft" cx="88" cy="228" r="1.6" />
+      <circle id="star-15-05" class="dim" cx="104" cy="228" r="1.3" />
+      <line id="hline-15-05" class="grid-line" x1="104" y1="228" x2="120" y2="228" />
+      <line id="vline-15-05" class="grid-line" x1="104" y1="228" x2="104" y2="242" />
+      <circle id="star-15-06" class="bright" cx="120" cy="228" r="2.0" />
+      <circle id="star-15-07" class="dim" cx="136" cy="228" r="1.3" />
+      <circle id="star-15-08" class="soft" cx="152" cy="228" r="1.6" />
+      <circle id="star-15-09" class="bright" cx="168" cy="228" r="2.0" />
+      <line id="hline-15-09" class="grid-line" x1="168" y1="228" x2="184" y2="228" />
+      <line id="dline-15-09" class="arc-line" x1="168" y1="228" x2="184" y2="242" />
+      <circle id="star-15-10" class="soft" cx="184" cy="228" r="1.6" />
+      <line id="vline-15-10" class="grid-line" x1="184" y1="228" x2="184" y2="242" />
+      <circle id="star-15-11" class="dim" cx="200" cy="228" r="1.3" />
+      <circle id="star-15-12" class="bright" cx="216" cy="228" r="2.0" />
+      <circle id="star-15-13" class="dim" cx="232" cy="228" r="1.3" />
+      <line id="hline-15-13" class="grid-line" x1="232" y1="228" x2="248" y2="228" />
+      <circle id="star-15-14" class="soft" cx="248" cy="228" r="1.6" />
+      <circle id="star-15-15" class="bright" cx="264" cy="228" r="2.0" />
+      <line id="vline-15-15" class="grid-line" x1="264" y1="228" x2="264" y2="242" />
+      <circle id="star-15-16" class="soft" cx="280" cy="228" r="1.6" />
+      <circle id="star-15-17" class="dim" cx="296" cy="228" r="1.3" />
+      <line id="hline-15-17" class="grid-line" x1="296" y1="228" x2="312" y2="228" />
+      <line id="dline-15-17" class="arc-line" x1="296" y1="228" x2="312" y2="242" />
+      <circle id="star-15-18" class="bright" cx="312" cy="228" r="2.0" />
+      <circle id="star-15-19" class="dim" cx="328" cy="228" r="1.3" />
+      <circle id="star-16-00" class="soft" cx="24" cy="242" r="1.6" />
+      <line id="hline-16-00" class="grid-line" x1="24" y1="242" x2="40" y2="242" />
+      <line id="dline-16-00" class="arc-line" x1="24" y1="242" x2="40" y2="256" />
+      <circle id="star-16-01" class="dim" cx="40" cy="242" r="1.3" />
+      <circle id="star-16-02" class="bright" cx="56" cy="242" r="2.0" />
+      <circle id="star-16-03" class="dim" cx="72" cy="242" r="1.3" />
+      <circle id="star-16-04" class="soft" cx="88" cy="242" r="1.6" />
+      <line id="hline-16-04" class="grid-line" x1="88" y1="242" x2="104" y2="242" />
+      <line id="vline-16-04" class="grid-line" x1="88" y1="242" x2="88" y2="256" />
+      <circle id="star-16-05" class="bright" cx="104" cy="242" r="2.0" />
+      <circle id="star-16-06" class="soft" cx="120" cy="242" r="1.6" />
+      <circle id="star-16-07" class="dim" cx="136" cy="242" r="1.3" />
+      <circle id="star-16-08" class="bright" cx="152" cy="242" r="2.0" />
+      <line id="hline-16-08" class="grid-line" x1="152" y1="242" x2="168" y2="242" />
+      <line id="dline-16-08" class="arc-line" x1="152" y1="242" x2="168" y2="256" />
+      <circle id="star-16-09" class="dim" cx="168" cy="242" r="1.3" />
+      <line id="vline-16-09" class="grid-line" x1="168" y1="242" x2="168" y2="256" />
+      <circle id="star-16-10" class="soft" cx="184" cy="242" r="1.6" />
+      <circle id="star-16-11" class="bright" cx="200" cy="242" r="2.0" />
+      <circle id="star-16-12" class="soft" cx="216" cy="242" r="1.6" />
+      <line id="hline-16-12" class="grid-line" x1="216" y1="242" x2="232" y2="242" />
+      <circle id="star-16-13" class="dim" cx="232" cy="242" r="1.3" />
+      <circle id="star-16-14" class="bright" cx="248" cy="242" r="2.0" />
+      <line id="vline-16-14" class="grid-line" x1="248" y1="242" x2="248" y2="256" />
+      <circle id="star-16-15" class="dim" cx="264" cy="242" r="1.3" />
+      <circle id="star-16-16" class="soft" cx="280" cy="242" r="1.6" />
+      <line id="hline-16-16" class="grid-line" x1="280" y1="242" x2="296" y2="242" />
+      <line id="dline-16-16" class="arc-line" x1="280" y1="242" x2="296" y2="256" />
+      <circle id="star-16-17" class="bright" cx="296" cy="242" r="2.0" />
+      <circle id="star-16-18" class="soft" cx="312" cy="242" r="1.6" />
+      <circle id="star-16-19" class="dim" cx="328" cy="242" r="1.3" />
+      <line id="vline-16-19" class="grid-line" x1="328" y1="242" x2="328" y2="256" />
+      <circle id="star-17-00" class="soft" cx="24" cy="256" r="1.6" />
+      <circle id="star-17-01" class="bright" cx="40" cy="256" r="2.0" />
+      <circle id="star-17-02" class="soft" cx="56" cy="256" r="1.6" />
+      <circle id="star-17-03" class="dim" cx="72" cy="256" r="1.3" />
+      <line id="hline-17-03" class="grid-line" x1="72" y1="256" x2="88" y2="256" />
+      <circle id="star-17-04" class="bright" cx="88" cy="256" r="2.0" />
+      <circle id="star-17-05" class="dim" cx="104" cy="256" r="1.3" />
+      <circle id="star-17-06" class="soft" cx="120" cy="256" r="1.6" />
+      <circle id="star-17-07" class="bright" cx="136" cy="256" r="2.0" />
+      <line id="hline-17-07" class="grid-line" x1="136" y1="256" x2="152" y2="256" />
+      <circle id="star-17-08" class="soft" cx="152" cy="256" r="1.6" />
+      <circle id="star-17-09" class="dim" cx="168" cy="256" r="1.3" />
+      <circle id="star-17-10" class="bright" cx="184" cy="256" r="2.0" />
+      <circle id="star-17-11" class="dim" cx="200" cy="256" r="1.3" />
+      <line id="hline-17-11" class="grid-line" x1="200" y1="256" x2="216" y2="256" />
+      <circle id="star-17-12" class="soft" cx="216" cy="256" r="1.6" />
+      <circle id="star-17-13" class="bright" cx="232" cy="256" r="2.0" />
+      <circle id="star-17-14" class="soft" cx="248" cy="256" r="1.6" />
+      <circle id="star-17-15" class="dim" cx="264" cy="256" r="1.3" />
+      <line id="hline-17-15" class="grid-line" x1="264" y1="256" x2="280" y2="256" />
+      <circle id="star-17-16" class="bright" cx="280" cy="256" r="2.0" />
+      <circle id="star-17-17" class="dim" cx="296" cy="256" r="1.3" />
+      <circle id="star-17-18" class="soft" cx="312" cy="256" r="1.6" />
+      <circle id="star-17-19" class="bright" cx="328" cy="256" r="2.0" />
+    </g>
+  </g>
+  <g id="constellation-scan" transform="translate(190,130)" fill="none" opacity="0.2">
+    <circle id="orbit-ring-0" class="grid-line" cx="0" cy="0" r="10" stroke-width="1.8" />
+
+    <circle id="orbit-ring-1" class="grid-line" cx="0" cy="0" r="28" stroke-width="1.6" />
+
+    <circle id="orbit-ring-2" class="grid-line" cx="0" cy="0" r="46" stroke-width="1.8" />
+
+    <circle id="orbit-ring-3" class="grid-line" cx="0" cy="0" r="64" stroke-width="1.6" />
+
+    <circle id="orbit-ring-4" class="grid-line" cx="0" cy="0" r="82" stroke-width="1.8" />
+
+    <circle id="orbit-ring-5" class="grid-line" cx="0" cy="0" r="100" stroke-width="1.6" />
+
+    <circle id="orbit-ring-6" class="grid-line" cx="0" cy="0" r="118" stroke-width="1.8" />
+
+    <circle id="orbit-ring-7" class="grid-line" cx="0" cy="0" r="136" stroke-width="1.6" />
+
+    <circle id="orbit-ring-8" class="grid-line" cx="0" cy="0" r="154" stroke-width="1.8" />
+
+    <circle id="orbit-ring-9" class="grid-line" cx="0" cy="0" r="172" stroke-width="1.6" />
+
+  </g>
+  <g id="constellation-core" transform="translate(190,130)">
+    <circle id="core-node-0" class="core" cx="0" cy="-20" r="3" />
+    <line id="core-spoke-0" class="grid-line" x1="0" y1="0" x2="0" y2="-20" />
+    <circle id="core-node-1" class="core" cx="9" cy="-7" r="3" />
+    <line id="core-spoke-1" class="grid-line" x1="0" y1="0" x2="9" y2="-7" />
+    <circle id="core-node-2" class="core" cx="18" cy="6" r="3" />
+    <line id="core-spoke-2" class="grid-line" x1="0" y1="0" x2="18" y2="6" />
+    <circle id="core-node-3" class="core" cx="27" cy="19" r="3" />
+    <line id="core-spoke-3" class="grid-line" x1="0" y1="0" x2="27" y2="19" />
+    <circle id="core-node-4" class="core" cx="28" cy="-8" r="3" />
+    <line id="core-spoke-4" class="grid-line" x1="0" y1="0" x2="28" y2="-8" />
+    <circle id="core-node-5" class="core" cx="37" cy="5" r="3" />
+    <line id="core-spoke-5" class="grid-line" x1="0" y1="0" x2="37" y2="5" />
+    <circle id="core-node-6" class="core" cx="6" cy="18" r="3" />
+    <line id="core-spoke-6" class="grid-line" x1="0" y1="0" x2="6" y2="18" />
+    <circle id="core-node-7" class="core" cx="15" cy="-9" r="3" />
+    <line id="core-spoke-7" class="grid-line" x1="0" y1="0" x2="15" y2="-9" />
+    <circle id="core-node-8" class="core" cx="16" cy="4" r="3" />
+    <line id="core-spoke-8" class="grid-line" x1="0" y1="0" x2="16" y2="4" />
+    <circle id="core-node-9" class="core" cx="25" cy="17" r="3" />
+    <line id="core-spoke-9" class="grid-line" x1="0" y1="0" x2="25" y2="17" />
+    <circle id="core-node-10" class="core" cx="34" cy="-10" r="3" />
+    <line id="core-spoke-10" class="grid-line" x1="0" y1="0" x2="34" y2="-10" />
+    <circle id="core-node-11" class="core" cx="43" cy="3" r="3" />
+    <line id="core-spoke-11" class="grid-line" x1="0" y1="0" x2="43" y2="3" />
+    <circle id="core-node-12" class="core" cx="4" cy="16" r="3" />
+    <line id="core-spoke-12" class="grid-line" x1="0" y1="0" x2="4" y2="16" />
+    <circle id="core-node-13" class="core" cx="13" cy="-11" r="3" />
+    <line id="core-spoke-13" class="grid-line" x1="0" y1="0" x2="13" y2="-11" />
+    <circle id="core-node-14" class="core" cx="22" cy="2" r="3" />
+    <line id="core-spoke-14" class="grid-line" x1="0" y1="0" x2="22" y2="2" />
+    <circle id="core-node-15" class="core" cx="31" cy="15" r="3" />
+    <line id="core-spoke-15" class="grid-line" x1="0" y1="0" x2="31" y2="15" />
+    <circle id="core-node-16" class="core" cx="32" cy="-12" r="3" />
+    <line id="core-spoke-16" class="grid-line" x1="0" y1="0" x2="32" y2="-12" />
+    <circle id="core-node-17" class="core" cx="41" cy="1" r="3" />
+    <line id="core-spoke-17" class="grid-line" x1="0" y1="0" x2="41" y2="1" />
+  </g>
+</svg>

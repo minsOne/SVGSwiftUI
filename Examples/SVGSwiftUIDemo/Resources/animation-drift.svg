@@ -1,0 +1,5 @@
+<svg width="220" height="140" viewBox="0 0 220 140">
+  <rect id="drift-track" x="10" y="55" width="200" height="30" fill="#e2e8f0"/>
+  <circle id="drift-dot" cx="40" cy="70" r="14" fill="#ef4444" />
+  <line x1="10" y1="120" x2="210" y2="120" stroke="#0f172a" stroke-width="2"/>
+</svg>

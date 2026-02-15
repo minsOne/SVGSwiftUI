@@ -8,6 +8,10 @@
 - 다음 단계: `unsupported` 집계 데이터를 `conformance unsupported` 카테고리와 연동해 검증 강화
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
+- 최근 진행 반영:
+  - 데모 샘플 2건 추가(`constellation-grid`, `transform-radial-spiral`)
+  - `polyline-ribbon.svg`의 XML 오류(`cx`/`cy` 미인용) 수정
+  - 데모 UI 테스트에서 신규 샘플 캔버스 존재 여부 확인 케이스 추가
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -24,6 +28,20 @@
 ## 바로 다음 실행 순서
 1. `A16-4` 결과를 conformance manifest strict 규칙에 반영 및 `unsupported` 분포 추적 리포트 보강
 2. 브라우저 오라클 manifest(`demo oracle`)을 WebKit/W3C 후보군과 매핑해 미지원 경로 정합성 비교를 강화
+
+### 2026-02-16 (Session 60)
+- 작업: 데모 샘플 고난도 확장 및 검증 편의성 강화
+- 완료:
+  - `Examples/SVGSwiftUIDemo/Resources/constellation-grid.svg` 신규 추가 (수백 node/line 기반)
+  - `Examples/SVGSwiftUIDemo/Resources/transform-radial-spiral.svg` 신규 추가 (변환 체인/필터 중심)
+  - `polyline-ribbon.svg`의 미인용 `cx`/`cy` 속성 수정
+  - `SampleSVG`에 `constellation-grid`, `transform-radial-spiral` 등록
+  - `project.yml`, UITest에서 신규 샘플 캔버스 존재 확인 항목 반영
+- 리스크:
+  - `Examples/SVGSwiftUIDemo/Resources/` 전체가 현재 미추적(untracked) 상태이므로 샘플 수정 이력이 분기별로 누락되지 않게 관리 필요
+- 검증:
+  - `xmllint --noout` (확장 샘플 5건)
+  - `swift test --no-parallel` 통과
 
 ### 2026-02-16 (Session 59)
 - 작업: `A16-4` strict 보강 적용

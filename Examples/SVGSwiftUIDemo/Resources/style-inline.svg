@@ -1,0 +1,8 @@
+<svg width="200" height="160" viewBox="0 0 200 160">
+  <g id="styled-group">
+    <rect id="styled-bg" x="10" y="10" width="180" height="140" fill="#f8fafc" stroke="#1f2937" stroke-width="2" />
+    <rect id="styled-card" x="25" y="25" width="60" height="60" rx="10" style="fill: #8b5cf6; stroke: #4c1d95; stroke-width: 3" />
+    <circle id="styled-dot" cx="160" cy="55" r="26" style="fill: rgba(34,197,94,0.9); stroke: #166534; stroke-width: 2" />
+    <text id="styled-text" x="100" y="125" font-size="18" fill="#111827" text-anchor="middle">Style</text>
+  </g>
+</svg>

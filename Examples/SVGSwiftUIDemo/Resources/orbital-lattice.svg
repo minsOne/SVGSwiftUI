@@ -1,0 +1,489 @@
+<svg width="360" height="260" viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .void { fill: #020617; fill-opacity: 0.04 }
+    .orbit-shell { fill: none; stroke: #94a3b8; stroke-width: 2 }
+    .ray-line { stroke: #38bdf8; stroke-width: 1.6; stroke-linecap: round }
+    .ray-dot { fill: #f97316; stroke: #7c2d12; stroke-width: 1 }
+    .pulse-node { fill: #22c55e; stroke: #166534; stroke-width: 1.4 }
+    .hull { fill: #ecfeff; stroke: #0f172a; stroke-width: 2 }
+  </style>
+
+  <rect id="lattice-bg" x="8" y="8" width="344" height="244" class="hull" />
+  <circle id="lattice-center" class="pulse-node" cx="180" cy="130" r="7" />
+  <g id="orbital-core" transform="translate(180,130)">
+    <g id="orbital-ring-0" opacity="0.40" transform="rotate(0)">
+      <circle id="orbital-shell-0" class="orbit-shell" cx="0" cy="0" r="20" />
+      <g id="orbital-radial-0-0" transform="rotate(0)">
+        <line id="orbital-ray-0-0" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-0" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-1" transform="rotate(30)">
+        <line id="orbital-ray-0-1" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-1" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-2" transform="rotate(60)">
+        <line id="orbital-ray-0-2" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-2" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-3" transform="rotate(90)">
+        <line id="orbital-ray-0-3" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-3" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-4" transform="rotate(120)">
+        <line id="orbital-ray-0-4" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-4" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-5" transform="rotate(150)">
+        <line id="orbital-ray-0-5" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-5" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-6" transform="rotate(180)">
+        <line id="orbital-ray-0-6" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-6" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-7" transform="rotate(210)">
+        <line id="orbital-ray-0-7" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-7" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-8" transform="rotate(240)">
+        <line id="orbital-ray-0-8" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-8" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-9" transform="rotate(270)">
+        <line id="orbital-ray-0-9" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-9" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-10" transform="rotate(300)">
+        <line id="orbital-ray-0-10" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-10" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+      <g id="orbital-radial-0-11" transform="rotate(330)">
+        <line id="orbital-ray-0-11" class="ray-line" x1="0" y1="-20" x2="0" y2="-8" />
+        <circle id="orbital-node-0-11" class="ray-dot" cx="0" cy="-20" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-1" opacity="0.45" transform="rotate(17)">
+      <circle id="orbital-shell-1" class="orbit-shell" cx="0" cy="0" r="38" />
+      <g id="orbital-radial-1-0" transform="rotate(0)">
+        <line id="orbital-ray-1-0" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-0" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-1" transform="rotate(30)">
+        <line id="orbital-ray-1-1" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-1" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-2" transform="rotate(60)">
+        <line id="orbital-ray-1-2" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-2" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-3" transform="rotate(90)">
+        <line id="orbital-ray-1-3" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-3" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-4" transform="rotate(120)">
+        <line id="orbital-ray-1-4" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-4" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-5" transform="rotate(150)">
+        <line id="orbital-ray-1-5" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-5" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-6" transform="rotate(180)">
+        <line id="orbital-ray-1-6" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-6" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-7" transform="rotate(210)">
+        <line id="orbital-ray-1-7" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-7" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-8" transform="rotate(240)">
+        <line id="orbital-ray-1-8" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-8" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-9" transform="rotate(270)">
+        <line id="orbital-ray-1-9" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-9" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-10" transform="rotate(300)">
+        <line id="orbital-ray-1-10" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-10" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+      <g id="orbital-radial-1-11" transform="rotate(330)">
+        <line id="orbital-ray-1-11" class="ray-line" x1="0" y1="-38" x2="0" y2="-26" />
+        <circle id="orbital-node-1-11" class="ray-dot" cx="0" cy="-38" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-2" opacity="0.50" transform="rotate(34)">
+      <circle id="orbital-shell-2" class="orbit-shell" cx="0" cy="0" r="56" />
+      <g id="orbital-radial-2-0" transform="rotate(0)">
+        <line id="orbital-ray-2-0" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-0" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-1" transform="rotate(30)">
+        <line id="orbital-ray-2-1" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-1" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-2" transform="rotate(60)">
+        <line id="orbital-ray-2-2" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-2" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-3" transform="rotate(90)">
+        <line id="orbital-ray-2-3" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-3" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-4" transform="rotate(120)">
+        <line id="orbital-ray-2-4" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-4" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-5" transform="rotate(150)">
+        <line id="orbital-ray-2-5" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-5" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-6" transform="rotate(180)">
+        <line id="orbital-ray-2-6" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-6" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-7" transform="rotate(210)">
+        <line id="orbital-ray-2-7" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-7" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-8" transform="rotate(240)">
+        <line id="orbital-ray-2-8" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-8" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-9" transform="rotate(270)">
+        <line id="orbital-ray-2-9" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-9" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-10" transform="rotate(300)">
+        <line id="orbital-ray-2-10" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-10" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+      <g id="orbital-radial-2-11" transform="rotate(330)">
+        <line id="orbital-ray-2-11" class="ray-line" x1="0" y1="-56" x2="0" y2="-44" />
+        <circle id="orbital-node-2-11" class="ray-dot" cx="0" cy="-56" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-3" opacity="0.55" transform="rotate(51)">
+      <circle id="orbital-shell-3" class="orbit-shell" cx="0" cy="0" r="74" />
+      <g id="orbital-radial-3-0" transform="rotate(0)">
+        <line id="orbital-ray-3-0" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-0" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-1" transform="rotate(30)">
+        <line id="orbital-ray-3-1" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-1" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-2" transform="rotate(60)">
+        <line id="orbital-ray-3-2" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-2" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-3" transform="rotate(90)">
+        <line id="orbital-ray-3-3" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-3" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-4" transform="rotate(120)">
+        <line id="orbital-ray-3-4" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-4" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-5" transform="rotate(150)">
+        <line id="orbital-ray-3-5" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-5" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-6" transform="rotate(180)">
+        <line id="orbital-ray-3-6" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-6" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-7" transform="rotate(210)">
+        <line id="orbital-ray-3-7" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-7" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-8" transform="rotate(240)">
+        <line id="orbital-ray-3-8" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-8" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-9" transform="rotate(270)">
+        <line id="orbital-ray-3-9" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-9" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-10" transform="rotate(300)">
+        <line id="orbital-ray-3-10" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-10" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+      <g id="orbital-radial-3-11" transform="rotate(330)">
+        <line id="orbital-ray-3-11" class="ray-line" x1="0" y1="-74" x2="0" y2="-62" />
+        <circle id="orbital-node-3-11" class="ray-dot" cx="0" cy="-74" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-4" opacity="0.60" transform="rotate(68)">
+      <circle id="orbital-shell-4" class="orbit-shell" cx="0" cy="0" r="92" />
+      <g id="orbital-radial-4-0" transform="rotate(0)">
+        <line id="orbital-ray-4-0" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-0" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-1" transform="rotate(30)">
+        <line id="orbital-ray-4-1" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-1" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-2" transform="rotate(60)">
+        <line id="orbital-ray-4-2" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-2" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-3" transform="rotate(90)">
+        <line id="orbital-ray-4-3" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-3" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-4" transform="rotate(120)">
+        <line id="orbital-ray-4-4" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-4" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-5" transform="rotate(150)">
+        <line id="orbital-ray-4-5" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-5" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-6" transform="rotate(180)">
+        <line id="orbital-ray-4-6" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-6" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-7" transform="rotate(210)">
+        <line id="orbital-ray-4-7" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-7" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-8" transform="rotate(240)">
+        <line id="orbital-ray-4-8" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-8" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-9" transform="rotate(270)">
+        <line id="orbital-ray-4-9" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-9" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-10" transform="rotate(300)">
+        <line id="orbital-ray-4-10" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-10" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-radial-4-11" transform="rotate(330)">
+        <line id="orbital-ray-4-11" class="ray-line" x1="0" y1="-92" x2="0" y2="-80" />
+        <circle id="orbital-node-4-11" class="ray-dot" cx="0" cy="-92" r="4" />
+      </g>
+      <g id="orbital-cross-4-0" transform="rotate(0)">
+        <circle id="orbital-core-node-4-0" class="pulse-node" cx="0" cy="-106" r="6" />
+      </g>
+      <g id="orbital-cross-4-1" transform="rotate(90)">
+        <circle id="orbital-core-node-4-1" class="pulse-node" cx="0" cy="-106" r="6" />
+      </g>
+      <g id="orbital-cross-4-2" transform="rotate(180)">
+        <circle id="orbital-core-node-4-2" class="pulse-node" cx="0" cy="-106" r="6" />
+      </g>
+      <g id="orbital-cross-4-3" transform="rotate(270)">
+        <circle id="orbital-core-node-4-3" class="pulse-node" cx="0" cy="-106" r="6" />
+      </g>
+    </g>
+    <g id="orbital-ring-5" opacity="0.65" transform="rotate(85)">
+      <circle id="orbital-shell-5" class="orbit-shell" cx="0" cy="0" r="110" />
+      <g id="orbital-radial-5-0" transform="rotate(0)">
+        <line id="orbital-ray-5-0" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-0" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-1" transform="rotate(30)">
+        <line id="orbital-ray-5-1" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-1" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-2" transform="rotate(60)">
+        <line id="orbital-ray-5-2" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-2" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-3" transform="rotate(90)">
+        <line id="orbital-ray-5-3" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-3" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-4" transform="rotate(120)">
+        <line id="orbital-ray-5-4" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-4" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-5" transform="rotate(150)">
+        <line id="orbital-ray-5-5" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-5" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-6" transform="rotate(180)">
+        <line id="orbital-ray-5-6" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-6" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-7" transform="rotate(210)">
+        <line id="orbital-ray-5-7" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-7" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-8" transform="rotate(240)">
+        <line id="orbital-ray-5-8" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-8" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-9" transform="rotate(270)">
+        <line id="orbital-ray-5-9" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-9" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-10" transform="rotate(300)">
+        <line id="orbital-ray-5-10" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-10" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+      <g id="orbital-radial-5-11" transform="rotate(330)">
+        <line id="orbital-ray-5-11" class="ray-line" x1="0" y1="-110" x2="0" y2="-98" />
+        <circle id="orbital-node-5-11" class="ray-dot" cx="0" cy="-110" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-6" opacity="0.70" transform="rotate(102)">
+      <circle id="orbital-shell-6" class="orbit-shell" cx="0" cy="0" r="128" />
+      <g id="orbital-radial-6-0" transform="rotate(0)">
+        <line id="orbital-ray-6-0" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-0" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-1" transform="rotate(30)">
+        <line id="orbital-ray-6-1" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-1" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-2" transform="rotate(60)">
+        <line id="orbital-ray-6-2" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-2" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-3" transform="rotate(90)">
+        <line id="orbital-ray-6-3" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-3" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-4" transform="rotate(120)">
+        <line id="orbital-ray-6-4" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-4" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-5" transform="rotate(150)">
+        <line id="orbital-ray-6-5" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-5" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-6" transform="rotate(180)">
+        <line id="orbital-ray-6-6" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-6" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-7" transform="rotate(210)">
+        <line id="orbital-ray-6-7" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-7" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-8" transform="rotate(240)">
+        <line id="orbital-ray-6-8" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-8" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-9" transform="rotate(270)">
+        <line id="orbital-ray-6-9" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-9" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-10" transform="rotate(300)">
+        <line id="orbital-ray-6-10" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-10" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+      <g id="orbital-radial-6-11" transform="rotate(330)">
+        <line id="orbital-ray-6-11" class="ray-line" x1="0" y1="-128" x2="0" y2="-116" />
+        <circle id="orbital-node-6-11" class="ray-dot" cx="0" cy="-128" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-7" opacity="0.75" transform="rotate(119)">
+      <circle id="orbital-shell-7" class="orbit-shell" cx="0" cy="0" r="146" />
+      <g id="orbital-radial-7-0" transform="rotate(0)">
+        <line id="orbital-ray-7-0" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-0" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-1" transform="rotate(30)">
+        <line id="orbital-ray-7-1" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-1" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-2" transform="rotate(60)">
+        <line id="orbital-ray-7-2" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-2" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-3" transform="rotate(90)">
+        <line id="orbital-ray-7-3" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-3" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-4" transform="rotate(120)">
+        <line id="orbital-ray-7-4" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-4" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-5" transform="rotate(150)">
+        <line id="orbital-ray-7-5" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-5" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-6" transform="rotate(180)">
+        <line id="orbital-ray-7-6" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-6" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-7" transform="rotate(210)">
+        <line id="orbital-ray-7-7" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-7" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-8" transform="rotate(240)">
+        <line id="orbital-ray-7-8" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-8" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-9" transform="rotate(270)">
+        <line id="orbital-ray-7-9" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-9" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-10" transform="rotate(300)">
+        <line id="orbital-ray-7-10" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-10" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+      <g id="orbital-radial-7-11" transform="rotate(330)">
+        <line id="orbital-ray-7-11" class="ray-line" x1="0" y1="-146" x2="0" y2="-134" />
+        <circle id="orbital-node-7-11" class="ray-dot" cx="0" cy="-146" r="4" />
+      </g>
+    </g>
+    <g id="orbital-ring-8" opacity="0.80" transform="rotate(136)">
+      <circle id="orbital-shell-8" class="orbit-shell" cx="0" cy="0" r="164" />
+      <g id="orbital-radial-8-0" transform="rotate(0)">
+        <line id="orbital-ray-8-0" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-0" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-1" transform="rotate(30)">
+        <line id="orbital-ray-8-1" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-1" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-2" transform="rotate(60)">
+        <line id="orbital-ray-8-2" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-2" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-3" transform="rotate(90)">
+        <line id="orbital-ray-8-3" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-3" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-4" transform="rotate(120)">
+        <line id="orbital-ray-8-4" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-4" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-5" transform="rotate(150)">
+        <line id="orbital-ray-8-5" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-5" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-6" transform="rotate(180)">
+        <line id="orbital-ray-8-6" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-6" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-7" transform="rotate(210)">
+        <line id="orbital-ray-8-7" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-7" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-8" transform="rotate(240)">
+        <line id="orbital-ray-8-8" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-8" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-9" transform="rotate(270)">
+        <line id="orbital-ray-8-9" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-9" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-10" transform="rotate(300)">
+        <line id="orbital-ray-8-10" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-10" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+      <g id="orbital-radial-8-11" transform="rotate(330)">
+        <line id="orbital-ray-8-11" class="ray-line" x1="0" y1="-164" x2="0" y2="-152" />
+        <circle id="orbital-node-8-11" class="ray-dot" cx="0" cy="-164" r="4" />
+      </g>
+    </g>
+  </g>
+  <g id="lattice-plate">
+    <path id="lattice-frame" d="M35 35 L325 35 L325 225 L35 225 Z" class="void" />
+  </g>
+</svg>

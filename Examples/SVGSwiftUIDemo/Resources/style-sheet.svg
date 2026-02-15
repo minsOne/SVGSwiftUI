@@ -1,0 +1,10 @@
+<svg width="240" height="160" viewBox="0 0 240 160">
+  <style>
+    .frame { fill: #111827; stroke: #334155; stroke-width: 2 }
+    .accent { fill: #0ea5e9; }
+    #text { fill: #f8fafc; font-size: 18; font-family: Arial; }
+  </style>
+  <rect class="frame" x="10" y="10" width="220" height="140" rx="8" ry="8" />
+  <circle class="accent" id="sheet-circle" cx="120" cy="58" r="34" />
+  <text id="text" x="120" y="120" text-anchor="middle">Class + ID</text>
+</svg>

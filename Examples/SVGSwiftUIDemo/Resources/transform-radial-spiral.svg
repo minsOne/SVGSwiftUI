@@ -1,0 +1,319 @@
+<svg width="380" height="260" viewBox="0 0 380 260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="spiral-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.0" result="soft" />
+      <feColorMatrix in="soft" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.25 0" result="shaded" />
+      <feBlend in="SourceGraphic" in2="shaded" mode="screen" />
+    </filter>
+    <clipPath id="spiral-clip">
+      <circle id="spiral-clip-circle" cx="190" cy="130" r="118" />
+    </clipPath>
+  </defs>
+
+  <style>
+    .halo { fill: #020617; stroke: #1e293b; stroke-width: 1.6 }
+    .blade { fill: #0f172a; stroke: #67e8f9; stroke-width: 0.8; opacity: 0.7 }
+    .blade-soft { fill: #1e293b; stroke: #38bdf8; stroke-width: 1; opacity: 0.45 }
+    .coil { fill: none; stroke: #22d3ee; stroke-width: 1.2; opacity: 0.65 }
+    .axis { fill: #f8fafc; stroke: #8b5cf6; stroke-width: 1.8 }
+    .pulse-core { fill: #22d3ee; stroke: #67e8f9; stroke-width: 1.2 }
+  </style>
+
+  <rect id="spiral-bg" class="halo" x="0" y="0" width="380" height="260" />
+  <g id="spiral-stage" filter="url(#spiral-glow)" clip-path="url(#spiral-clip)">
+    <g id="spiral-body" transform="translate(190 130)">
+      <circle id="spiral-core-shell" class="axis" cx="0" cy="0" r="24" />
+      <circle id="spiral-core" class="pulse-core" cx="0" cy="0" r="8" />
+      <g id="blade-segment-0" transform="rotate(0)">
+        <g id="blade-bundle-0" transform="scale(0.50)">
+          <path id="blade-path-0-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-0-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(0)" />
+          <polyline id="blade-spine-0" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-0" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-0" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-1" transform="rotate(15)">
+        <g id="blade-bundle-1" transform="scale(0.62)">
+          <path id="blade-path-1-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-1-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(5)" />
+          <polyline id="blade-spine-1" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-1" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-1" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-2" transform="rotate(30)">
+        <g id="blade-bundle-2" transform="scale(0.74)">
+          <path id="blade-path-2-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-2-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(10)" />
+          <polyline id="blade-spine-2" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-2" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-2" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-3" transform="rotate(45)">
+        <g id="blade-bundle-3" transform="scale(0.86)">
+          <path id="blade-path-3-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-3-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(15)" />
+          <polyline id="blade-spine-3" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-3" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-3" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-4" transform="rotate(60)">
+        <g id="blade-bundle-4" transform="scale(0.50)">
+          <path id="blade-path-4-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-4-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(20)" />
+          <polyline id="blade-spine-4" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-4" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-4" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-5" transform="rotate(75)">
+        <g id="blade-bundle-5" transform="scale(0.62)">
+          <path id="blade-path-5-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-5-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(25)" />
+          <polyline id="blade-spine-5" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-5" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-5" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-6" transform="rotate(90)">
+        <g id="blade-bundle-6" transform="scale(0.74)">
+          <path id="blade-path-6-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-6-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(0)" />
+          <polyline id="blade-spine-6" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-6" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-6" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-7" transform="rotate(105)">
+        <g id="blade-bundle-7" transform="scale(0.86)">
+          <path id="blade-path-7-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-7-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(5)" />
+          <polyline id="blade-spine-7" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-7" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-7" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-8" transform="rotate(120)">
+        <g id="blade-bundle-8" transform="scale(0.50)">
+          <path id="blade-path-8-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-8-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(10)" />
+          <polyline id="blade-spine-8" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-8" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-8" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-9" transform="rotate(135)">
+        <g id="blade-bundle-9" transform="scale(0.62)">
+          <path id="blade-path-9-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-9-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(15)" />
+          <polyline id="blade-spine-9" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-9" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-9" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-10" transform="rotate(150)">
+        <g id="blade-bundle-10" transform="scale(0.74)">
+          <path id="blade-path-10-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-10-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(20)" />
+          <polyline id="blade-spine-10" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-10" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-10" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-11" transform="rotate(165)">
+        <g id="blade-bundle-11" transform="scale(0.86)">
+          <path id="blade-path-11-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-11-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(25)" />
+          <polyline id="blade-spine-11" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-11" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-11" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-12" transform="rotate(180)">
+        <g id="blade-bundle-12" transform="scale(0.50)">
+          <path id="blade-path-12-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-12-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(0)" />
+          <polyline id="blade-spine-12" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-12" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-12" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-13" transform="rotate(195)">
+        <g id="blade-bundle-13" transform="scale(0.62)">
+          <path id="blade-path-13-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-13-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(5)" />
+          <polyline id="blade-spine-13" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-13" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-13" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-14" transform="rotate(210)">
+        <g id="blade-bundle-14" transform="scale(0.74)">
+          <path id="blade-path-14-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-14-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(10)" />
+          <polyline id="blade-spine-14" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-14" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-14" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-15" transform="rotate(225)">
+        <g id="blade-bundle-15" transform="scale(0.86)">
+          <path id="blade-path-15-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-15-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(15)" />
+          <polyline id="blade-spine-15" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-15" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-15" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-16" transform="rotate(240)">
+        <g id="blade-bundle-16" transform="scale(0.50)">
+          <path id="blade-path-16-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-16-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(20)" />
+          <polyline id="blade-spine-16" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-16" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-16" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-17" transform="rotate(255)">
+        <g id="blade-bundle-17" transform="scale(0.62)">
+          <path id="blade-path-17-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-17-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(25)" />
+          <polyline id="blade-spine-17" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-17" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-17" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-18" transform="rotate(270)">
+        <g id="blade-bundle-18" transform="scale(0.74)">
+          <path id="blade-path-18-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-18-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(0)" />
+          <polyline id="blade-spine-18" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-18" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-18" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-19" transform="rotate(285)">
+        <g id="blade-bundle-19" transform="scale(0.86)">
+          <path id="blade-path-19-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-19-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(5)" />
+          <polyline id="blade-spine-19" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-19" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-19" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-20" transform="rotate(300)">
+        <g id="blade-bundle-20" transform="scale(0.50)">
+          <path id="blade-path-20-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-20-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(10)" />
+          <polyline id="blade-spine-20" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-20" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-20" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-21" transform="rotate(315)">
+        <g id="blade-bundle-21" transform="scale(0.62)">
+          <path id="blade-path-21-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-21-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(15)" />
+          <polyline id="blade-spine-21" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-21" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-21" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-22" transform="rotate(330)">
+        <g id="blade-bundle-22" transform="scale(0.74)">
+          <path id="blade-path-22-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-22-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(20)" />
+          <polyline id="blade-spine-22" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-22" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-22" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="blade-segment-23" transform="rotate(345)">
+        <g id="blade-bundle-23" transform="scale(0.86)">
+          <path id="blade-path-23-a" class="blade" d="M0 0 C12 20, 28 32, 42 26 C56 20, 62 6, 58 -8 C52 -36, 36 -48, 16 -52 C8 -54, -4 -48, -10 -40 C-16 -32, -14 -22, -10 -16 L-2 -8 Z" />
+          <path id="blade-path-23-b" class="blade-soft" d="M0 0 C15 22, 32 34, 46 27 C58 20, 64 4, 60 -10 C53 -42, 36 -56, 14 -60 C4 -62, -8 -56, -14 -48 C-20 -40, -18 -30, -14 -24 Z" transform="rotate(25)" />
+          <polyline id="blade-spine-23" class="coil" points="0,0 14,20 18,42 14,64 0,82" />
+          <line id="blade-spur-23" class="coil" x1="8" y1="14" x2="34" y2="30" />
+          <line id="blade-rib-23" class="coil" x1="0" y1="22" x2="22" y2="32" />
+        </g>
+      </g>
+      <g id="spiral-layers" transform="rotate(90)">
+        <g id="coil-ring-0" transform="rotate(0)">
+          <circle id="coil-ring-0-bg" class="blade-soft" cx="0" cy="0" r="14" />
+          <circle id="coil-ring-0-fg" class="coil" cx="0" cy="0" r="13" />
+          <path id="coil-segment-0" class="coil" d="M0,-14 A14,14 0 0 1 0,14 Z" />
+          <line id="coil-radial-0-a" class="axis" x1="0" y1="-14" x2="0" y2="14" />
+        </g>
+        <g id="coil-ring-1" transform="rotate(30)">
+          <circle id="coil-ring-1-bg" class="blade-soft" cx="0" cy="0" r="22" />
+          <circle id="coil-ring-1-fg" class="coil" cx="0" cy="0" r="21" />
+          <path id="coil-segment-1" class="coil" d="M0,-22 A22,22 0 0 1 0,22 Z" />
+          <line id="coil-radial-1-a" class="axis" x1="0" y1="-22" x2="0" y2="22" />
+        </g>
+        <g id="coil-ring-2" transform="rotate(60)">
+          <circle id="coil-ring-2-bg" class="blade-soft" cx="0" cy="0" r="30" />
+          <circle id="coil-ring-2-fg" class="coil" cx="0" cy="0" r="29" />
+          <path id="coil-segment-2" class="coil" d="M0,-30 A30,30 0 0 1 0,30 Z" />
+          <line id="coil-radial-2-a" class="axis" x1="0" y1="-30" x2="0" y2="30" />
+        </g>
+        <g id="coil-ring-3" transform="rotate(90)">
+          <circle id="coil-ring-3-bg" class="blade-soft" cx="0" cy="0" r="38" />
+          <circle id="coil-ring-3-fg" class="coil" cx="0" cy="0" r="37" />
+          <path id="coil-segment-3" class="coil" d="M0,-38 A38,38 0 0 1 0,38 Z" />
+          <line id="coil-radial-3-a" class="axis" x1="0" y1="-38" x2="0" y2="38" />
+        </g>
+        <g id="coil-ring-4" transform="rotate(120)">
+          <circle id="coil-ring-4-bg" class="blade-soft" cx="0" cy="0" r="46" />
+          <circle id="coil-ring-4-fg" class="coil" cx="0" cy="0" r="45" />
+          <path id="coil-segment-4" class="coil" d="M0,-46 A46,46 0 0 1 0,46 Z" />
+          <line id="coil-radial-4-a" class="axis" x1="0" y1="-46" x2="0" y2="46" />
+        </g>
+        <g id="coil-ring-5" transform="rotate(150)">
+          <circle id="coil-ring-5-bg" class="blade-soft" cx="0" cy="0" r="54" />
+          <circle id="coil-ring-5-fg" class="coil" cx="0" cy="0" r="53" />
+          <path id="coil-segment-5" class="coil" d="M0,-54 A54,54 0 0 1 0,54 Z" />
+          <line id="coil-radial-5-a" class="axis" x1="0" y1="-54" x2="0" y2="54" />
+        </g>
+        <g id="coil-ring-6" transform="rotate(180)">
+          <circle id="coil-ring-6-bg" class="blade-soft" cx="0" cy="0" r="62" />
+          <circle id="coil-ring-6-fg" class="coil" cx="0" cy="0" r="61" />
+          <path id="coil-segment-6" class="coil" d="M0,-62 A62,62 0 0 1 0,62 Z" />
+          <line id="coil-radial-6-a" class="axis" x1="0" y1="-62" x2="0" y2="62" />
+        </g>
+        <g id="coil-ring-7" transform="rotate(210)">
+          <circle id="coil-ring-7-bg" class="blade-soft" cx="0" cy="0" r="70" />
+          <circle id="coil-ring-7-fg" class="coil" cx="0" cy="0" r="69" />
+          <path id="coil-segment-7" class="coil" d="M0,-70 A70,70 0 0 1 0,70 Z" />
+          <line id="coil-radial-7-a" class="axis" x1="0" y1="-70" x2="0" y2="70" />
+        </g>
+        <g id="coil-ring-8" transform="rotate(240)">
+          <circle id="coil-ring-8-bg" class="blade-soft" cx="0" cy="0" r="78" />
+          <circle id="coil-ring-8-fg" class="coil" cx="0" cy="0" r="77" />
+          <path id="coil-segment-8" class="coil" d="M0,-78 A78,78 0 0 1 0,78 Z" />
+          <line id="coil-radial-8-a" class="axis" x1="0" y1="-78" x2="0" y2="78" />
+        </g>
+        <g id="coil-ring-9" transform="rotate(270)">
+          <circle id="coil-ring-9-bg" class="blade-soft" cx="0" cy="0" r="86" />
+          <circle id="coil-ring-9-fg" class="coil" cx="0" cy="0" r="85" />
+          <path id="coil-segment-9" class="coil" d="M0,-86 A86,86 0 0 1 0,86 Z" />
+          <line id="coil-radial-9-a" class="axis" x1="0" y1="-86" x2="0" y2="86" />
+        </g>
+        <g id="coil-ring-10" transform="rotate(300)">
+          <circle id="coil-ring-10-bg" class="blade-soft" cx="0" cy="0" r="94" />
+          <circle id="coil-ring-10-fg" class="coil" cx="0" cy="0" r="93" />
+          <path id="coil-segment-10" class="coil" d="M0,-94 A94,94 0 0 1 0,94 Z" />
+          <line id="coil-radial-10-a" class="axis" x1="0" y1="-94" x2="0" y2="94" />
+        </g>
+        <g id="coil-ring-11" transform="rotate(330)">
+          <circle id="coil-ring-11-bg" class="blade-soft" cx="0" cy="0" r="102" />
+          <circle id="coil-ring-11-fg" class="coil" cx="0" cy="0" r="101" />
+          <path id="coil-segment-11" class="coil" d="M0,-102 A102,102 0 0 1 0,102 Z" />
+          <line id="coil-radial-11-a" class="axis" x1="0" y1="-102" x2="0" y2="102" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

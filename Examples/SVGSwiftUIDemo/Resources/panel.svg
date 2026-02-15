@@ -1,0 +1,5 @@
+<svg width="180" height="120" viewBox="0 0 180 120">
+  <rect id="panel-base" x="12" y="12" width="156" height="96" fill="#e2ecff" stroke="#3056d3" stroke-width="3"/>
+  <line id="panel-divider" x1="12" y1="60" x2="168" y2="60" stroke="#3056d3" stroke-width="2"/>
+  <circle id="panel-dot" cx="36" cy="36" r="8" fill="#3056d3"/>
+</svg>

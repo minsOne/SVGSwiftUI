@@ -8,7 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		1F5AA8B98530FB6FD9E52E77 /* SVGSwiftUIDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */; };
+		386A9CE49A0909326EC0800B /* panel_stroke.png in Resources */ = {isa = PBXBuildFile; fileRef = 718E4A5AC89A382CDCD9684F /* panel_stroke.png */; };
 		4C09C89A50207F57F6CD5DF9 /* SVGSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A2F2D1B1AF94DDD5224EFA9F /* SVGSwiftUI */; };
+		4DF373AC1EB53A3978057074 /* route_offset.png in Resources */ = {isa = PBXBuildFile; fileRef = B1166026776CBA3F25046A29 /* route_offset.png */; };
+		6365D2D17649068C19B1FBB3 /* badge_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 025ABB80D8E04C3A9815ABB2 /* badge_default.png */; };
+		2D1C0B9A8F7E6D5C4B3A2918 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 8F9A7B6C5D4E3F2101A2B3C4D /* Resources */; };
 		76C9213973DCE863A64F93B1 /* SVGSwiftUIDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4050A8761E9E23769BA6BE21 /* SVGSwiftUIDemoApp.swift */; };
 		78F71122F5434A0B6C0FB2BC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DCCFDE4E59914EB04BDCF0 /* ContentView.swift */; };
 		94D1120D8F8DB606C6EB3592 /* SampleSVG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87489974ABD3ABBFE1A1F9C1 /* SampleSVG.swift */; };
@@ -25,10 +29,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		025ABB80D8E04C3A9815ABB2 /* badge_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_default.png; sourceTree = "<group>"; };
 		032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGSwiftUIDemoUITests.swift; sourceTree = "<group>"; };
 		26DCCFDE4E59914EB04BDCF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4050A8761E9E23769BA6BE21 /* SVGSwiftUIDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGSwiftUIDemoApp.swift; sourceTree = "<group>"; };
+		718E4A5AC89A382CDCD9684F /* panel_stroke.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = panel_stroke.png; sourceTree = "<group>"; };
 		87489974ABD3ABBFE1A1F9C1 /* SampleSVG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleSVG.swift; sourceTree = "<group>"; };
+		B1166026776CBA3F25046A29 /* route_offset.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = route_offset.png; sourceTree = "<group>"; };
+		8F9A7B6C5D4E3F2101A2B3C4D /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
 		B1448F987321C138BE26B27E /* SVGSwiftUIDemo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SVGSwiftUIDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC180D0D7DAD3390794B1317 /* SVGSwiftUIDemoUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SVGSwiftUIDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEFE7905ABB7C0E141E848DF /* SVGSwiftUI */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SVGSwiftUI; path = ../..; sourceTree = SOURCE_ROOT; };
@@ -59,9 +67,28 @@
 			children = (
 				02DD1B9E2C57933816098A50 /* Packages */,
 				AC1D506ACE078758FA8CA98F /* Sources */,
+				8F9A7B6C5D4E3F2101A2B3C4D /* Resources */,
 				9E40EF9AB3A91BA21253AFEA /* UITests */,
 				80B290A1C3B93855B74F3447 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		254BF8262E165815D12C9F0A /* Baselines */ = {
+			isa = PBXGroup;
+			children = (
+				9E3A8615E1BA48ECE358B123 /* iPhone_17 */,
+			);
+			path = Baselines;
+			sourceTree = "<group>";
+		};
+		5E90A9806A8D45476F806EEE /* 26.2 */ = {
+			isa = PBXGroup;
+			children = (
+				025ABB80D8E04C3A9815ABB2 /* badge_default.png */,
+				718E4A5AC89A382CDCD9684F /* panel_stroke.png */,
+				B1166026776CBA3F25046A29 /* route_offset.png */,
+			);
+			path = 26.2;
 			sourceTree = "<group>";
 		};
 		80B290A1C3B93855B74F3447 /* Products */ = {
@@ -73,10 +100,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		9E3A8615E1BA48ECE358B123 /* iPhone_17 */ = {
+			isa = PBXGroup;
+			children = (
+				5E90A9806A8D45476F806EEE /* 26.2 */,
+			);
+			path = iPhone_17;
+			sourceTree = "<group>";
+		};
 		9E40EF9AB3A91BA21253AFEA /* UITests */ = {
 			isa = PBXGroup;
 			children = (
 				032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */,
+				254BF8262E165815D12C9F0A /* Baselines */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -89,6 +125,13 @@
 				4050A8761E9E23769BA6BE21 /* SVGSwiftUIDemoApp.swift */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		"TEMP_6C20C69A-F118-4617-8D66-63F57DFD194E" /* iPhone_16e */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = iPhone_16e;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,6 +161,7 @@
 			buildConfigurationList = 8645A07FE147CEF695F61707 /* Build configuration list for PBXNativeTarget "SVGSwiftUIDemoUITests" */;
 			buildPhases = (
 				6EE2665481D436DD5F1B58C6 /* Sources */,
+				E6A06529F5D0A07523C1DF4C /* Resources */,
 			);
 			buildRules = (
 			);
@@ -167,6 +211,20 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E6A06529F5D0A07523C1DF4C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6365D2D17649068C19B1FBB3 /* badge_default.png in Resources */,
+				386A9CE49A0909326EC0800B /* panel_stroke.png in Resources */,
+				4DF373AC1EB53A3978057074 /* route_offset.png in Resources */,
+				2D1C0B9A8F7E6D5C4B3A2918 /* Resources in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6EE2665481D436DD5F1B58C6 /* Sources */ = {
