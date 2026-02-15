@@ -1,5 +1,5 @@
 # WebKit LayoutTests Conformance Coverage
-Generated: 2026-02-15 15:05:33Z UTC
+Generated: 2026-02-15 15:17:19Z UTC
 Manifest: `Tests/SVGSwiftUITests/WebKit/webkit-manifest.json`
 - Total fixtures: 53
 - Missing SVG resources: 0

@@ -3,11 +3,11 @@
 ## 현재 상태 (2026-02-16)
 - 저장소 상태: Swift Package + DemoApp(`Examples/SVGSwiftUIDemo`) 생성 완료
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
-- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2 완료
-- 다음 단계: `A15-1` 실행 그래프 분리 착수 및 `A15-2` 필터 합성 정밀도 강화 검토
+- 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1 완료
+- 다음 단계: `A15-2` (`feBlend`/`feColorMatrix` 오프스크린 합성 정밀도 강화) 착수
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
-- 다음 단계: `A15-1` (`in`/`in2`/`result` 실행 정책 분리) 착수
+- 다음 단계: `A15-2` (`feBlend`/`feColorMatrix` 오프스크린 합성 정밀도 강화) 착수
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -117,6 +117,21 @@
   - `A15-2`에서 오프스크린 합성 그래프를 도입해 `blend`/`colorMatrix` 정확도 강화
 - 검증:
   - `swift test --no-parallel` (138 tests, 0 failures)
+
+### 2026-02-16 (Session 51)
+- 작업: `A15-1` 후속 안정화 (오프스크린 체인 실결합 버그 수정)
+- 완료:
+  - `CIAffineTransform` 적용에서 `CIVector(cgAffineTransform:)` 대신 `CGAffineTransform` 직접 전달로 변경
+  - `result` 지정 `offset` + 후속 `colorMatrix` 체인에서 `Source` 보존이 정상적으로 되는지 회귀 테스트 추가/통과
+  - 임시 디버그 테스트는 삭제하고 디버그 로그를 제거해 깨끗한 테스트 집합으로 정리
+- 리스크:
+  - 현재는 `feBlend`는 오프스크린 합성 경로에서 일부 BlendMode만 지원되어, 일부 blend 모드의 정밀도는 A15-2에서 강화 필요
+  - 오프스크린 렌더는 여전히 `SourceAlpha` 경로를 포함한 정밀한 사전 처리 여지가 남아 있음
+- 다음 액션:
+  - `A15-2`: `blend`/`colorMatrix` 오프스크린 경로 정합성 강화를 위한 픽셀 비교 중심 테스트 확장
+- 검증:
+  - `swift test --filter SVGFilterImageRendererTests --no-parallel`
+  - `swift test --no-parallel`
 
 ## 구현 중 준수 규칙
 - 파서/모델 계층은 UI 타입(`Color`) 의존을 피하고 값 타입 중심으로 유지

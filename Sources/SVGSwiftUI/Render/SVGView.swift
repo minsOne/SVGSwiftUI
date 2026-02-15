@@ -103,23 +103,41 @@ private struct SVGStaticPlaceholderView: View {
 
     var body: some View {
         GeometryReader { _ in
-            Canvas { context, _ in
+            Canvas { context, size in
                 for node in drawNodes {
                     if node.clipPaths.isEmpty && node.filterPrimitives.isEmpty {
-                        let opacity = node.opacity
-                        if let fill = node.fillColor {
-                            context.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
-                        }
-                        if let stroke = node.strokeColor, node.strokeWidth > 0 {
-                            let strokeStyle = StrokeStyle(
-                                lineWidth: node.strokeWidth,
+                        drawNodeShape(node, in: &context)
+                    } else if SVGFilterImageRenderer.requiresOffscreenProcessing(node.filterPrimitives) {
+                        context.drawLayer { layer in
+                            if !node.clipPaths.isEmpty {
+                                for clipPath in node.clipPaths {
+                                    layer.clip(to: clipPath, style: .init(eoFill: false))
+                                }
+                            }
+                            if let filteredImage: CGImage = SVGFilterImageRenderer.renderFilteredImage(
+                                path: node.path,
+                                fillColor: node.fillColor,
+                                fillStyle: node.fillStyle,
+                                strokeColor: node.strokeColor,
+                                strokeWidth: node.strokeWidth,
                                 lineCap: node.lineCap,
                                 lineJoin: node.lineJoin,
                                 miterLimit: node.miterLimit,
                                 dash: node.dash,
-                                dashPhase: node.dashPhase
-                            )
-                            context.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
+                                dashPhase: node.dashPhase,
+                                opacity: node.opacity,
+                                size: size,
+                                primitives: node.filterPrimitives
+                            ) {
+                                let image = Image(
+                                    decorative: filteredImage,
+                                    scale: 1,
+                                    orientation: .up
+                                )
+                                layer.draw(image, at: CGPoint(x: size.width / 2, y: size.height / 2))
+                            } else {
+                                drawNodeShape(node, in: &layer)
+                            }
                         }
                     } else {
                         context.drawLayer { layer in
@@ -129,21 +147,7 @@ private struct SVGStaticPlaceholderView: View {
                                 }
                             }
                             applyFilterPrimitives(node.filterPrimitives, to: &layer)
-                            let opacity = node.opacity
-                            if let fill = node.fillColor {
-                                layer.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
-                            }
-                            if let stroke = node.strokeColor, node.strokeWidth > 0 {
-                                let strokeStyle = StrokeStyle(
-                                    lineWidth: node.strokeWidth,
-                                    lineCap: node.lineCap,
-                                    lineJoin: node.lineJoin,
-                                    miterLimit: node.miterLimit,
-                                    dash: node.dash,
-                                    dashPhase: node.dashPhase
-                                )
-                                layer.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
-                            }
+                            drawNodeShape(node, in: &layer)
                         }
                     }
                 }
@@ -162,6 +166,27 @@ private struct SVGStaticPlaceholderView: View {
             )) {
                 await loadDocument()
             }
+        }
+    }
+
+    private func drawNodeShape(
+        _ node: SVGDrawNode,
+        in context: inout GraphicsContext
+    ) {
+        let opacity = node.opacity
+        if let fill = node.fillColor {
+            context.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
+        }
+        if let stroke = node.strokeColor, node.strokeWidth > 0 {
+            let strokeStyle = StrokeStyle(
+                lineWidth: node.strokeWidth,
+                lineCap: node.lineCap,
+                lineJoin: node.lineJoin,
+                miterLimit: node.miterLimit,
+                dash: node.dash,
+                dashPhase: node.dashPhase
+            )
+            context.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
         }
     }
 

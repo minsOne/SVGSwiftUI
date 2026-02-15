@@ -56,6 +56,7 @@
 | A14-2 | filter 체인 실행 가드 | `applyFilterPrimitives` 입력 소스 가용성 확인 | 유효하지 않은 체인은 no-op, 유효 체인만 적용 |
 | A14-3 | chain 회귀 검증 강화 | 파싱/시각 회귀 케이스 보강 | `filter` 체인 케이스 기반 conformance 범위 확장 |
 | A15-1 | 필터 체인 실행 그래프 분리 | `SourceGraphic`/`SourceAlpha`/`result` 상태머신 추상화 | renderer/파서 체인 가용성 규칙 정합성 보강 |
+| A15-2 | 오프스크린 필터 합성 정밀도 강화 | `feBlend`/`feColorMatrix`를 CI 기반 합성으로 정착 | 시각 정합성 회귀 케이스 기반 오프스크린 정확도 확장 |
 
 ## 5. API 설계 고정안
 - 공개 API(외부 사용 대상):

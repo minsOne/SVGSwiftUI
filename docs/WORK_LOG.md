@@ -2,6 +2,21 @@
 
 ## 2026-02-16
 
+### Session 51
+- 작업: `A15-1` 후속 안정화 (오프스크린 필터 체인 결합)
+- 완료:
+  - `CIAffineTransform`에서 `CIVector(cgAffineTransform:)`를 사용하는 방식이 nil을 유발하는 이슈를 확인하고 `CGAffineTransform` 직접 전달로 전환
+  - `Sources/SVGSwiftUI/Render/SVGFilterImageRenderer.swift`에 오프스크린 `offset` 체인 경로가 제대로 `result`를 등록해 후속 primitive가 소비하도록 수정
+  - 기존 디버그 테스트(`SVGFilterImageRendererDebugTest`) 정리 후 테스트셋 일관성 유지
+  - `SVGFilterImageRendererTests` `testRenderFilteredImageResolvesResultInChain` 추가/통과로 chain 정합성 검증
+- 검증:
+  - `swift test --filter SVGFilterImageRendererTests --no-parallel`
+  - `swift test --no-parallel`
+- 리스크:
+  - `feBlend`의 색상/알파 혼합 정밀도는 일부 blend mode에 제한, 오프스크린 구현이 확장 필요
+- 다음 액션:
+  - `A15-2`로 이동해 `blend`/`colorMatrix` 오프스크린 경로 정밀도 강화를 수행
+
 ### Session 50
 - 작업: `A15-1` 필터 체인 실행 그래프 분리
 - 완료:
