@@ -31,6 +31,24 @@
 - 다음 액션:
   - D1-4 브라우저 기준 비교 확장(고난도 샘플/샘플별 스모크 케이스)로 전환
 
+### Session 65
+- 작업: XCFramework 배포 자동화 및 GitHub Release 준비
+- 완료:
+  - `Package.swift`를 동적 라이브러리 product로 변경해 `.xcframework` 생성 기반 준비
+  - `Scripts/package-release.sh` 추가:
+    - iOS + iOS Simulator 아카이브 생성
+    - `xcodebuild -create-xcframework`로 `SVGSwiftUI.xcframework` 생성
+    - `.xcframework` zip 패키지 생성
+    - `swift package compute-checksum`으로 체크섬 생성
+  - `README.md`에 GitHub Release 기반 XCFramework 사용 방법 추가
+  - `.github/workflows/release.yml` 추가:
+    - 태그 푸시(`v*`) 및 manual dispatch 지원
+    - release artifact 업로드(`zip`, `checksum`)
+    - 태그 기준 GitHub Release 생성
+- 검증:
+  - `./Scripts/package-release.sh --version 0.0.0-local --output build/xcframework-test`
+  - `swift test --filter SVGParserTests --no-parallel` (56 tests, 0 failures)
+
 ### Session 62
 - 작업: 데모 노드 제어 UI + 렌더 변경 검증 강화
 - 완료:

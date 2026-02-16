@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (Session 64)
+Last Updated: 2026-02-16 (Session 65)
 
 ## Status Legend
 - `todo`: not started
@@ -86,6 +86,11 @@ Last Updated: 2026-02-16 (Session 64)
 | A16-2 | A16 | feComposite `arithmetic` 지원 | done | `arithmetic` 연산을 CIColorKernel 기반으로 수식대로 합성하도록 구현, 파서/그래프/렌더 테스트 보강 |
 | A16-3 | A16 | feComposite 경계/시각 회귀 확장 | done | `in`/`in2` 조합과 unsupported fallback 케이스 정량화 |
 | A16-4 | A16 | unsupported 추적 정책 고도화 | done | 미지원 요소/primitive를 카운팅해 `SVGDocument.unsupportedFeatures`에 기록하고 커버리지/manifest 기대값 정합성 개선 |
+
+## Distribution Milestones
+| ID | Phase | Task | Status | Notes |
+|---|---|---|---|---|
+| R1-1 | R1 | XCFramework 배포 자동화 | done | 동적 라이브러리 전환, `Scripts/package-release.sh` 생성, release workflow 추가, README 배포 안내 반영 |
 
 ## Stabilization Milestones
 | ID | Phase | Task | Status | Notes |

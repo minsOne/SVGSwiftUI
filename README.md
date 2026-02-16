@@ -126,6 +126,25 @@ SVGView(
 )
 ```
 
+### XCFramework (GitHub Release)
+
+`GitHub Releases`에 업로드된 `SVGSwiftUI-<version>.xcframework.zip`를 내려받아 통합할 수 있습니다.
+
+1. 릴리스 페이지에서 `SVGSwiftUI-<version>.xcframework.zip`를 다운로드합니다.
+2. Xcode에서 `File > Add Packages...`가 아닌 `File > Add Files...`로 압축을 풀어 얻은 `.xcframework`를 프로젝트에 추가합니다.
+3. 프로젝트의 타깃 > `General > Frameworks, Libraries, and Embedded Content`에 `SVGSwiftUI.xcframework`를 추가하고, 사용 방식은 `Embed & Sign` 또는 필요에 맞게 설정합니다.
+4. Swift 파일에서 `import SVGSwiftUI`로 사용합니다.
+
+릴리스 아티팩트는 아래 명령으로 로컬에서 직접 생성할 수 있습니다.
+
+```bash
+./Scripts/package-release.sh --version 1.0.0
+```
+
+생성 결과:
+- `build/xcframework/SVGSwiftUI-<version>.xcframework.zip`
+- `build/xcframework/SVGSwiftUI-<version>.xcframework.zip.sha256`
+
 우선순위는 항상 `idOverrides` → `resolver` 입니다.
 
 ## 캐시 및 성능

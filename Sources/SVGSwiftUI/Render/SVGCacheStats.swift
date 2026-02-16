@@ -1,5 +1,6 @@
 #if canImport(SwiftUI)
 import SwiftUI
+import Combine
 
 @MainActor
 public final class SVGCacheStats: ObservableObject {
