@@ -22,6 +22,16 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         "animation-pulse",
         "animation-drift",
         "animation-luminous-core",
+        "animation-opacity-pulse",
+        "animation-badge-breath",
+        "animation-route-flow",
+        "animation-geometry-fade",
+        "animation-panel-bounce",
+        "animation-style-sheet-fade",
+        "animation-polygon-pulse",
+        "animation-aurora-wisp",
+        "animation-nested-drift",
+        "animation-transform-radiant",
         "geometry",
         "style-inline",
         "style-sheet",
@@ -32,7 +42,29 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
     private static let animatedCanvases: [String] = [
         "animation-pulse",
         "animation-drift",
-        "animation-luminous-core"
+        "animation-luminous-core",
+        "animation-opacity-pulse",
+        "animation-badge-breath",
+        "animation-route-flow",
+        "animation-geometry-fade",
+        "animation-panel-bounce",
+        "animation-style-sheet-fade",
+        "animation-polygon-pulse",
+        "animation-aurora-wisp",
+        "animation-nested-drift",
+        "animation-transform-radiant",
+        "animation-smil-orbital",
+        "animation-smil-drift-lines",
+        "animation-smil-opacity-breath",
+        "animation-smil-radar-spin",
+        "animation-smil-mosaic-grid",
+        "animation-smil-path-signal",
+        "animation-smil-pulse-sunburst",
+        "animation-smil-spin-petal",
+        "animation-smil-color-lattice",
+        "animation-smil-pendulum-sweep",
+        "animation-smil-wave-cascade",
+        "animation-smil-orbit-multi-ring"
     ]
 
     private static let nodeControlCanvases: [String] = requiredCanvases
@@ -164,6 +196,46 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
     func testDemoSample_nested_groups_canOpenAndRenderWithoutInvalidOverlay() {
         let app = launchApp()
         assertSampleCanOpenAndRenderWithoutInvalidOverlay(sampleID: "nested-groups", in: app)
+    }
+
+    @MainActor
+    func testDemoTabs_canSwitchToAnimationAndRemoteAndRenderValidation() {
+        let app = launchApp()
+
+        XCTAssertTrue(
+            selectDemoCatalogTab("demo.tab.animation", fallbackLabel: "애니메이션", in: app),
+            "애니메이션 탭으로 전환되지 않았습니다."
+        )
+        XCTAssertTrue(
+            waitForIdentifier("demo.content.animation", in: app, timeout: 4),
+            "애니메이션 탭의 목록 컨테이너가 표시되지 않았습니다."
+        )
+
+        assertSampleCanOpenAndRenderWithoutInvalidOverlay(sampleID: "animation-pulse", in: app)
+
+        XCTAssertTrue(
+            selectDemoCatalogTab("demo.tab.remote", fallbackLabel: "원격 SVG", in: app),
+            "원격 SVG 탭으로 전환되지 않았습니다."
+        )
+        let urlField = app.textFields["demo.remote.urlField"]
+        XCTAssertTrue(urlField.waitForExistence(timeout: 3))
+
+        urlField.tap()
+        urlField.typeText("bad url")
+        app.buttons["demo.remote.loadButton"].tap()
+        XCTAssertTrue(
+            app.staticTexts["demo.remote.error"].waitForExistence(timeout: 2),
+            "원격 SVG 탭에서 잘못된 URL 입력 시 에러 메시지가 노출되지 않았습니다."
+        )
+
+        XCTAssertTrue(
+            selectDemoCatalogTab("demo.tab.w3c", fallbackLabel: "W3C 케이스", in: app),
+            "W3C 탭으로 전환되지 않았습니다."
+        )
+        XCTAssertTrue(
+            waitForIdentifier("demo.content.w3c", in: app, timeout: 3),
+            "W3C 탭의 목록 컨테이너가 표시되지 않았습니다."
+        )
     }
 
     @MainActor
@@ -894,12 +966,30 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         if rootContainer.exists {
             return
         }
+        let animationRootContainer = app.otherElements["demo.content.animation"]
+        if animationRootContainer.exists {
+            return
+        }
+        let w3cRootContainer = app.otherElements["demo.content.w3c"]
+        if w3cRootContainer.exists {
+            return
+        }
+        let remoteRootContainer = app.otherElements["demo.content.remote"]
+        if remoteRootContainer.exists {
+            return
+        }
 
+        let fallbackRootContainer: XCUIElement = [
+            rootContainer,
+            animationRootContainer,
+            w3cRootContainer,
+            remoteRootContainer
+        ].first(where: { $0.exists }) ?? rootContainer
         let backButton = app.navigationBars.buttons["SVGSwiftUI Demo"]
         if backButton.exists {
             backButton.tap()
             waitForRenderSettled()
-            _ = rootContainer.waitForExistence(timeout: 4)
+            _ = fallbackRootContainer.waitForExistence(timeout: 4)
             return
         }
 
@@ -908,6 +998,52 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
             fallbackBackButton.tap()
             waitForRenderSettled()
         }
+    }
+
+    @MainActor
+    private func selectDemoCatalogTab(
+        _ identifier: String,
+        fallbackLabel: String? = nil,
+        in app: XCUIApplication
+    ) -> Bool {
+        let tabButton = app.tabBars.buttons[identifier]
+        if tabButton.exists {
+            tabButton.tap()
+            return true
+        }
+
+        let identifierButtons = app.tabBars.buttons.matching(identifier: identifier)
+        if identifierButtons.count > 0 {
+            identifierButtons.element(boundBy: 0).tap()
+            return true
+        }
+
+        let fallbackButton = app.buttons[identifier]
+        if fallbackButton.exists {
+            fallbackButton.tap()
+            return true
+        }
+
+        if let fallbackLabel {
+            let exactLabelButton = app.tabBars.buttons[fallbackLabel]
+            if exactLabelButton.exists {
+                exactLabelButton.tap()
+                return true
+            }
+
+            let labelPredicate = NSPredicate(
+                format: "label == %@ OR label CONTAINS %@",
+                fallbackLabel,
+                fallbackLabel
+            )
+            let candidateButtons = app.tabBars.buttons.matching(labelPredicate)
+            if candidateButtons.count > 0 {
+                candidateButtons.element(boundBy: 0).tap()
+                return true
+            }
+        }
+
+        return false
     }
 
     @MainActor
@@ -956,6 +1092,18 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         if contentContainer.exists {
             return contentContainer
         }
+        let animationContent = app.otherElements["demo.content.animation"]
+        if animationContent.exists {
+            return animationContent
+        }
+        let w3cContent = app.otherElements["demo.content.w3c"]
+        if w3cContent.exists {
+            return w3cContent
+        }
+        let remoteContent = app.otherElements["demo.content.remote"]
+        if remoteContent.exists {
+            return remoteContent
+        }
 
         let firstScrollView = app.scrollViews.element(boundBy: 0)
         if firstScrollView.exists {
@@ -968,6 +1116,24 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         }
 
         return app.otherElements.firstMatch
+    }
+
+    @MainActor
+    private func waitForIdentifier(
+        _ identifier: String,
+        in app: XCUIApplication,
+        timeout: TimeInterval,
+        pollInterval: TimeInterval = 0.1
+    ) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            let match = app.descendants(matching: .any).matching(identifier: identifier).firstMatch
+            if match.exists {
+                return true
+            }
+            Thread.sleep(forTimeInterval: pollInterval)
+        }
+        return false
     }
 
     @MainActor
