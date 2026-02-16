@@ -446,6 +446,21 @@ struct SVGStyleResolver: Sendable {
         if let strokeWidth = override.strokeWidth {
             style.strokeWidth = strokeWidth
         }
+        if let fontSize = override.fontSize {
+            style.fontSize = fontSize
+        }
+        if let fontFamily = override.fontFamily {
+            style.fontFamily = fontFamily
+        }
+        if let textAnchor = override.textAnchor {
+            style.textAnchor = textAnchor
+        }
+        if let fontStyle = override.fontStyle {
+            style.fontStyle = fontStyle
+        }
+        if let fontWeight = override.fontWeight {
+            style.fontWeight = fontWeight
+        }
         if let opacity = override.opacity {
             style.opacity = opacity
         }

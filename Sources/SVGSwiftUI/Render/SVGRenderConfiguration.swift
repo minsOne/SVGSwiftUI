@@ -2,6 +2,11 @@ public struct NodeOverride: Sendable, Equatable {
     public var fill: SVGPaint?
     public var stroke: SVGPaint?
     public var strokeWidth: Double?
+    public var fontSize: Double?
+    public var fontFamily: String?
+    public var textAnchor: SVGTextAnchor?
+    public var fontStyle: SVGFontStyle?
+    public var fontWeight: SVGFontWeight?
     public var opacity: Double?
     public var scale: SVGSize?
     public var offset: SVGPoint?
@@ -10,6 +15,11 @@ public struct NodeOverride: Sendable, Equatable {
         fill: SVGPaint? = nil,
         stroke: SVGPaint? = nil,
         strokeWidth: Double? = nil,
+        fontSize: Double? = nil,
+        fontFamily: String? = nil,
+        textAnchor: SVGTextAnchor? = nil,
+        fontStyle: SVGFontStyle? = nil,
+        fontWeight: SVGFontWeight? = nil,
         opacity: Double? = nil,
         scale: SVGSize? = nil,
         offset: SVGPoint? = nil
@@ -17,6 +27,11 @@ public struct NodeOverride: Sendable, Equatable {
         self.fill = fill
         self.stroke = stroke
         self.strokeWidth = strokeWidth
+        self.fontSize = fontSize
+        self.fontFamily = fontFamily
+        self.textAnchor = textAnchor
+        self.fontStyle = fontStyle
+        self.fontWeight = fontWeight
         self.opacity = opacity
         self.scale = scale
         self.offset = offset

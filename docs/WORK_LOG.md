@@ -19,6 +19,19 @@
   - 폰트 렌더링은 기본 SwiftUI 폰트 매핑을 사용하므로 웹 브라우저와의 픽셀 정확도는 플랫폼/폰트 가용성에 따라 편차가 생길 수 있음
   - 애니메이션 샘플은 시각 회귀 기준을 추가 구축하지 않으면 런타임 성능/시각 동작 추적이 분산될 수 있음
 
+### Session 67
+- 작업: `NodeOverride` 폰트 오버라이드 완성
+- 완료:
+  - `SVGFontStyle`, `SVGFontWeight`, `SVGTextAnchor`를 public 타입으로 노출해 오버라이드 API와 정합
+  - `NodeOverride`에 폰트 오버라이드 필드 추가(`fontSize`, `fontFamily`, `textAnchor`, `fontStyle`, `fontWeight`)
+  - `SVGStyleResolver` 오버라이드 적용 경로에 폰트 필드 병합 반영
+  - `SVGStyleResolverTests`에 `NodeOverride` 폰트 오버라이드 회귀 케이스 2건 추가
+- 검증:
+  - `swift test --filter SVGStyleResolverTests --no-parallel` (17 tests, 0 failures)
+  - `swift test --no-parallel` (175 tests, 0 failures)
+- 리스크:
+  - 공개 API 표면이 확장되므로 릴리스 노트와 API 호환성 체크 항목에 반영 필요
+
 ### Session 63
 - 작업: 데모 고난도 샘플 3단계 정합 점검 추가 및 정리
 - 완료:

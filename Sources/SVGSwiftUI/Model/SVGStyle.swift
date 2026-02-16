@@ -35,13 +35,13 @@ enum SVGLineJoin: Sendable, Equatable {
     case bevel
 }
 
-enum SVGFontStyle: String, Sendable, Equatable {
+public enum SVGFontStyle: String, Sendable, Equatable {
     case normal
     case italic
     case oblique
 }
 
-enum SVGFontWeight: Sendable, Equatable {
+public enum SVGFontWeight: Sendable, Equatable {
     case normal
     case bold
     case bolder
@@ -110,7 +110,7 @@ struct SVGStyle: Sendable, Equatable {
     }
 }
 
-enum SVGTextAnchor: String, Sendable, Equatable {
+public enum SVGTextAnchor: String, Sendable, Equatable {
     case start
     case middle
     case end

@@ -239,6 +239,66 @@ final class SVGStyleResolverTests: XCTestCase {
         XCTAssertEqual(node.style.fontWeight, .normal)
     }
 
+    func testNodeOverrideCanOverrideFontProperties() {
+        let textBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            style: .init(fontSize: 12, fontFamily: "Times New Roman", fontStyle: .normal)
+        )
+        let document = SVGDocument(nodes: [.text(.init(base: textBase, x: 0, y: 0, content: "hello"))])
+        let config = SVGRenderConfiguration(
+            idOverrides: [
+                "target": NodeOverride(
+                    fontSize: 24,
+                    fontFamily: "Courier",
+                    textAnchor: SVGTextAnchor.end,
+                    fontStyle: SVGFontStyle.italic,
+                    fontWeight: SVGFontWeight.bold
+                ),
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document, configuration: config)
+        let node = tryUnwrap(resolved["target"])
+
+        XCTAssertEqual(node.style.fontFamily, "Courier")
+        XCTAssertEqual(node.style.fontSize, 24)
+        XCTAssertEqual(node.style.textAnchor, SVGTextAnchor.end)
+        XCTAssertEqual(node.style.fontStyle, SVGFontStyle.italic)
+        XCTAssertEqual(node.style.fontWeight, SVGFontWeight.bold)
+    }
+
+    func testResolverOverrideAppliesFontProperties() {
+        let textBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            style: .init(fontSize: 12, fontFamily: "Times New Roman")
+        )
+        let document = SVGDocument(
+            nodes: [.text(.init(base: textBase, x: 0, y: 0, content: "hello"))],
+            styleRules: [
+                SVGStyleRule(
+                    selector: .id("target"),
+                    declarations: ["font-size": "14", "font-family": "Helvetica"]
+                )
+            ]
+        )
+        let config = SVGRenderConfiguration(
+            idOverrides: ["target": NodeOverride(fontFamily: "OverrideBase")],
+            resolver: { context in
+                guard context.id == "target" else { return nil }
+                return NodeOverride(fontSize: 30, fontWeight: .numeric(700))
+            }
+        )
+
+        let resolved = resolver.resolve(document: document, configuration: config)
+        let node = tryUnwrap(resolved["target"])
+
+        XCTAssertEqual(node.style.fontFamily, "OverrideBase")
+        XCTAssertEqual(node.style.fontSize, 30)
+        XCTAssertEqual(node.style.fontWeight, SVGFontWeight.numeric(700))
+    }
+
     func testStyleRulesSpecificityAndSourceOrderAreRespected() {
         let pathBase = SVGBaseNode(
             id: "target",
