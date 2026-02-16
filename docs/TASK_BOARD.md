@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (Session 63)
+Last Updated: 2026-02-16 (Session 64)
 
 ## Status Legend
 - `todo`: not started
@@ -103,7 +103,7 @@ Last Updated: 2026-02-16 (Session 63)
 | D1-1 | D1 | 샘플/노드 타깃 메타 확장 | done | `SampleSVG`에 20개 샘플과 `overrideTargets` 메타 등록 |
 | D1-2 | D1 | Demo 노드 제어 UI 확장 | done | 색상/크기/offset/opacity 제어 및 접근성 ID 정리 완료 |
 | D1-3 | D1 | Demo UITest 오버라이드 검증 시나리오 추가 | done | 항목별 애니메이션/노드 제어 on/off 및 렌더 반영 검증까지 추가 |
-| D1-4 | D1 | 브라우저 기준 비교 확장 | todo | Playwright baseline 대상 확장 + 허용오차 검증 |
+| D1-4 | D1 | 브라우저 기준 비교 확장 | in_progress | Playwright baseline 대상 확장 + 허용오차 검증 |
 | D1-5 | D1 | W3C/WebKit 연계 강화 | todo | 신규 샘플 대응 fixture/manifest/coverage strict 정합 |
 
 

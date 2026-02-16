@@ -5,7 +5,7 @@
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3/A16-4 완료
 - 추가 진행: Demo UITest 브라우저 기준 비교 파이프라인 추가
-- 다음 단계: `unsupported` 집계 데이터를 `conformance unsupported` 카테고리와 연동해 검증 강화
+- 다음 단계: `unsupported` 집계 strict 규칙 반영 마무리 후 `D1-4` 브라우저 기준 확장(샘플-샘플맵 + tolerance 튜닝)
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 - 최근 진행 반영:
@@ -15,8 +15,17 @@
   - `D1-1` 샘플 메타 확장 완료(오버라이드 타깃 메타 등록)
   - `D1-2` 노드 제어 UI 확장(색상/scale/offset/opacity) 완료
   - `D1-3` 픽셀 기반 렌더 변경 검증 UITest 초안 추가
+  - `A16-2` `arithmetic` 산출을 `CIColorKernel` 의존 없이 CPU 픽셀 경로로 정리, `bytesPerRow` 오차 처리 보강
 - 세션 우선순위:
   - D1-3(픽셀 비교 UITest) → D1-4(브라우저 기준 비교 확대) → D1-5(Conformance 연계)
+
+### 2026-02-16 (Session 64)
+- 작업: `A16-2` arithmetic 픽셀 합성 정합 보강
+- 완료:
+  - `applyArithmeticComposite`에서 `CIColorKernel` 경로 제거 후 `CGImage` 바이트 기반 계산 경로로 전환
+  - `extractRGBABytes`가 `bytesPerRow` 패딩을 정규화해 행 단위 오프셋 기반 인덱싱으로 일관화
+  - 테스트: `swift test --no-parallel` 및 `swift test -Xswiftc -warnings-as-errors --no-parallel` 통과
+  - `Package.swift`의 임시 `CI_SILENCE_GL_DEPRECATION` 정의 제거
 
 ### 2026-02-16 (Session 62)
 - 작업: D1-3 UI 렌더 비교 검증 강화
@@ -41,8 +50,8 @@
 - 접근제어 규칙: 기본 `internal`, 외부 계약(API)으로 필요한 심볼만 `public` (`docs/API_SURFACE_POLICY.md`)
 
 ## 바로 다음 실행 순서
-1. `A16-4` 결과를 conformance manifest strict 규칙에 반영 및 `unsupported` 분포 추적 리포트 보강
-2. 브라우저 오라클 manifest(`demo oracle`)을 WebKit/W3C 후보군과 매핑해 미지원 경로 정합성 비교를 강화
+1. `D1-4` 브라우저 기준 비교 확장 실행(샘플 우선순위 TopN, tolerance 재조정, 실패 diff 보존)
+2. `D1-5` `unsupported`/Conformance manifest와 `Demo Web/Browser` 샘플 매핑 정합 강화
 
 ### 2026-02-16 (Session 60)
 - 작업: 데모 샘플 고난도 확장 및 검증 편의성 강화

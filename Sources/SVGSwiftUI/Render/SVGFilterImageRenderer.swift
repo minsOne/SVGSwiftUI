@@ -16,27 +16,6 @@ internal enum SVGFilterImageRenderer {
         options: [CIContextOption.useSoftwareRenderer: false]
     )
 
-    private static let arithmeticCompositeKernel: CIColorKernel? = {
-        let kernelSource: String = """
-        kernel vec4 arithmeticComposite(
-            __sample source,
-            __sample destination,
-            float k1,
-            float k2,
-            float k3,
-            float k4
-        ) {
-            vec4 multiplied = source * destination * k1;
-            vec4 sourceContribution = source * k2;
-            vec4 destinationContribution = destination * k3;
-            vec4 constantContribution = vec4(k4);
-            vec4 result = multiplied + sourceContribution + destinationContribution + constantContribution;
-            return clamp(result, 0.0, 1.0);
-        }
-        """
-        return CIColorKernel(source: kernelSource)
-    }()
-
     static func requiresOffscreenProcessing(_ primitives: [SVGFilterPrimitive]) -> Bool {
         for primitive in primitives {
             switch primitive {
@@ -446,28 +425,186 @@ internal enum SVGFilterImageRenderer {
         k4: Double,
         extent: CGRect
     ) -> CIImage? {
+        guard let firstData: RGBABytes = extractRGBABytes(from: firstSource, extent: extent) else {
+            return nil
+        }
+        guard let secondData: RGBABytes = extractRGBABytes(from: secondSource, extent: extent) else {
+            return nil
+        }
+        if firstData.width != secondData.width
+            || firstData.height != secondData.height {
+            return nil
+        }
+        if firstData.width <= 0 || firstData.height <= 0 {
+            return nil
+        }
+
+        let width: Int = firstData.width
+        let height: Int = firstData.height
+        let firstSourceBytes: [UInt8] = firstData.bytes
+        let secondSourceBytes: [UInt8] = secondData.bytes
+        let sourceBytesPerRow: Int = firstData.bytesPerRow
+        let destinationBytesPerRow: Int = secondData.bytesPerRow
         let firstCoefficient: Double = k1
         let secondCoefficient: Double = k2
         let thirdCoefficient: Double = k3
         let fourthCoefficient: Double = k4
-        let kernel: CIColorKernel? = arithmeticCompositeKernel
-        guard let kernel else {
+        let outputBytesPerRow: Int = width * 4
+        var outputBytes: [UInt8] = Array(repeating: 0, count: height * outputBytesPerRow)
+
+        for y in 0..<height {
+            let firstRowOffset: Int = y * sourceBytesPerRow
+            let secondRowOffset: Int = y * destinationBytesPerRow
+            let outputRowOffset: Int = y * outputBytesPerRow
+            for x in 0..<width {
+                let sourceByteIndex: Int = firstRowOffset + (x * 4)
+                let destinationByteIndex: Int = secondRowOffset + (x * 4)
+                let outputByteIndex: Int = outputRowOffset + (x * 4)
+                if sourceByteIndex + 3 >= firstSourceBytes.count
+                    || destinationByteIndex + 3 >= secondSourceBytes.count
+                    || outputByteIndex + 3 >= outputBytes.count {
+                    return nil
+                }
+
+                let firstRed: Double = Double(firstSourceBytes[sourceByteIndex]) / 255.0
+                let firstGreen: Double = Double(firstSourceBytes[sourceByteIndex + 1]) / 255.0
+                let firstBlue: Double = Double(firstSourceBytes[sourceByteIndex + 2]) / 255.0
+                let firstAlpha: Double = Double(firstSourceBytes[sourceByteIndex + 3]) / 255.0
+
+                let secondRed: Double = Double(secondSourceBytes[destinationByteIndex]) / 255.0
+                let secondGreen: Double = Double(secondSourceBytes[destinationByteIndex + 1]) / 255.0
+                let secondBlue: Double = Double(secondSourceBytes[destinationByteIndex + 2]) / 255.0
+                let secondAlpha: Double = Double(secondSourceBytes[destinationByteIndex + 3]) / 255.0
+
+                let outputRed: UInt8 = pixelByte(
+                    value: firstRed * secondRed * firstCoefficient
+                        + firstRed * secondCoefficient
+                        + secondRed * thirdCoefficient
+                        + fourthCoefficient
+                )
+                let outputGreen: UInt8 = pixelByte(
+                    value: firstGreen * secondGreen * firstCoefficient
+                        + firstGreen * secondCoefficient
+                        + secondGreen * thirdCoefficient
+                        + fourthCoefficient
+                )
+                let outputBlue: UInt8 = pixelByte(
+                    value: firstBlue * secondBlue * firstCoefficient
+                        + firstBlue * secondCoefficient
+                        + secondBlue * thirdCoefficient
+                        + fourthCoefficient
+                )
+                let outputAlpha: UInt8 = pixelByte(
+                    value: firstAlpha * secondAlpha * firstCoefficient
+                        + firstAlpha * secondCoefficient
+                        + secondAlpha * thirdCoefficient
+                        + fourthCoefficient
+                )
+
+                outputBytes[outputByteIndex] = outputRed
+                outputBytes[outputByteIndex + 1] = outputGreen
+                outputBytes[outputByteIndex + 2] = outputBlue
+                outputBytes[outputByteIndex + 3] = outputAlpha
+            }
+        }
+
+        let colorSpace: CGColorSpace? = CGColorSpace(name: CGColorSpace.sRGB)
+        guard let safeColorSpace: CGColorSpace = colorSpace else {
             return nil
         }
-        let k1Value: NSNumber = NSNumber(value: firstCoefficient)
-        let k2Value: NSNumber = NSNumber(value: secondCoefficient)
-        let k3Value: NSNumber = NSNumber(value: thirdCoefficient)
-        let k4Value: NSNumber = NSNumber(value: fourthCoefficient)
-        let arguments: [Any] = [
-            firstSource,
-            secondSource,
-            k1Value,
-            k2Value,
-            k3Value,
-            k4Value
-        ]
-        let filtered: CIImage? = kernel.apply(extent: extent, arguments: arguments)
-        return filtered
+        var outputImageBytes: [UInt8] = outputBytes
+        let image: CGImage? = outputImageBytes.withUnsafeMutableBytes { mutableRawBuffer -> CGImage? in
+            guard let rawBaseAddress: UnsafeMutableRawPointer = mutableRawBuffer.baseAddress else {
+                return nil
+            }
+            guard let outputContext: CGContext = CGContext(
+                data: rawBaseAddress,
+                width: width,
+                height: height,
+                bitsPerComponent: 8,
+                bytesPerRow: outputBytesPerRow,
+                space: safeColorSpace,
+                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+            ) else {
+                return nil
+            }
+            return outputContext.makeImage()
+        }
+        guard let outputImage: CGImage = image else {
+            return nil
+        }
+        return CIImage(cgImage: outputImage)
+    }
+
+    private static func extractRGBABytes(
+        from sourceImage: CIImage,
+        extent: CGRect
+    ) -> RGBABytes? {
+        let normalizedWidth: Int = Int(max(1, ceil(extent.width)))
+        let normalizedHeight: Int = Int(max(1, ceil(extent.height)))
+        let normalizedExtent: CGRect = CGRect(
+            x: 0,
+            y: 0,
+            width: CGFloat(normalizedWidth),
+            height: CGFloat(normalizedHeight)
+        )
+        guard let sourceCGImage: CGImage = ciContext.createCGImage(
+            sourceImage,
+            from: normalizedExtent
+        ) else {
+            return nil
+        }
+        guard let sourceData: CFData = sourceCGImage.dataProvider?.data else {
+            return nil
+        }
+        guard let sourceBytesPointer: UnsafePointer<UInt8> = CFDataGetBytePtr(sourceData) else {
+            return nil
+        }
+        let sourceBytesPerRow: Int = sourceCGImage.bytesPerRow
+        let imageBytes: [UInt8] = Array(UnsafeBufferPointer(
+            start: sourceBytesPointer,
+            count: normalizedHeight * sourceBytesPerRow
+        ))
+        if sourceBytesPerRow == normalizedWidth * 4 {
+            return RGBABytes(
+                bytes: imageBytes,
+                width: normalizedWidth,
+                height: normalizedHeight,
+                bytesPerRow: sourceBytesPerRow
+            )
+        }
+
+        var normalizedBytes: [UInt8] = Array(repeating: 0, count: normalizedWidth * normalizedHeight * 4)
+        for y in 0..<normalizedHeight {
+            let sourceRowOffset: Int = y * sourceBytesPerRow
+            let destinationRowOffset: Int = y * normalizedWidth * 4
+            for x in 0..<normalizedWidth {
+                let sourcePixelOffset: Int = sourceRowOffset + (x * 4)
+                let destinationPixelOffset: Int = destinationRowOffset + (x * 4)
+                normalizedBytes[destinationPixelOffset] = imageBytes[sourcePixelOffset]
+                normalizedBytes[destinationPixelOffset + 1] = imageBytes[sourcePixelOffset + 1]
+                normalizedBytes[destinationPixelOffset + 2] = imageBytes[sourcePixelOffset + 2]
+                normalizedBytes[destinationPixelOffset + 3] = imageBytes[sourcePixelOffset + 3]
+            }
+        }
+        return RGBABytes(
+            bytes: normalizedBytes,
+            width: normalizedWidth,
+            height: normalizedHeight,
+            bytesPerRow: normalizedWidth * 4
+        )
+    }
+
+    private static func pixelByte(value: Double) -> UInt8 {
+        let clamped: Double = min(max(value, 0.0), 1.0)
+        return UInt8((clamped * 255.0).rounded())
+    }
+
+    private struct RGBABytes {
+        let bytes: [UInt8]
+        let width: Int
+        let height: Int
+        let bytesPerRow: Int
     }
 
     private static func applyColorMatrix(

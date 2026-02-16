@@ -16,6 +16,21 @@
 - 다음 액션:
   - 다음 단계에서 D1-4/브라우저 기준 비교 확장의 신규 샘플들을 이 3단계 점검에 반영해 점진적으로 확장
 
+### Session 64
+- 작업: `A16-2` `feComposite` arithmetic 경로의 CPU Fallback 정합 안정화
+- 완료:
+  - `CIColorKernel` 기반 `arithmetic` 합성 경로를 제거하고 `CGImage` 픽셀 처리 경로로 대체
+  - `extractRGBABytes`가 `bytesPerRow` 패딩을 고려해 `RGBABytes`를 반환하도록 정리해 행 단위 인덱스 오차 가능성 제거
+  - `Sources/SVGSwiftUI/Render/SVGFilterImageRenderer.swift`에서 arithmetic 합성 루프가 width/height 기반 고정폭 인덱스를 사용하도록 정합
+  - `Package.swift`에서 `CI_SILENCE_GL_DEPRECATION` define 제거(필요하지 않음 확인)
+- 검증:
+  - `swift test --no-parallel` (170 tests, 0 failures)
+  - `swift test -Xswiftc -warnings-as-errors --no-parallel` (170 tests, 0 failures)
+- 리스크:
+  - CPU 기반 arithmetic 합성은 성능이 필터 체인에서 다소 느릴 수 있어 향후 프로파일링 기반 임계치 또는 Metal 대체 경로가 필요할 수 있음
+- 다음 액션:
+  - D1-4 브라우저 기준 비교 확장(고난도 샘플/샘플별 스모크 케이스)로 전환
+
 ### Session 62
 - 작업: 데모 노드 제어 UI + 렌더 변경 검증 강화
 - 완료:
