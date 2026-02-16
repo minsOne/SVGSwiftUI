@@ -1247,3 +1247,28 @@
   - `swift test --parallel` 통과 (`73` tests, `0` failures)
 - Next:
   - `A3-1` 스타일 cascade/specificity 엔진 착수
+
+### Session 25
+- Scope:
+  - 데모 UITest 정리 및 유지보수성 개선 마무리
+- Completed:
+  - UITest 공통 타입과 스냅샷/비교 로직 분리:
+    - `Examples/SVGSwiftUIDemo/UITests/SVGDemoBrowserOracleSupport.swift` 생성
+    - `Examples/SVGSwiftUIDemo/UITests/SVGDemoSnapshotSupport.swift` 생성
+  - `SVGSwiftUIDemoUITests.swift`에서 BrowserOracle/스냅샷 공통 의존성 분리 및 접근 제어 정합성 수정
+  - Xcode 프로젝트 파일에 신규 UITest 파일 엔트리 등록
+    - `Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj/project.pbxproj`
+  - `Scripts/browser-oracle/browser-oracle-manifest.json` 및 Baseline 이미지 갱신 반영
+    - `Aurora`, `Orbital`, `Lattice` 계열 및 SMIL 애니메이션 샘플 포함
+  - 기존 분리된 테스트 파일 정합 확인:
+    - `SVGDemoBaselineUITests.swift`
+    - `SVGDemoCatalogUITests.swift`
+    - `SVGDemoFeatureUITests.swift`
+- Validation:
+  - `swift test --parallel` (`175` tests, `0` failures)
+- Risk:
+  - 데모 앱 리소스(디렉토리/이미지)와 baseline 명칭 동기화 필요
+  - UI 테스트 결과는 시뮬레이터 구성에 따라 CI/로컬 상이성 존재
+- Next:
+  - 분리한 UITest 파일별 목적별 커버리지 검증 확장(필요 시 추가 시나리오)
+  - baseline 갱신 자동화 스크립트 또는 수동 절차 문서화 보강

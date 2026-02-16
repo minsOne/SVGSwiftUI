@@ -253,6 +253,114 @@
       }
     },
     {
+      "name": "animation_smil_orbital_default",
+      "sampleID": "animation-smil-orbital",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-orbital.svg",
+      "size": {
+        "width": 320,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_drift_lines_default",
+      "sampleID": "animation-smil-drift-lines",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-drift-lines.svg",
+      "size": {
+        "width": 360,
+        "height": 200
+      }
+    },
+    {
+      "name": "animation_smil_opacity_breath_default",
+      "sampleID": "animation-smil-opacity-breath",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-opacity-breath.svg",
+      "size": {
+        "width": 280,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_radar_spin_default",
+      "sampleID": "animation-smil-radar-spin",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-radar-spin.svg",
+      "size": {
+        "width": 240,
+        "height": 240
+      }
+    },
+    {
+      "name": "animation_smil_mosaic_grid_default",
+      "sampleID": "animation-smil-mosaic-grid",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-mosaic-grid.svg",
+      "size": {
+        "width": 320,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_path_signal_default",
+      "sampleID": "animation-smil-path-signal",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-path-signal.svg",
+      "size": {
+        "width": 360,
+        "height": 180
+      }
+    },
+    {
+      "name": "animation_smil_pulse_sunburst_default",
+      "sampleID": "animation-smil-pulse-sunburst",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-pulse-sunburst.svg",
+      "size": {
+        "width": 360,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_spin_petal_default",
+      "sampleID": "animation-smil-spin-petal",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-spin-petal.svg",
+      "size": {
+        "width": 340,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_color_lattice_default",
+      "sampleID": "animation-smil-color-lattice",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-color-lattice.svg",
+      "size": {
+        "width": 360,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_pendulum_sweep_default",
+      "sampleID": "animation-smil-pendulum-sweep",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-pendulum-sweep.svg",
+      "size": {
+        "width": 320,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_wave_cascade_default",
+      "sampleID": "animation-smil-wave-cascade",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-wave-cascade.svg",
+      "size": {
+        "width": 360,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_smil_orbit_multi_ring_default",
+      "sampleID": "animation-smil-orbit-multi-ring",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-orbit-multi-ring.svg",
+      "size": {
+        "width": 320,
+        "height": 220
+      }
+    },
+    {
       "name": "animation_transform_radiant_default",
       "sampleID": "animation-transform-radiant",
       "svg": "../../Examples/SVGSwiftUIDemo/Resources/transform-radial-spiral.svg",

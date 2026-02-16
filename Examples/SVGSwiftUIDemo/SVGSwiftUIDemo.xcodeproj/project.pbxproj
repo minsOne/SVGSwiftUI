@@ -13,6 +13,8 @@
 		022B8D4A6B772F4D99765F21 /* orbital_lattice_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 84BD04D1069D92D10E5C3AF0 /* orbital_lattice_default.png */; };
 		092D58A8544B6AFE61DDD0F0 /* badge.svg in Resources */ = {isa = PBXBuildFile; fileRef = CCC2FCAFA1F2D87B7EF62664 /* badge.svg */; };
 		1F5AA8B98530FB6FD9E52E77 /* SVGSwiftUIDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */; };
+		B3A0A4A4D2C3B5E1F00123B3 /* SVGDemoBrowserOracleSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A0A4A4D2C3B5E1F00123B1 /* SVGDemoBrowserOracleSupport.swift */; };
+		B3A0A4A4D2C3B5E1F00123B4 /* SVGDemoSnapshotSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A0A4A4D2C3B5E1F00123B2 /* SVGDemoSnapshotSupport.swift */; };
 		230E870EEBB0DBA4C10CFC2D /* transform-radial-spiral.svg in Resources */ = {isa = PBXBuildFile; fileRef = EF2F83A6967452831960F8F3 /* transform-radial-spiral.svg */; };
 		2A0A2EA2FF018E08A81F2C50 /* dense-grid-world.svg in Resources */ = {isa = PBXBuildFile; fileRef = 4AC4213758B97728F86344E8 /* dense-grid-world.svg */; };
 		2C7554A584DEEC5DE247B6EB /* geometry.svg in Resources */ = {isa = PBXBuildFile; fileRef = 67D1E5D6E87A9DC7CE643E0D /* geometry.svg */; };
@@ -66,6 +68,8 @@
 		009510E01DF126DCE8C02C44 /* aurora-wave.svg */ = {isa = PBXFileReference; path = "aurora-wave.svg"; sourceTree = "<group>"; };
 		025ABB80D8E04C3A9815ABB2 /* badge_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_default.png; sourceTree = "<group>"; };
 		032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGSwiftUIDemoUITests.swift; sourceTree = "<group>"; };
+		B3A0A4A4D2C3B5E1F00123B1 /* SVGDemoBrowserOracleSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGDemoBrowserOracleSupport.swift; sourceTree = "<group>"; };
+		B3A0A4A4D2C3B5E1F00123B2 /* SVGDemoSnapshotSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGDemoSnapshotSupport.swift; sourceTree = "<group>"; };
 		06F5BFB0F4769831B0F3ACBC /* orbital-lattice.svg */ = {isa = PBXFileReference; path = "orbital-lattice.svg"; sourceTree = "<group>"; };
 		15F1FB182F4BDE2607B1E0A5 /* path-commands.svg */ = {isa = PBXFileReference; path = "path-commands.svg"; sourceTree = "<group>"; };
 		1837CDE8D380F463B2948D2A /* style_inline_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = style_inline_default.png; sourceTree = "<group>"; };
@@ -218,15 +222,17 @@
 			path = iPhone_17;
 			sourceTree = "<group>";
 		};
-		9E40EF9AB3A91BA21253AFEA /* UITests */ = {
-			isa = PBXGroup;
-			children = (
-				032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */,
-				254BF8262E165815D12C9F0A /* Baselines */,
-			);
-			path = UITests;
-			sourceTree = "<group>";
-		};
+			9E40EF9AB3A91BA21253AFEA /* UITests */ = {
+				isa = PBXGroup;
+				children = (
+					032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */,
+					B3A0A4A4D2C3B5E1F00123B1 /* SVGDemoBrowserOracleSupport.swift */,
+					B3A0A4A4D2C3B5E1F00123B2 /* SVGDemoSnapshotSupport.swift */,
+					254BF8262E165815D12C9F0A /* Baselines */,
+				);
+				path = UITests;
+				sourceTree = "<group>";
+			};
 		AC1D506ACE078758FA8CA98F /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -379,14 +385,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6EE2665481D436DD5F1B58C6 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1F5AA8B98530FB6FD9E52E77 /* SVGSwiftUIDemoUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+			6EE2665481D436DD5F1B58C6 /* Sources */ = {
+				isa = PBXSourcesBuildPhase;
+				buildActionMask = 2147483647;
+				files = (
+					1F5AA8B98530FB6FD9E52E77 /* SVGSwiftUIDemoUITests.swift in Sources */,
+					B3A0A4A4D2C3B5E1F00123B3 /* SVGDemoBrowserOracleSupport.swift in Sources */,
+					B3A0A4A4D2C3B5E1F00123B4 /* SVGDemoSnapshotSupport.swift in Sources */,
+				);
+				runOnlyForDeploymentPostprocessing = 0;
+			};
 		FB3BAD3BDB19FC7952606D2D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
