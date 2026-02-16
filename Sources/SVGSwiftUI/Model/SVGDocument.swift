@@ -2,6 +2,7 @@ struct SVGDocument: Sendable, Equatable {
     var size: SVGSize?
     var viewBox: SVGRect?
     var nodes: [SVGNode]
+    var animations: [SVGSMILAnimation]
     var styleRules: [SVGStyleRule]
     var clipPaths: [String: [SVGNode]]
     var filterDefinitions: [String: SVGFilterDefinition]
@@ -15,6 +16,7 @@ struct SVGDocument: Sendable, Equatable {
         size: SVGSize? = nil,
         viewBox: SVGRect? = nil,
         nodes: [SVGNode] = [],
+        animations: [SVGSMILAnimation] = [],
         styleRules: [SVGStyleRule] = [],
         clipPaths: [String: [SVGNode]] = [:],
         filterDefinitions: [String: SVGFilterDefinition] = [:],
@@ -23,6 +25,7 @@ struct SVGDocument: Sendable, Equatable {
         self.size = size
         self.viewBox = viewBox
         self.nodes = nodes
+        self.animations = animations
         self.styleRules = styleRules
         self.clipPaths = clipPaths
         self.filterDefinitions = filterDefinitions

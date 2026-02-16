@@ -5,7 +5,7 @@
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3/A16-4 완료
 - 추가 진행: Demo UITest 브라우저 기준 비교 파이프라인 추가
-- 다음 단계: `unsupported` 집계 strict 규칙 반영 마무리 후 `D1-4` 브라우저 기준 확장(샘플-샘플맵 + tolerance 튜닝)
+- 다음 단계: `M1-2` 파서 프레임 확장 완료 → `M1-3` animate/set/timing 구현
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 - 최근 진행 반영:
@@ -17,7 +17,37 @@
   - `D1-3` 픽셀 기반 렌더 변경 검증 UITest 초안 추가
   - `A16-2` `arithmetic` 산출을 `CIColorKernel` 의존 없이 CPU 픽셀 경로로 정리, `bytesPerRow` 오차 처리 보강
 - 세션 우선순위:
-  - D1-3(픽셀 비교 UITest) → D1-4(브라우저 기준 비교 확대) → D1-5(Conformance 연계)
+  - SMIL 우선순위: M1-1 → M1-2 → M1-3 → M1-4 → M1-5
+  - 기존: D1-3 → D1-4 → D1-5(Conformance 연계)
+
+### 2026-02-16 (Session 68)
+- 작업: SMIL 고급 로드맵 1차 준비
+- 완료:
+  - `docs/SMIL_FEATURE_MATRIX.md` 작성: `W3C/animation` 샘플 기반 SMIL 요소 미지원 상태 정리
+  - `docs/TASK_BOARD.md`에 `SMIL Milestones` 등록(M1-1~M1-8)
+  - `docs/WORK_LOG.md` 기록을 위한 후속 항목 초안 정리
+- 검증:
+  - 문서 간 참조 정합성 확인(`rg`, `sed`)
+- 리스크:
+  - M1-2부터 구현을 병렬화할 경우, 범위 고정이 빠르게 흔들릴 수 있어 체크리스트 기반으로 게이팅 필요
+- 다음 액션:
+  - `M1-2` 파서 AST 추가 및 `frameKind` 인식 처리 시작
+
+### 2026-02-16 (Session 69)
+- 작업: SMIL 파서 프레임워크 확장
+- 완료:
+  - `Sources/SVGSwiftUI/Model/SVGAnimation.swift` 추가: `SVGSMILAnimation` / `SVGSMILAnimationKind` 도입
+  - `SVGDocument`에 `animations: [SVGSMILAnimation]` 추가 및 파서 경로 전달
+  - `SVGXMLDocumentParser`에 SMIL 프레임 판별(`animate`, `set`, `animateTransform`, `animateMotion`) 및 `smilAnimations` 수집 적용
+  - 기존 `SVGParserTests`에 SMIL 파서 케이스 추가 (`supported`/`unknown` 태그)
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel`
+  - `swift test --no-parallel` (전체 177개 테스트 통과)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' build-for-testing CODE_SIGNING_ALLOWED=NO`
+- 리스크:
+  - 현재는 파서 수집만 구현되어 실제 렌더 타임라인 반영은 미적용. `M1-3`에서 타이밍 규칙과 타입 분기를 검증해야 함
+- 다음 액션:
+  - `M1-3` 파서 단계의 값 추출(`dur`, `begin`, `repeat*`, `values`) 및 샘플러 스켈레톤 구현
 
 ### 2026-02-16 (Session 64)
 - 작업: `A16-2` arithmetic 픽셀 합성 정합 보강

@@ -727,6 +727,52 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(embeddedShape.base.id, "embedded-supported")
     }
 
+    func testParseCapturesSupportedSMILElementsAsAnimations() throws {
+        let svg = """
+        <svg width='120' height='120'>
+          <g id='motion-group'>
+            <animate attributeName='opacity' values='0;1;0' dur='3s'/>
+          </g>
+          <circle id='target' cx='50' cy='50' r='20'>
+            <set attributeName='opacity' to='0.5' begin='1s' dur='2s'/>
+          </circle>
+          <rect id='spin' width='10' height='10'>
+            <animateTransform attributeName='transform' type='rotate' from='0 5 5' to='360 5 5' dur='4s'/>
+          </rect>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        XCTAssertEqual(document.animations.count, 3)
+        XCTAssertNil(document.unsupportedFeatures["element:animate"])
+        XCTAssertNil(document.unsupportedFeatures["element:set"])
+        XCTAssertNil(document.unsupportedFeatures["element:animatetransform"])
+
+        let motionGroupAnimation = animation(forTargetID: "motion-group", in: document, kind: .animate)
+        XCTAssertEqual(motionGroupAnimation?.targetElementID, "motion-group")
+        XCTAssertEqual(motionGroupAnimation?.targetSyntheticID, "auto:/0/0")
+
+        let targetCircleAnimation = animation(forTargetID: "target", in: document, kind: .set)
+        XCTAssertEqual(targetCircleAnimation?.attributes["attributename"], "opacity")
+
+        let rectAnimation = animation(forTargetID: "spin", in: document, kind: .animateTransform)
+        XCTAssertEqual(rectAnimation?.attributes["from"], "0 5 5")
+    }
+
+    func testParseFallsBackToUnsupportedForUnknownSMILElements() throws {
+        let svg = """
+        <svg>
+          <circle id='target' cx='50' cy='50' r='20'>
+            <animateColor values='red;blue;red' dur='3s'/>
+          </circle>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        XCTAssertTrue(document.animations.isEmpty)
+        XCTAssertEqual(document.unsupportedFeatures["element:animatecolor"], 1)
+    }
+
     func testParseReadsFilterPrimitiveChainInputsAndResults() throws {
         let svg = """
         <svg>
@@ -1444,6 +1490,15 @@ final class SVGParserTests: XCTestCase {
         for node in allNodes(in: document) {
             if case .path(let path) = node, path.base.id == id {
                 return path
+            }
+        }
+        return nil
+    }
+
+    private func animation(forTargetID targetID: String, in document: SVGDocument, kind: SVGSMILAnimationKind) -> SVGSMILAnimation? {
+        for animation in document.animations {
+            if animation.targetElementID == targetID && animation.kind == kind {
+                return animation
             }
         }
         return nil

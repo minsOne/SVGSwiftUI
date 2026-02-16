@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (Session 65)
+Last Updated: 2026-02-16 (Session 69)
 
 ## Status Legend
 - `todo`: not started
@@ -111,6 +111,19 @@ Last Updated: 2026-02-16 (Session 65)
 | D1-4 | D1 | 브라우저 기준 비교 확장 | in_progress | Playwright baseline 대상 확장 + 허용오차 검증 |
 | D1-5 | D1 | W3C/WebKit 연계 강화 | todo | 신규 샘플 대응 fixture/manifest/coverage strict 정합 |
 
+
+
+## SMIL Milestones
+| ID | Phase | Task | Status | Notes |
+|---|---|---|---|---|
+| M1-1 | SMIL | SMIL 범위/현재 상태 매트릭스 정리 (`docs/SMIL_FEATURE_MATRIX.md`) | done | 현재 샘플 대상(`W3C/animation`) 기반 미지원 항목 정리 완료 |
+| M1-2 | SMIL | 파서 프레임워크 확장 (`frameKind`, `SMIL` AST 추가) | done | `SVGXMLDocumentParser`가 `animate`/`set`/`animateTransform`/`animateMotion`를 구조화 모델(`SVGSMILAnimation`)로 수집 |
+| M1-3 | SMIL | `animate`/`set` 파서 + 타이밍 모델 구현 | in_progress | `dur/begin/repeatCount` 기반 샘플러 착수 |
+| M1-4 | SMIL | SMIL 렌더 타임라인 동기화 | todo | `SVGView`에 Animation clock 경로 추가 |
+| M1-5 | SMIL | `animateTransform` + color/length 보간기 | todo | 회전/스케일 중심 기본 케이스 통과 목표 |
+| M1-6 | SMIL | `animateMotion` 기초 지원 | todo | `path` 기반 이동 최소 스펙 |
+| M1-7 | SMIL | SMIL UI 탭 + UITest/샘플 제어 분리 | todo | 샘플별 시작/중단 및 키프레임 체크 |
+| M1-8 | SMIL | W3C/웹 브라우저 비교 시나리오 연동 | todo | 기존 비교 파이프라인에 SMIL 시나리오 등록 |
 
 ## Anti-Duplication Rules
 1. 작업 시작 전 해당 Task ID를 `in_progress`로 먼저 바꾼다.

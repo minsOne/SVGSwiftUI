@@ -150,6 +150,7 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             size: parsedDocument.size,
             viewBox: parsedDocument.viewBox,
             nodes: expandedNodes,
+            animations: parsedDocument.animations,
             styleRules: parsedDocument.styleRules,
             clipPaths: parsedDocument.clipPaths,
             filterDefinitions: parsedDocument.filterDefinitions,
@@ -699,6 +700,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         case shape(SVGElementKind)
         case image
         case text
+        case smil(SVGSMILAnimationKind)
     }
 
     private struct Frame {
@@ -722,6 +724,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     private var styleRules: [SVGStyleRule] = []
     private var clipPathDefinitions: [String: [SVGNode]] = [:]
     private var filterDefinitions: [String: SVGFilterDefinition] = [:]
+    private var smilAnimations: [SVGSMILAnimation] = []
     private var unsupportedFeatures: [String: Int] = [:]
     private var parseError: SVGParserError?
     private var rootDocument: SVGDocument?
@@ -738,6 +741,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         styleRules.removeAll(keepingCapacity: false)
         clipPathDefinitions.removeAll(keepingCapacity: false)
         filterDefinitions.removeAll(keepingCapacity: false)
+        smilAnimations.removeAll(keepingCapacity: false)
         unsupportedFeatures.removeAll(keepingCapacity: false)
         parseError = nil
         rootDocument = nil
@@ -885,6 +889,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 size: parseRootSize(attributes: frame.attributes),
                 viewBox: parseViewBox(attributes: frame.attributes),
                 nodes: frame.children,
+                animations: smilAnimations,
                 styleRules: styleRules,
                 clipPaths: clipPathDefinitions,
                 filterDefinitions: filterDefinitions,
@@ -926,6 +931,16 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             if !content.isEmpty {
                 appendNode(buildTextNode(frame: frame), parser: parser)
             }
+        case .smil(let smilKind):
+            let targetFrame: Frame? = frames.last
+            guard let targetFrame else {
+                return
+            }
+            appendSMILAnimation(
+                kind: smilKind,
+                source: frame,
+                targetFrame: targetFrame
+            )
         }
     }
 
@@ -968,6 +983,31 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 frames[frames.count - 1] = current
             }
         }
+    }
+
+    private func appendSMILAnimation(
+        kind: SVGSMILAnimationKind,
+        source: Frame,
+        targetFrame: Frame
+    ) {
+        let targetElementID = targetFrame.base.id ?? targetFrame.base.syntheticID
+        let normalizedAttributes = normalizeAttributes(source.attributes)
+        let animation = SVGSMILAnimation(
+            id: source.base.id,
+            kind: kind,
+            targetElementID: targetElementID,
+            targetSyntheticID: targetFrame.base.syntheticID,
+            attributes: normalizedAttributes
+        )
+        smilAnimations.append(animation)
+    }
+
+    private func normalizeAttributes(_ attributes: [String: String]) -> [String: String] {
+        var output: [String: String] = [:]
+        for pair in attributes {
+            output[normalizeName(pair.key)] = pair.value
+        }
+        return output
     }
 
     private func parseFilterPrimitive(
@@ -1237,6 +1277,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return .shape(.polygon)
         case "text":
             return .text
+        case "animate":
+            return .smil(.animate)
+        case "set":
+            return .smil(.set)
+        case "animatetransform":
+            return .smil(.animateTransform)
+        case "animatemotion":
+            return .smil(.animateMotion)
         default:
             return nil
         }
@@ -1260,6 +1308,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return "image"
         case .text:
             return "text"
+        case .smil(let smilKind):
+            return smilKind.rawValue
         case .shape(let shapeKind):
             return shapeKind.rawValue
         }

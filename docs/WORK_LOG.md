@@ -2,6 +2,40 @@
 
 ## 2026-02-16
 
+### Session 68
+- 작업: SMIL 로드맵 1차 준비(기준 문서·범위 정리)
+- 완료:
+  - `docs/SMIL_FEATURE_MATRIX.md` 신규 작성:
+    - `W3C/animation` 샘플 기반 SMIL 태그 목록 정리
+    - `animate`/`animateTransform` 미지원 항목 현황 정량화
+    - M1 단계 산출 우선순위 정의
+  - `docs/TASK_BOARD.md`에 `SMIL Milestones` 섹션 추가(M1-1~M1-8)
+  - `docs/WORK_CONTINUATION.md` 우선순위/다음 액션을 M1-1 기준으로 갱신
+- 검증:
+  - 문서 정합성 확인(`rg`, `sed` 기반)으로 참조 및 상태 표시 점검
+- 다음 액션:
+  - M1-2: 파서에서 SMIL 요소(`animate`, `set`, `animateTransform`)를 노드 모델로 수용
+
+### Session 69
+- 작업: SMIL 파서 프레임워크 확장 완료
+- 완료:
+  - `Sources/SVGSwiftUI/Model/SVGAnimation.swift` 추가:
+    - `SVGSMILAnimationKind`: `animate`/`set`/`animateTransform`/`animateMotion`
+    - `SVGSMILAnimation`: 대상 노드 ID+synthetic ID 및 정규화 속성 저장
+  - `SVGDocument`에 `animations` 저장소 추가, 파서 루트 결과에 전달
+  - `SVGXMLDocumentParser`의 `FrameKind`에 `.smil(...)`을 추가하고 `frameKind(for:)`에서 `animate/set/animatetransform/animatemotion` 인식
+  - SMIL 종료 시 부모 프레임을 대상 노드로 매핑해 `appendSMILAnimation(...)`를 통해 애니메이션 모델 축적
+  - `Tests/SVGParserTests.swift`에 SMIL 지원/미지원 케이스 추가 (`testParseCapturesSupportedSMILElementsAsAnimations`, `testParseFallsBackToUnsupportedForUnknownSMILElements`)
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (59 tests, 0 failures)
+  - `swift test --no-parallel` (177 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' build-for-testing CODE_SIGNING_ALLOWED=NO`
+- 리스크:
+  - 현재 미지원 태그 분류는 파서 수준이고 렌더 동기화는 미구현.
+  - `animatetransform`, `animatemotion`는 추출은 되지만 타이밍/보간/노드 반영은 `M1-3`에서 추가 예정
+- 다음 액션:
+  - `M1-3`에서 타이밍 속성 파싱 + 샘플러/보간 타입 초안 구현 후 문서 연동
+
 ### Session 66
 - 작업: 폰트 스타일 및 텍스트 렌더링 파이프라인 정비, 고난도 애니메이션 데모/브라우저 기준 샘플 확장
 - 완료:
