@@ -5,7 +5,7 @@
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3/A16-4 완료
 - 추가 진행: Demo UITest 브라우저 기준 비교 파이프라인 추가
-- 다음 단계: `D1-4` 브라우저 기준 비교 확장
+- 다음 단계: `D1-5` W3C/WebKit 연계 강화
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 - 최근 진행 반영:
@@ -30,6 +30,20 @@
   - `python` 스크립트로 manifest 샘플셋과 `requiredCanvases + animatedCanvases`, `smilCanvases` 정합성 수동 점검
 - 다음 액션:
   - `M1-9` (선행 검토) 이후 `D1-4` 브라우저 baseline 확대 및 시각 회귀 비교 안정화로 이동
+
+### 2026-02-16 (Session 75)
+- 작업: `D1-4` 브라우저 기준 비교 확장 마무리
+- 완료:
+  - `browser-oracle` manifest 정렬 기반 TopN/priority 로딩 및 샘플 필터 API를 추가.
+  - `Scripts/browser-oracle/generate-browser-baselines.sh`에 `--top-n` 옵션을 추가하고 렌더러에서 우선순위 정렬/샘플 제한을 적용.
+  - Demo UITest에 `SVG_BROWSER_BASELINE_TOP_N`, `SVG_BROWSER_MISMATCH_TOLERANCE`, `SVG_BROWSER_COMPARISON_ARTIFACT_DIR` 지원 추가.
+  - 비교 실패 산출물 경로를 CI 업로드 대상으로 지정하여 추적 가능성 확보.
+  - `SVGDemoBrowserOracleSupport.swift`의 `compactMap` 타입 추론 이슈를 Swift 6 기준으로 보정.
+- 검증:
+  - `swift test --no-parallel` (190 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' build-for-testing CODE_SIGNING_ALLOWED=NO`에서 Swift 6 타입 추론 오류 보정 후 재검증 완료
+- 다음 액션:
+  - `D1-5`로 이동: W3C/WebKit 연계 샘플 매핑 정합 및 추가 검증 항목 반영
 
 ### 2026-02-16 (Session 71)
 - 작업: M1-4 SMIL 렌더 타임라인 동기화 검증 및 마무리

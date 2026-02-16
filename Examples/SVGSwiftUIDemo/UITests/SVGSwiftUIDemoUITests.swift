@@ -1097,7 +1097,8 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         guard let value = rawValue else {
             return 2.0
         }
-        guard let parsed = Double(value), parsed.isFinite else {
+        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let parsed = Double(trimmedValue), parsed.isFinite else {
             return 2.0
         }
         if parsed < 0.0 {
@@ -1107,7 +1108,29 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
     }
 
     func browserMismatchTolerance() -> Double {
-        return 0.005
+        let rawValue = ProcessInfo.processInfo.environment["SVG_BROWSER_MISMATCH_TOLERANCE"]
+        let trimmedValue = rawValue?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !trimmedValue.isEmpty else {
+            return 0.005
+        }
+        guard let parsed = Double(trimmedValue), parsed.isFinite else {
+            return 0.005
+        }
+        if parsed < 0.0 {
+            return 0.0
+        }
+        return parsed
+    }
+
+    func browserBaselineTopNLimit() -> Int? {
+        let rawValue = ProcessInfo.processInfo.environment["SVG_BROWSER_BASELINE_TOP_N"]
+        let trimmedValue = rawValue?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard let parsed = Int(trimmedValue), parsed > 0 else {
+            return nil
+        }
+        return parsed
     }
 
     func localBaselineDirectory() -> URL {

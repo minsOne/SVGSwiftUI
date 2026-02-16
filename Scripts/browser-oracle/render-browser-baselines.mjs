@@ -17,9 +17,29 @@ const referenceBaselineDirectory = args.referenceBaselineDir
     : null;
 const manifest = loadJSON(manifestPath);
 const entries = Array.isArray(manifest.cases) ? manifest.cases : [];
+const topN = parsePositiveInt(args.topN);
 if (entries.length === 0) {
     throw new Error(`No cases found in manifest: ${manifestPath}`);
 }
+
+const orderedEntries = Array.from(entries)
+    .map((entry, index) => ({
+        ...entry,
+        __index: index,
+        __priority: normalizePriority(entry.priority, index)
+    }))
+    .sort((lhs, rhs) => {
+        const lhsPriority = lhs.__priority;
+        const rhsPriority = rhs.__priority;
+        if (lhsPriority !== rhsPriority) {
+            return lhsPriority - rhsPriority;
+        }
+        return lhs.__index - rhs.__index;
+    });
+
+const selectedEntries = topN && topN > 0
+    ? orderedEntries.slice(0, topN)
+    : orderedEntries;
 
 await fs.promises.mkdir(outputDirectory, { recursive: true });
 const browser = await chromium.launch({ headless: true });
@@ -27,7 +47,7 @@ const baseDir = path.dirname(manifestPath);
 const page = await browser.newPage();
 
 try {
-    for (const entry of entries) {
+    for (const entry of selectedEntries) {
         if (!entry.name || !entry.svg) {
             throw new Error(
                 `Invalid manifest entry: name and svg are required. Entry=${JSON.stringify(entry)}`
@@ -71,6 +91,24 @@ try {
 } finally {
     await page.close();
     await browser.close();
+}
+
+function normalizePriority(rawValue, fallbackIndex) {
+    if (Number.isInteger(rawValue) && rawValue >= 0) {
+        return rawValue;
+    }
+    return fallbackIndex;
+}
+
+function parsePositiveInt(value) {
+    if (typeof value !== "string") {
+        return null;
+    }
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return null;
+    }
+    return parsed;
 }
 
 function parseArgs(rawArgs) {

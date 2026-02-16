@@ -10,7 +10,8 @@ extension SVGSwiftUIDemoUITests {
     func testCanvasMatchesBrowserBaselines() throws {
         continueAfterFailure = true
         let app = launchApp()
-        let browserBaselineCases = try loadBrowserBaselineCases()
+        let topN = browserBaselineTopNLimit()
+        let browserBaselineCases = try loadBrowserBaselineCases(maxEntries: topN)
         let snapshotMode = SnapshotMode.current(sourceFilePath: #filePath)
         let referenceDirectory = browserReferenceDirectory()
         let shouldUseBrowserReference = referenceDirectory != nil
@@ -21,6 +22,15 @@ extension SVGSwiftUIDemoUITests {
         if !missingBaselineSamples.isEmpty {
             let missingList = missingBaselineSamples.sorted().joined(separator: ", ")
             XCTFail("브라우저 기준 비교 매핑 누락: \(missingList)")
+        }
+
+        if let topN, topN > 0 {
+            let topNDescription = "브라우저 기준 비교 TopN: \(topN)"
+            if browserBaselineCases.count < topN {
+                print("\(topNDescription) (매니페스트에 부족: \(browserBaselineCases.count))")
+            } else {
+                print(topNDescription)
+            }
         }
 
         if !shouldUseBrowserReference {

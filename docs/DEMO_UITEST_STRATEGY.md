@@ -4,7 +4,7 @@
 - DemoApp 렌더 결과가 기대 결과와 일치하는지 자동 검증한다.
 - 수동 눈검사를 줄이고 회귀를 조기에 탐지한다.
 
-## 현재 구현 상태 (2026-02-15)
+## 현재 구현 상태 (2026-02-16)
 - `Examples/SVGSwiftUIDemo/UITests/SVGSwiftUIDemoUITests.swift` 구현 완료
 - 브라우저 기준 오라클(Playwright) 비교 모드 추가: 환경변수 `SVG_BROWSER_REFERENCE_DIR`로 기준 이미지 경로를 바인딩하면 로컬 baseline 대신 브라우저 렌더 이미지를 기준으로 비교
 - 현재 자동화 범위:
@@ -20,10 +20,11 @@
 ### 브라우저 기준 비교 실행
 - 기준 생성:
   - `./Scripts/browser-oracle/generate-browser-baselines.sh --output Examples/SVGSwiftUIDemo/UITests/BrowserBaselines`
+  - 우선순위 정렬/샘플 제한이 필요하면 `--top-n <숫자>` 사용
   - 필요 시 기존 Swift baseline 크기에 맞추려면:
     - `./Scripts/browser-oracle/generate-browser-baselines.sh --output Examples/SVGSwiftUIDemo/UITests/BrowserBaselines --reference-baseline-dir Examples/SVGSwiftUIDemo/UITests/Baselines/iPhone_17/26.2`
 - 테스트 실행:
-  - `SVG_BROWSER_REFERENCE_DIR=Examples/SVGSwiftUIDemo/UITests/BrowserBaselines SVG_BROWSER_REFERENCE_TOLERANCE=2 xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
+  - `SVG_BROWSER_REFERENCE_DIR=Examples/SVGSwiftUIDemo/UITests/BrowserBaselines SVG_BROWSER_REFERENCE_TOLERANCE=2 SVG_BROWSER_MISMATCH_TOLERANCE=0.005 xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' test`
 
 ## 범위
 1. DemoApp launch 및 샘플 SVG 화면 진입 테스트
@@ -42,11 +43,14 @@
    - 경로: `Examples/SVGSwiftUIDemo/UITests/Baselines/<device>/<runtime>/<name>.png`
    - 현재 baseline: `iPhone_17/26.2/{badge_default,panel_stroke,route_offset}.png`
 5. 비교 방식
-   - 픽셀 mismatch ratio 계산 후 허용오차 비교
-   - 현재 허용오차: `0.50%` (`0.005`)
+  - 픽셀 mismatch ratio 계산 후 허용오차 비교
+  - 채널 허용치(`SVG_BROWSER_REFERENCE_TOLERANCE`): 기본 `2` (0~255 RGBA 값)
+  - mismatch 허용치(`SVG_BROWSER_MISMATCH_TOLERANCE`): 기본 `0.005` (0.5%)
+  - TopN 제한(`SVG_BROWSER_BASELINE_TOP_N`): 양수일 때만 적용
 6. 실패 시 산출물
-   - actual, expected, diff 이미지 저장
-   - 로그에 mismatch 비율 + artifact 경로 출력
+  - actual, expected, diff 이미지 저장
+  - 로그에 mismatch 비율 + artifact 경로 출력
+  - `SVG_BROWSER_COMPARISON_ARTIFACT_DIR` 지정 시 해당 경로에 산출물 저장(미지정 시 `~/tmp/SVGSwiftUIDemoSnapshotArtifacts/<timestamp>/<baseline>/`)
 
 ## Baseline 갱신 절차
 1. `touch Examples/SVGSwiftUIDemo/UITests/Baselines/.record`

@@ -120,7 +120,9 @@ jobs:
       - name: Generate browser oracle baselines
         run: |
           BROWSER_BASELINE_DIR="Examples/SVGSwiftUIDemo/UITests/BrowserBaselines"
+          BROWSER_ARTIFACT_DIR="Examples/SVGSwiftUIDemo/UITests/BrowserOracleArtifacts"
           mkdir -p "$BROWSER_BASELINE_DIR"
+          mkdir -p "$BROWSER_ARTIFACT_DIR"
           ./Scripts/browser-oracle/generate-browser-baselines.sh \
             --output "$BROWSER_BASELINE_DIR" \
             --reference-baseline-dir "Examples/SVGSwiftUIDemo/UITests/Baselines/iPhone_17/26.2"
@@ -128,9 +130,18 @@ jobs:
       - name: Run demo tests
         run: |
           SVG_BROWSER_REFERENCE_DIR="$PWD/Examples/SVGSwiftUIDemo/UITests/BrowserBaselines" \
+          SVG_BROWSER_COMPARISON_ARTIFACT_DIR="$PWD/$BROWSER_ARTIFACT_DIR" \
           SVG_BROWSER_REFERENCE_TOLERANCE="2" \
+          SVG_BROWSER_MISMATCH_TOLERANCE="0.005" \
           xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj \
             -scheme SVGSwiftUIDemo \
             -destination "${{ steps.destination.outputs.destination }}" \
             -parallel-testing-enabled NO \
             test
+
+      - name: Upload browser comparison artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-browser-baseline-artifacts-${{ github.run_id }}
+          path: Examples/SVGSwiftUIDemo/UITests/BrowserOracleArtifacts

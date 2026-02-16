@@ -6,24 +6,28 @@ struct DemoBrowserBaselineCase {
     let baselineName: String
     let sourceSVGPath: String
     let expectedSize: CGSize?
+    let priority: Int
 
     init(sampleID: String, baselineName: String, sourceSVGPath: String) {
         self.sampleID = sampleID
         self.baselineName = baselineName
         self.sourceSVGPath = sourceSVGPath
         self.expectedSize = nil
+        self.priority = Int.max
     }
 
     init(
         sampleID: String,
         baselineName: String,
         sourceSVGPath: String,
-        expectedSize: CGSize?
+        expectedSize: CGSize?,
+        priority: Int? = nil
     ) {
         self.sampleID = sampleID
         self.baselineName = baselineName
         self.sourceSVGPath = sourceSVGPath
         self.expectedSize = expectedSize
+        self.priority = priority ?? Int.max
     }
 }
 
@@ -35,6 +39,7 @@ struct BrowserOracleManifestEntry: Decodable {
     let name: String
     let svg: String
     let sampleID: String?
+    let priority: Int?
     let size: BrowserOracleManifestSize?
 }
 
@@ -44,7 +49,10 @@ struct BrowserOracleManifestSize: Decodable {
 }
 
 extension SVGSwiftUIDemoUITests {
-    func loadBrowserBaselineCases() throws -> [DemoBrowserBaselineCase] {
+    func loadBrowserBaselineCases(
+        maxEntries: Int? = nil,
+        sampleIDFilter: Set<String>? = nil
+    ) throws -> [DemoBrowserBaselineCase] {
         guard let manifestURL = findBrowserOracleManifestURL() else {
             throw NSError(
                 domain: "BrowserOracleManifest",
@@ -60,18 +68,41 @@ extension SVGSwiftUIDemoUITests {
         let manifest = try JSONDecoder().decode(BrowserOracleManifest.self, from: rawData)
         let manifestDirectory = manifestURL.deletingLastPathComponent().path
 
-        return manifest.cases.map { entry in
-            let svgPath = (manifestDirectory as NSString).appendingPathComponent(entry.svg)
-            let svgURL = URL(fileURLWithPath: svgPath).standardized
-            let sampleID = entry.sampleID ?? svgURL.deletingPathExtension().lastPathComponent
-            let expectedSize = makeExpectedSize(from: entry.size)
-            return DemoBrowserBaselineCase(
-                sampleID: sampleID,
-                baselineName: entry.name,
-                sourceSVGPath: svgURL.path,
-                expectedSize: expectedSize
-            )
+        let indexedEntries = Array(manifest.cases.enumerated())
+        let selectedEntries = indexedEntries
+            .sorted {
+                let lhsEntry = $0.element
+                let rhsEntry = $1.element
+                let lhsPriority = lhsEntry.priority ?? $0.offset
+                let rhsPriority = rhsEntry.priority ?? $1.offset
+                if lhsPriority != rhsPriority {
+                    return lhsPriority < rhsPriority
+                }
+                return $0.offset < $1.offset
+            }
+            .compactMap { entryOffset -> DemoBrowserBaselineCase? in
+                let entry = entryOffset.element
+                let svgURL = URL(
+                    fileURLWithPath: (manifestDirectory as NSString).appendingPathComponent(entry.svg)
+                ).standardized
+                let sampleID = entry.sampleID ?? svgURL.deletingPathExtension().lastPathComponent
+                if let sampleIDFilter, !sampleIDFilter.contains(sampleID) {
+                    return nil
+                }
+                return DemoBrowserBaselineCase(
+                    sampleID: sampleID,
+                    baselineName: entry.name,
+                    sourceSVGPath: svgURL.path,
+                    expectedSize: makeExpectedSize(from: entry.size),
+                    priority: entry.priority ?? entryOffset.offset
+                )
+            }
+
+        if let maxEntries, maxEntries > 0 {
+            return Array(selectedEntries.prefix(maxEntries))
         }
+
+        return selectedEntries
     }
 
     func makeExpectedSize(from size: BrowserOracleManifestSize?) -> CGSize? {

@@ -2,6 +2,27 @@
 
 ## 2026-02-16
 
+### Session 75
+- 작업: `D1-4` 브라우저 기준 비교 확장 마무리
+- 완료:
+  - `browser-oracle` manifest 정렬/선택 로직 보강:
+    - `DemoBrowserBaselineCase`/manifest decoding에 priority 지원.
+    - `loadBrowserBaselineCases(maxEntries:sampleIDFilter:)`로 TopN + 샘플 필터 API 적용.
+    - `generate-browser-baselines.sh`에 `--top-n` 옵션 추가 및 렌더러에서 TopN 적용.
+  - UITest 비교 파라미터 보강:
+    - `SVG_BROWSER_BASELINE_TOP_N`, `SVG_BROWSER_MISMATCH_TOLERANCE`, `SVG_BROWSER_COMPARISON_ARTIFACT_DIR` 지원 추가.
+    - 채널 tolerance는 `SVG_BROWSER_REFERENCE_TOLERANCE` 파싱 로직 강화.
+  - 시각 회귀 실패 산출물 보존:
+    - baseline 비교 실패 시 expected/actual/diff 이미지 첨부.
+    - 실패 artifacts 경로가 테스트 실행 산출물로 업로드되도록 CI에 전달 경로/업로드 스텝 추가.
+  - Swift 6 컴파일 호환성:
+    - `compactMap` 반환형 추론 이슈를 명시 타입(`DemoBrowserBaselineCase?`)으로 보정.
+- 검증:
+  - `swift test --no-parallel` (190 tests, 0 failures)
+  - `xcodebuild ... -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' build-for-testing CODE_SIGNING_ALLOWED=NO` (현재 `compactMap` 수정 반영 후 통과 확인)
+- 다음 액션:
+  - `D1-5`로 전환: W3C/WebKit 연계 연산 정합/샘플 매핑 강화
+
 ### Session 74
 - 작업: `M1-8` SMIL W3C/웹 브라우저 비교 시나리오 연동 마무리
 - 완료:

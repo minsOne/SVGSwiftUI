@@ -148,9 +148,40 @@ struct SnapshotComparator {
             }
 
             let mismatchString = String(format: "%.4f%%", comparison.mismatchRatio * 100.0)
+            let artifactSummary = "\(artifactsDirectoryURL.path)"
+            XCTContext.runActivity(named: "Baseline mismatch artifacts: \(baselineName)") { activity in
+                let attachment = XCTAttachment(string: artifactSummary)
+                attachment.name = "Snapshot artifacts directory"
+                attachment.lifetime = .keepAlways
+                activity.add(attachment)
+                if FileManager.default.fileExists(atPath: expectedURL.path) {
+                    if let expectedData = try? Data(contentsOf: expectedURL) {
+                        let expectedAttachment = XCTAttachment(data: expectedData, uniformTypeIdentifier: UTType.png.identifier)
+                        expectedAttachment.name = "\(baselineName).expected.png"
+                        expectedAttachment.lifetime = .keepAlways
+                        activity.add(expectedAttachment)
+                    }
+                }
+                if FileManager.default.fileExists(atPath: actualURL.path) {
+                    if let actualData = try? Data(contentsOf: actualURL) {
+                        let actualAttachment = XCTAttachment(data: actualData, uniformTypeIdentifier: UTType.png.identifier)
+                        actualAttachment.name = "\(baselineName).actual.png"
+                        actualAttachment.lifetime = .keepAlways
+                        activity.add(actualAttachment)
+                    }
+                }
+                if FileManager.default.fileExists(atPath: diffURL.path) {
+                    if let diffData = try? Data(contentsOf: diffURL) {
+                        let diffAttachment = XCTAttachment(data: diffData, uniformTypeIdentifier: UTType.png.identifier)
+                        diffAttachment.name = "\(baselineName).diff.png"
+                        diffAttachment.lifetime = .keepAlways
+                        activity.add(diffAttachment)
+                    }
+                }
+            }
             XCTFail(
                 "Baseline mismatch (\(mismatchString)) for \(baselineName). " +
-                    "Artifacts: \(artifactsDirectoryURL.path)"
+                    "Artifacts: \(artifactSummary)"
             )
         }
     }
@@ -175,12 +206,16 @@ struct SnapshotComparator {
 
     func makeArtifactsDirectory(baselineName: String) -> URL {
         let tempDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        let configuredDirectory = ProcessInfo.processInfo.environment["SVG_BROWSER_COMPARISON_ARTIFACT_DIR"] ?? ""
+        let artifactRootURL = configuredDirectory.isEmpty
+            ? tempDirectoryURL
+                .appendingPathComponent("SVGSwiftUIDemoSnapshotArtifacts", isDirectory: true)
+            : URL(fileURLWithPath: configuredDirectory, isDirectory: true)
         let timestamp = makeTimestampString(Date())
-        let artifactsDirectoryURL = tempDirectoryURL
-            .appendingPathComponent("SVGSwiftUIDemoSnapshotArtifacts", isDirectory: true)
+        let artifactsDirectoryURL = artifactRootURL
             .appendingPathComponent(timestamp, isDirectory: true)
             .appendingPathComponent(baselineName, isDirectory: true)
-        try? fileManager.createDirectory(at: artifactsDirectoryURL, withIntermediateDirectories: true)
+        try? fileManager.createDirectory(atPath: artifactsDirectoryURL.path, withIntermediateDirectories: true)
         return artifactsDirectoryURL
     }
 
