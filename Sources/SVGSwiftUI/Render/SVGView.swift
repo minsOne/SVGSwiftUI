@@ -76,6 +76,9 @@ private struct SVGStaticPlaceholderView: View {
     private var hasTransformAnimation: Bool {
         for animations in animationsByTargetID.values {
             for animation in animations {
+                if animation.kind == .animateMotion {
+                    return true
+                }
                 let attributeName: String = animation.attributeName?
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                     .lowercased() ?? ""
@@ -476,7 +479,7 @@ private struct SVGStaticPlaceholderView: View {
                     configuration: configuration
                 )
                 baseResolvedStyles = resolved
-                animationsByTargetID = SVGSMILEngine.groupAnimationsByTarget(cached.animations)
+                animationsByTargetID = cached.animationsByTargetID
                 animationStartDate = Date()
                 pathCache = canCache.shouldCachePathCache
                     ? buildPathCache(from: cached.nodes)
@@ -505,7 +508,7 @@ private struct SVGStaticPlaceholderView: View {
                 configuration: configuration
             )
             baseResolvedStyles = resolved
-            animationsByTargetID = SVGSMILEngine.groupAnimationsByTarget(parsed.animations)
+            animationsByTargetID = parsed.animationsByTargetID
             animationStartDate = Date()
             await cache.insert(parsed, for: key, cost: data.count)
             document = parsed

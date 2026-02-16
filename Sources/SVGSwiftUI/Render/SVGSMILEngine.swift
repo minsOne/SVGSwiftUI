@@ -69,6 +69,11 @@ private struct SVGSMILEngineTimelineSample {
     let usesKeyTimes: Bool
 }
 
+private struct SVGSMILEngineAnimationSample {
+    let animation: SVGSMILAnimation
+    let sample: SVGSMILEngineTimelineSample
+}
+
 struct SVGSMILEngine {
     private static let millisecondsPerSecond: Double = 1000
     private static let motionPathParser: SVGPathDataParser = SVGPathDataParser()
@@ -92,17 +97,81 @@ struct SVGSMILEngine {
             var style = resolvedNodeStyle.style
             var transformOverride = resolvedNodeStyle.transformOverride
             var changed = false
+            var transformAnimation: SVGSMILEngineAnimationSample?
+            var animationByAttribute: [SVGSMILStyleAttribute: SVGSMILEngineAnimationSample] = [:]
 
             for animation in animations {
-                if apply(
-                    animation: animation,
-                    to: &style,
-                    transformOverride: &transformOverride,
+                guard let animationSample = animationSample(
+                    for: animation,
                     elapsed: elapsed
-                ) {
-                    changed = true
+                ) else {
+                    continue
+                }
+
+                if animation.kind == .animateMotion {
+                    transformAnimation = SVGSMILEngineAnimationSample(
+                        animation: animation,
+                        sample: animationSample
+                    )
+                    continue
+                }
+
+                guard let rawAttributeName = animation.attributeName else {
+                    continue
+                }
+                let normalizedName = rawAttributeName
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased()
+                guard let attribute = SVGSMILStyleAttribute(rawValue: normalizedName) else {
+                    continue
+                }
+
+                let candidate = SVGSMILEngineAnimationSample(
+                    animation: animation,
+                    sample: animationSample
+                )
+                if attribute == .transform {
+                    transformAnimation = candidate
+                } else {
+                    animationByAttribute[attribute] = candidate
                 }
             }
+
+                if let transformCandidate = transformAnimation {
+                    if transformCandidate.animation.kind == .animateMotion {
+                        if applyAnimateMotionAnimation(
+                            animation: transformCandidate.animation,
+                            transformOverride: &transformOverride,
+                            sample: transformCandidate.sample
+                        ) {
+                            changed = true
+                        }
+                    } else {
+                        if apply(
+                            animation: transformCandidate.animation,
+                            attribute: .transform,
+                            to: &style,
+                            transformOverride: &transformOverride,
+                            elapsed: elapsed,
+                            sample: transformCandidate.sample
+                        ) {
+                            changed = true
+                        }
+                    }
+                }
+
+                for (attribute, candidate) in animationByAttribute {
+                    if apply(
+                        animation: candidate.animation,
+                        attribute: attribute,
+                        to: &style,
+                        transformOverride: &transformOverride,
+                        elapsed: elapsed,
+                        sample: candidate.sample
+                    ) {
+                        changed = true
+                    }
+                }
             if changed {
                 resolvedNodeStyle.style = style
                 resolvedNodeStyle.transformOverride = transformOverride
@@ -123,40 +192,12 @@ struct SVGSMILEngine {
 
     private static func apply(
         animation: SVGSMILAnimation,
+        attribute: SVGSMILStyleAttribute,
         to style: inout SVGResolvedStyle,
         transformOverride: inout CGAffineTransform?,
-        elapsed: TimeInterval
+        elapsed: TimeInterval,
+        sample: SVGSMILEngineTimelineSample
     ) -> Bool {
-        if animation.kind == .animateMotion {
-            return applyAnimateMotionAnimation(
-                animation: animation,
-                transformOverride: &transformOverride,
-                elapsed: elapsed
-            )
-        }
-
-        guard let rawAttributeName = animation.attributeName else {
-            return false
-        }
-        let normalizedName = rawAttributeName
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased()
-        guard let attribute = SVGSMILStyleAttribute(rawValue: normalizedName) else {
-            return false
-        }
-
-        guard let sample = timelineSample(
-            for: animation.timing,
-            elapsed: elapsed,
-            valueCount: nil,
-            interpolation: animation.interpolation,
-            keyTimes: animation.keyTimes,
-            keySplines: animation.keySplines,
-            fillMode: animation.timing.fill
-        ) else {
-            return false
-        }
-
         switch attribute {
         case .opacity:
             if animation.kind == .set {
@@ -289,7 +330,7 @@ struct SVGSMILEngine {
                 style.stroke = animatedStroke
                 return true
             }
-                return false
+            return false
         case .transform:
             if animation.kind == .set {
                 if let nextTransform = parseTransformValue(
@@ -318,20 +359,8 @@ struct SVGSMILEngine {
     private static func applyAnimateMotionAnimation(
         animation: SVGSMILAnimation,
         transformOverride: inout CGAffineTransform?,
-        elapsed: TimeInterval
+        sample: SVGSMILEngineTimelineSample
     ) -> Bool {
-        guard let sample = timelineSample(
-            for: animation.timing,
-            elapsed: elapsed,
-            valueCount: nil,
-            interpolation: animation.interpolation,
-            keyTimes: animation.keyTimes,
-            keySplines: animation.keySplines,
-            fillMode: animation.timing.fill
-        ) else {
-            return false
-        }
-
         let rotateValue: String = animation.attributes["rotate"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             ?? ""
@@ -346,6 +375,21 @@ struct SVGSMILEngine {
             return true
         }
         return false
+    }
+
+    private static func animationSample(
+        for animation: SVGSMILAnimation,
+        elapsed: TimeInterval
+    ) -> SVGSMILEngineTimelineSample? {
+        timelineSample(
+            for: animation.timing,
+            elapsed: elapsed,
+            valueCount: nil,
+            interpolation: animation.interpolation,
+            keyTimes: animation.keyTimes,
+            keySplines: animation.keySplines,
+            fillMode: animation.timing.fill
+        )
     }
 
     private static func motionTransform(

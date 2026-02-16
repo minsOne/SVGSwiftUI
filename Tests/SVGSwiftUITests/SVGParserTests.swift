@@ -772,6 +772,36 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(rectAnimation?.timing.repeatDur, nil)
     }
 
+    func testAnimationTargetLookupMapsByIDAndSyntheticID() throws {
+        let svg = """
+        <svg width='120' height='120'>
+          <circle>
+            <animate attributeName='opacity' from='0' to='1' dur='2s'/>
+          </circle>
+          <rect id='target' width='10' height='10'>
+            <set attributeName='opacity' to='0.5' dur='1s'/>
+          </rect>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let rectAnimation = animation(forTargetID: "target", in: document, kind: .set)
+        XCTAssertNotNil(rectAnimation)
+        XCTAssertEqual(document.animationIDs(forTargetID: "target").count, 1)
+        XCTAssertEqual(document.animationIDs(forTargetID: "target", includeSyntheticID: false).count, 1)
+        XCTAssertEqual(
+            document.animationsByTargetID["target"]?.count,
+            1
+        )
+
+        let circleAnimation = document.animations.first(where: { animation in
+            animation.kind == .animate && animation.targetElementID != "target"
+        })
+        let circleTargetID = try XCTUnwrap(circleAnimation?.targetElementID)
+        XCTAssertEqual(document.animationIDs(forTargetID: circleTargetID).count, 1)
+        XCTAssertEqual(document.animationsByTargetID[circleTargetID]?.count, 1)
+    }
+
     func testParseSMILCalcModeAndUnsupportedTimeSyntaxFallsBackToDefaults() throws {
         let svg = """
         <svg>

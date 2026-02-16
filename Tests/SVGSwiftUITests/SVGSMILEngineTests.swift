@@ -748,4 +748,232 @@ final class SVGSMILEngineTests: XCTestCase {
         }
         XCTAssertEqual(updatedStyle.style.opacity, 64.7551586836, accuracy: 0.01)
     }
+
+    func testApplyAnimationsLastActiveAnimationWinsForSameAttribute() {
+        let target = "opacity-conflict"
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: SVGResolvedStyle(opacity: 0)
+            )
+        ]
+
+        let firstAnimation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: ["attributename": "opacity", "from": "0", "to": "0.25"],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "opacity",
+            values: nil,
+            type: nil,
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: "0",
+            toValue: "0.25",
+            byValue: nil
+        )
+
+        let secondAnimation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: ["attributename": "opacity", "from": "0.25", "to": "0.75"],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "opacity",
+            values: nil,
+            type: nil,
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: "0.25",
+            toValue: "0.75",
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [firstAnimation, secondAnimation]],
+            at: 1
+        )
+
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        XCTAssertEqual(updatedStyle.style.opacity, 0.375)
+    }
+
+    func testApplyAnimationsLastActiveTransformAnimationWins() {
+        let target = "transform-conflict"
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: SVGResolvedStyle()
+            )
+        ]
+
+        let scaleAnimation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: ["attributename": "transform", "from": "1", "to": "2", "type": "scale"],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "transform",
+            values: nil,
+            type: "scale",
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: "1",
+            toValue: "2",
+            byValue: nil
+        )
+
+        let translateAnimation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: [
+                "attributename": "transform",
+                "values": "translate(0 0);translate(20 20)",
+                "type": "translate"
+            ],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "transform",
+            values: .init(kind: "values", raw: "translate(0 0);translate(20 20)"),
+            type: "translate",
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: nil,
+            toValue: nil,
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [scaleAnimation, translateAnimation]],
+            at: 2
+        )
+
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        guard let transform = updatedStyle.transformOverride else {
+            return XCTFail("Expected transform override")
+        }
+        XCTAssertEqual(transform.tx, 10, accuracy: 0.001)
+        XCTAssertEqual(transform.ty, 10, accuracy: 0.001)
+    }
+
+    func testApplyAnimationsLastActiveAnimateMotionWins() {
+        let target = "motion-conflict"
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: SVGResolvedStyle()
+            )
+        ]
+
+        let firstMotion = SVGSMILAnimation(
+            id: nil,
+            kind: .animateMotion,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: ["path": "M 0 0 L 100 0", "rotate": "0"],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: nil,
+            values: nil,
+            type: nil,
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: nil,
+            toValue: nil,
+            byValue: nil
+        )
+
+        let secondMotion = SVGSMILAnimation(
+            id: nil,
+            kind: .animateMotion,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: ["path": "M 0 0 L 0 100", "rotate": "0"],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: nil,
+            values: nil,
+            type: nil,
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: nil,
+            toValue: nil,
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [firstMotion, secondMotion]],
+            at: 2
+        )
+
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        guard let transform = updatedStyle.transformOverride else {
+            return XCTFail("Expected transform override")
+        }
+        XCTAssertEqual(transform.tx, 0, accuracy: 0.001)
+        XCTAssertEqual(transform.ty, 50, accuracy: 0.001)
+    }
 }

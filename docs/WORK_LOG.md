@@ -2,6 +2,18 @@
 
 ## 2026-02-16
 
+### Session 77
+- 작업: `M1-10` SMIL 애니메이션 병합 정책 구현
+- 완료:
+  - `SVGSMILEngine`에서 동일 target의 동일 속성 다중 애니메이션을 conflict-free로 병합.
+  - `transform`/`transform`(animateTransform)/`animateMotion` 충돌은 마지막 활성 애니메이션 우선으로 정리.
+  - 충돌 병합 회귀 테스트 3건을 `SVGSMILEngineTests`에 추가.
+- 검증:
+  - `swift test --filter SVGSMILEngineTests --no-parallel` (17 tests, 0 failures)
+  - `swift test --no-parallel` (196 tests, 0 failures)
+- 다음 액션:
+  - `D1-5`로 이동해 W3C/WebKit Conformance 매핑 및 Demo 검증 연계 항목을 계속 진행
+
 ### Session 76
 - 작업: `M1-4` 샘플러 보강 및 keyTimes/keySplines 시점 테스트 추가
 - 완료:

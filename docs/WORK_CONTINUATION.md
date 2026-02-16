@@ -17,8 +17,20 @@
   - `D1-3` 픽셀 기반 렌더 변경 검증 UITest 초안 추가
   - `A16-2` `arithmetic` 산출을 `CIColorKernel` 의존 없이 CPU 픽셀 경로로 정리, `bytesPerRow` 오차 처리 보강
 - 세션 우선순위:
-  - SMIL 우선순위: M1-1 → M1-2 → M1-3 → M1-4 → M1-5 → M1-6 → M1-7 → M1-8 → M1-9(완료)
+  - SMIL 우선순위: M1-1 → M1-2 → M1-3 → M1-4 → M1-5 → M1-6 → M1-7 → M1-8 → M1-9 → M1-10(완료)
   - 기존: D1-3 → D1-4 → D1-5(Conformance 연계)
+
+### 2026-02-16 (Session 77)
+- 작업: `M1-10` SMIL 애니메이션 병합 정책 구현
+- 완료:
+  - 동일 target의 동일 속성 다중 애니메이션 충돌을 “마지막 활성 애니메이션 우선” 규칙으로 정리.
+  - `transform`/`animateMotion` 병합 경로를 일관되게 정렬해 마지막 액티브 값만 반영되도록 수정.
+  - 충돌 우선순위 회귀 테스트 3건을 `SVGSMILEngineTests`에 추가.
+- 검증:
+  - `swift test --filter SVGSMILEngineTests --no-parallel`
+  - `swift test --no-parallel`
+- 다음 액션:
+  - `D1-5`로 이동해 W3C/WebKit Conformance 매핑 및 Demo 검증 연계 항목을 계속 진행
 
 ### 2026-02-16 (Session 76)
 - 작업: `M1-9` `keyTimes`/`keySplines` 샘플러 정교화

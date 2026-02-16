@@ -7,6 +7,7 @@ struct SVGDocument: Sendable, Equatable {
     var clipPaths: [String: [SVGNode]]
     var filterDefinitions: [String: SVGFilterDefinition]
     var unsupportedFeatures: [String: Int]
+    var animationsByTargetID: [String: [SVGSMILAnimation]]
 
     var hasUnsupportedFeatures: Bool {
         !unsupportedFeatures.isEmpty
@@ -20,7 +21,8 @@ struct SVGDocument: Sendable, Equatable {
         styleRules: [SVGStyleRule] = [],
         clipPaths: [String: [SVGNode]] = [:],
         filterDefinitions: [String: SVGFilterDefinition] = [:],
-        unsupportedFeatures: [String: Int] = [:]
+        unsupportedFeatures: [String: Int] = [:],
+        animationsByTargetID: [String: [SVGSMILAnimation]]? = nil
     ) {
         self.size = size
         self.viewBox = viewBox
@@ -30,5 +32,32 @@ struct SVGDocument: Sendable, Equatable {
         self.clipPaths = clipPaths
         self.filterDefinitions = filterDefinitions
         self.unsupportedFeatures = unsupportedFeatures
+        self.animationsByTargetID = animationsByTargetID ?? Self.groupAnimationsByTarget(animations)
+    }
+
+    func animationIDs(
+        forTargetID targetID: String,
+        includeSyntheticID: Bool = true
+    ) -> [SVGSMILAnimation] {
+        if includeSyntheticID {
+            return animationsByTargetID[targetID] ?? []
+        }
+        return animations.filter { animation in
+            animation.targetElementID == targetID
+        }
+    }
+
+    private static func groupAnimationsByTarget(
+        _ animations: [SVGSMILAnimation]
+    ) -> [String: [SVGSMILAnimation]] {
+        var output: [String: [SVGSMILAnimation]] = [:]
+        output.reserveCapacity(max(0, animations.count))
+        for animation in animations {
+            output[animation.targetElementID, default: []].append(animation)
+            if animation.targetSyntheticID != animation.targetElementID {
+                output[animation.targetSyntheticID, default: []].append(animation)
+            }
+        }
+        return output
     }
 }
