@@ -8,18 +8,37 @@ struct SVGStyleRuleParser {
         let text = noComments
         var rules: [SVGStyleRule] = []
 
-        var cursorIndex: String.Index = text.startIndex
-        while cursorIndex < text.endIndex {
-            guard let openBraceIndex = text[cursorIndex...].firstIndex(of: "{") else {
+        let chars: [Character] = Array(text)
+        var cursor = 0
+
+        while cursor < chars.count {
+            cursor = skipWhitespace(chars: chars, from: cursor)
+            if cursor >= chars.count {
                 break
             }
 
-            guard let closeBraceIndex = text[openBraceIndex...].dropFirst().firstIndex(of: "}") else {
+            guard let openBraceIndex = index(of: "{", chars: chars, from: cursor) else {
                 break
             }
 
-            let selectorText = String(text[cursorIndex..<openBraceIndex])
-            let declarationText = String(text[text.index(after: openBraceIndex)..<closeBraceIndex])
+            let selectorText = String(
+                chars[cursor..<openBraceIndex]
+            ).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let closeBraceIndex = matchingBraceEnd(
+                from: openBraceIndex,
+                chars: chars
+            ) else {
+                break
+            }
+
+            if selectorText.hasPrefix("@") {
+                cursor = closeBraceIndex + 1
+                continue
+            }
+
+            let declarationText = String(
+                chars[(openBraceIndex + 1)..<closeBraceIndex]
+            )
             let selectors = parseSelectors(selectorText)
             let declarations = declarationParser.parse(declarationText)
 
@@ -31,10 +50,57 @@ struct SVGStyleRuleParser {
                 }
             }
 
-            cursorIndex = text.index(after: closeBraceIndex)
+            cursor = closeBraceIndex + 1
         }
 
         return rules
+    }
+
+    private func skipWhitespace(chars: [Character], from start: Int) -> Int {
+        var index: Int = start
+        while index < chars.count {
+            if chars[index].isWhitespace {
+                index += 1
+                continue
+            }
+            break
+        }
+        return index
+    }
+
+    private func index(of target: Character, chars: [Character], from start: Int) -> Int? {
+        guard start < chars.count else {
+            return nil
+        }
+
+        var index = start
+        while index < chars.count {
+            if chars[index] == target {
+                return index
+            }
+            index += 1
+        }
+        return nil
+    }
+
+    private func matchingBraceEnd(from openBraceIndex: Int, chars: [Character]) -> Int? {
+        var depth = 0
+        var index = openBraceIndex
+
+        while index < chars.count {
+            let item = chars[index]
+            if item == "{" {
+                depth += 1
+            } else if item == "}" {
+                depth -= 1
+                if depth == 0 {
+                    return index
+                }
+            }
+            index += 1
+        }
+
+        return nil
     }
 
     private func parseSelectors(_ text: String) -> [SVGStyleSelector] {
@@ -99,4 +165,3 @@ struct SVGStyleRuleParser {
         return output
     }
 }
-

@@ -2,6 +2,35 @@
 
 ## 2026-02-16
 
+### Session 86
+- 작업: CSS `@keyframes` 및 `animation` 파서/병합 경로 1차 적용
+- 완료:
+  - `Sources/SVGSwiftUI/Parser/SVGKeyframeParser.swift` 추가:
+    - `@keyframes`, `@-webkit-keyframes` 파싱
+    - `%/from/to` 오프셋 계산
+    - 프레임별 선언 매핑
+  - `Sources/SVGSwiftUI/Parser/SVGCSSAnimationBuilder.swift` 추가:
+    - `animation` shorthand/longhand 속성 파싱
+    - `animation-name`, `duration`, `delay`, `timing-function`, `iteration-count`, `fill-mode`, `direction` 해석
+    - 지원 속성(`fill`, `stroke`, `opacity`, `transform`, `stroke-dasharray`, `stroke-dashoffset`) 대상 SMIL 변환
+    - 미지원 keyframes key/타이밍/디렉션은 `unsupportedFeatures` 집계
+  - `SVGParser` 통합:
+    - `XMLParser` 파싱 결과의 `styleRules` + `parsedKeyframes`를 병합 후 `document.animations` 반환
+    - CSS keyframes 애니메이션을 기존 SMIL 애니메이션과 동일 바인딩 흐름에 연결
+  - `SVGSMILEngine` 확장:
+    - `stroke-dasharray`, `stroke-dashoffset` 애니메이션 샘플러 추가
+  - 테스트 강화:
+    - `Tests/SVGParserTests.swift`:
+      - CSS keyframe 지원 테스트 2건(`testParseTracksSupportedCSSKeyframeAnimation`, `testParseRecordsUnsupportedCSSKeyframeReference`)
+      - 스타일 태그 관련 테스트 일부에서 `enableStyleTag: true` 명시로 안정화
+    - `Tests/SVGStyleRuleParserTests.swift`:
+      - `testParseRulesWithKeyframesAtRule`
+- 검증:
+  - `swift test --no-parallel` (206 tests, 0 failures)
+  - `cd Examples/SVGSwiftUIDemo && xcodebuild build -scheme SVGSwiftUIDemo -project SVGSwiftUIDemo.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 17' CODE_SIGNING_ALLOWED=NO`
+- 다음 액션:
+  - `SMIL_ROADMAP.md` Step 7 문서/API 정리 항목 진행
+
 ### Session 85
 - 작업: `SVGSMILEngine` 단위 접미사 변환 검증 테스트 안정화
 - 완료:

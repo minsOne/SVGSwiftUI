@@ -1156,19 +1156,22 @@ private struct RemoteSVGValidationView: View {
                                 }
 
                                 if !analysis.unsupportedSmilElementKeys.isEmpty {
-                                    Text("미지원 SMIL 요소 키: \(analysis.unsupportedSmilElementKeys.joined(separator: \", \"))")
+                                    let unsupportedSmilElements = analysis.unsupportedSmilElementKeys.joined(separator: ", ")
+                                    Text("미지원 SMIL 요소 키: \(unsupportedSmilElements)")
                                         .font(.caption2)
                                         .foregroundStyle(.red)
                                 }
 
                                 if !analysis.unsupportedSmilAttributeKeys.isEmpty {
-                                    Text("미지원 SMIL 속성 키: \(analysis.unsupportedSmilAttributeKeys.joined(separator: \", \"))")
+                                    let unsupportedSmilAttributes = analysis.unsupportedSmilAttributeKeys.joined(separator: ", ")
+                                    Text("미지원 SMIL 속성 키: \(unsupportedSmilAttributes)")
                                         .font(.caption2)
                                         .foregroundStyle(.red)
                                 }
 
                                 if !analysis.unsupportedOtherKeys.isEmpty {
-                                    Text("기타 미지원 피처: \(analysis.unsupportedOtherKeys.joined(separator: \", \"))")
+                                    let unsupportedOther = analysis.unsupportedOtherKeys.joined(separator: ", ")
+                                    Text("기타 미지원 피처: \(unsupportedOther)")
                                         .font(.caption2)
                                         .foregroundStyle(.secondary)
                                 }
@@ -1350,61 +1353,36 @@ private struct RemoteSVGValidationView: View {
     }
 
     private func runSMILAnalysis(sourceText: String, data: Data) -> RemoteSMILAnalysis {
-        do {
-            let parser = SVGParser(options: parserOptions)
-            let document = try parser.parse(data: data)
-            let lowerSource = sourceText.lowercased()
-            let smilElementTags = detectSMILElementTags(from: lowerSource)
-            let hasCSSAnimation = lowerSource.contains("@keyframes") || lowerSource.contains("animation:")
-            let hasJavaScript = lowerSource.contains("<script") || lowerSource.contains("requestanimationframe")
-            let unsupportedKeys = document.unsupportedFeatures.keys.map { $0.lowercased() }
-            let unsupportedSmilElements = unsupportedKeys.filter { key in
-                key.hasPrefix("element:animate") || key == "element:animatetransform" || key == "element:animatemotion"
-            }
-            let unsupportedSmilAttributes = unsupportedKeys.filter { $0.hasPrefix("smil:") && !$0.hasPrefix("smil:unsupported") }
-            let unsupportedOther = unsupportedKeys.filter { key in
-                let isSmilSpecific = key.hasPrefix("element:animate")
-                    || key == "element:animatetransform"
-                    || key == "element:animatemotion"
-                    || key.hasPrefix("smil:")
-                return !isSmilSpecific
-            }
+        let lowerSource = sourceText.lowercased()
+        let smilElementTags = detectSMILElementTags(from: lowerSource)
+        let hasCSSAnimation = lowerSource.contains("@keyframes") || lowerSource.contains("animation:")
+        let hasJavaScript = lowerSource.contains("<script") || lowerSource.contains("requestanimationframe")
+        let unsupportedSmilElements = detectUnsupportedSMILElements(from: lowerSource)
+        let parsedAnimationCount = detectSMILAnimations(from: lowerSource)
 
-            let status: RemoteSMILAnalysis.SupportStatus = {
-                if smilElementTags == 0 {
-                    return .noSMILElements
-                }
-                if document.animations.isEmpty {
-                    return .unsupportedElements
-                }
-                if unsupportedSmilElements.isEmpty && unsupportedSmilAttributes.isEmpty {
-                    return .fullySupported
-                }
-                return .partialSupported
-            }()
+        let status: RemoteSMILAnalysis.SupportStatus = {
+            if smilElementTags == 0 {
+                return .noSMILElements
+            }
+            if parsedAnimationCount == 0 {
+                return .unsupportedElements
+            }
+            if unsupportedSmilElements.isEmpty {
+                return .fullySupported
+            }
+            return .partialSupported
+        }()
 
-            return RemoteSMILAnalysis(
-                status: status,
-                sourceSMILElementCount: smilElementTags,
-                sourceCSSAnimationDetected: hasCSSAnimation,
-                sourceJavaScriptDetected: hasJavaScript,
-                parsedAnimationCount: document.animations.count,
-                unsupportedSmilElementKeys: unsupportedSmilElements.sorted(),
-                unsupportedSmilAttributeKeys: unsupportedSmilAttributes.sorted(),
-                unsupportedOtherKeys: unsupportedOther.sorted()
-            )
-        } catch {
-            return RemoteSMILAnalysis(
-                status: .parseFailed(error.localizedDescription),
-                sourceSMILElementCount: 0,
-                sourceCSSAnimationDetected: false,
-                sourceJavaScriptDetected: false,
-                parsedAnimationCount: 0,
-                unsupportedSmilElementKeys: [],
-                unsupportedSmilAttributeKeys: [],
-                unsupportedOtherKeys: []
-            )
-        }
+        return RemoteSMILAnalysis(
+            status: status,
+            sourceSMILElementCount: smilElementTags,
+            sourceCSSAnimationDetected: hasCSSAnimation,
+            sourceJavaScriptDetected: hasJavaScript,
+            parsedAnimationCount: parsedAnimationCount,
+            unsupportedSmilElementKeys: unsupportedSmilElements,
+            unsupportedSmilAttributeKeys: [],
+            unsupportedOtherKeys: []
+        )
     }
 
     private func detectSMILElementTags(from normalizedSource: String) -> Int {
@@ -1421,6 +1399,49 @@ private struct RemoteSVGValidationView: View {
             let lowerToken = token.lowercased()
             return total + normalizedSource.components(separatedBy: lowerToken).count - 1
         }
+    }
+
+    private func detectSMILAnimations(from normalizedSource: String) -> Int {
+        let tokens: [String] = [
+            "<animate ",
+            "<set ",
+            "<animatetransform",
+            "<animatemotion",
+            "<animatecolor",
+            "<animatetextpath"
+        ]
+        return tokens.reduce(0) { total, token in
+            total + normalizedSource.components(separatedBy: token).count - 1
+        }
+    }
+
+    private func detectUnsupportedSMILElements(from normalizedSource: String) -> [String] {
+        let supportedTags: Set<String> = [
+            "<animate",
+            "<set",
+            "<animatetransform",
+            "<animatemotion",
+            "<animatecolor"
+        ]
+        let allSmilTags: [String] = [
+            "<animate",
+            "<set",
+            "<animatetransform",
+            "<discrete",
+            "<mpath",
+            "<animatepath",
+            "<animatetextpath"
+        ]
+
+        var unsupported: [String] = []
+        for rawTag in allSmilTags {
+            let tag = rawTag.lowercased()
+            let hasTag = normalizedSource.contains(tag)
+            if hasTag && !supportedTags.contains(tag) {
+                unsupported.append(tag.trimmingCharacters(in: CharacterSet(charactersIn: "<")))
+            }
+        }
+        return unsupported
     }
 
     private func decodeSVGText(from data: Data) -> String {

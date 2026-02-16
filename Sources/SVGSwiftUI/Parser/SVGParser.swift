@@ -136,10 +136,22 @@ struct SVGParser: SVGDocumentParsing, Sendable {
     ) throws -> SVGDocument {
         let xmlParser = SVGXMLDocumentParser(options: options)
         let parsedDocument = try xmlParser.parse(data: data)
+        let keyframeDefinitions: [String: SVGParsedKeyframeDefinition] = xmlParser.consumeParsedKeyframes()
         mergeUnsupportedFeatures(
             parsedDocument.unsupportedFeatures,
             into: &unsupportedFeatures
         )
+
+        let cssAnimations = buildCSSAnimations(
+            for: parsedDocument.nodes,
+            styleRules: parsedDocument.styleRules,
+            keyframeDefinitions: keyframeDefinitions,
+            unsupportedFeatures: &unsupportedFeatures
+        )
+
+        var mergedAnimations: [SVGSMILAnimation] = parsedDocument.animations
+        mergedAnimations.append(contentsOf: cssAnimations)
+
         let expandedNodes = try expandEmbeddedImageNodes(
             in: parsedDocument.nodes,
             options: options,
@@ -147,7 +159,7 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             unsupportedFeatures: &unsupportedFeatures
         )
         let animationBindingByTargetID: [String: [SVGSMILAnimationBinding]] = groupAnimationBindingsByTarget(
-            from: parsedDocument.animations
+            from: mergedAnimations
         )
         let linkedNodes: [SVGNode] = linkAnimationReferences(
             in: expandedNodes,
@@ -157,7 +169,7 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             size: parsedDocument.size,
             viewBox: parsedDocument.viewBox,
             nodes: linkedNodes,
-            animations: parsedDocument.animations,
+            animations: mergedAnimations,
             styleRules: parsedDocument.styleRules,
             clipPaths: parsedDocument.clipPaths,
             filterDefinitions: parsedDocument.filterDefinitions,
@@ -853,12 +865,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     private let options: SVGParserOptions
     private let styleDeclarationParser = SVGStyleDeclarationParser()
     private let styleRuleParser = SVGStyleRuleParser()
+    private let keyframeParser = SVGKeyframeParser()
     private let pathDataParser = SVGPathDataParser()
     private var frames: [Frame] = []
     private var ignoreDepth: Int = 0
     private var styleDepth: Int = 0
     private var styleBuffer: String = ""
     private var styleRules: [SVGStyleRule] = []
+    private var parsedKeyframes: [SVGParsedKeyframeDefinition] = []
     private var clipPathDefinitions: [String: [SVGNode]] = [:]
     private var filterDefinitions: [String: SVGFilterDefinition] = [:]
     private var smilAnimations: [SVGSMILAnimation] = []
@@ -876,6 +890,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         styleDepth = 0
         styleBuffer.removeAll(keepingCapacity: false)
         styleRules.removeAll(keepingCapacity: false)
+        parsedKeyframes.removeAll(keepingCapacity: false)
         clipPathDefinitions.removeAll(keepingCapacity: false)
         filterDefinitions.removeAll(keepingCapacity: false)
         smilAnimations.removeAll(keepingCapacity: false)
@@ -995,6 +1010,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 if styleDepth == 1 {
                     let rules = styleRuleParser.parse(styleBuffer)
                     styleRules.append(contentsOf: rules)
+                    let keyframes = keyframeParser.parse(styleBuffer)
+                    parsedKeyframes.append(contentsOf: keyframes)
                     styleBuffer.removeAll(keepingCapacity: false)
                 }
                 styleDepth -= 1
@@ -1122,6 +1139,14 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         }
     }
 
+    func consumeParsedKeyframes() -> [String: SVGParsedKeyframeDefinition] {
+        var output: [String: SVGParsedKeyframeDefinition] = [:]
+        for keyframe in parsedKeyframes {
+            output[keyframe.name] = keyframe
+        }
+        return output
+    }
+
     private func appendSMILAnimation(
         kind: SVGSMILAnimationKind,
         source: Frame,
@@ -1206,6 +1231,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         case fill
         case stroke
         case transform
+        case strokeDashArray = "stroke-dasharray"
+        case strokeDashOffset = "stroke-dashoffset"
     }
 
     private func parseSMILAnimationTiming(attributes: [String: String]) -> SVGSMILAnimationTiming {

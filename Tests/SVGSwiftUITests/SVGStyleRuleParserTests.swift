@@ -47,5 +47,25 @@ final class SVGStyleRuleParserTests: XCTestCase {
 
         XCTAssertTrue(rules.isEmpty)
     }
-}
 
+    func testParseRulesWithKeyframesAtRule() {
+        let rules = parser.parse("""
+            #icon { fill: #f00; }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .loader { opacity: 0.8; }
+        """)
+
+        XCTAssertEqual(rules.count, 2)
+        XCTAssertEqual(rules[0].declarations["fill"], "#f00")
+        XCTAssertEqual(rules[1].declarations["opacity"], "0.8")
+        guard case .id("icon") = rules[0].selector else {
+            return XCTFail("Expected id selector")
+        }
+        guard case .class("loader") = rules[1].selector else {
+            return XCTFail("Expected class selector")
+        }
+    }
+}

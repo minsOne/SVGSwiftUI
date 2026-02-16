@@ -60,7 +60,10 @@ final class SVGParserTests: XCTestCase {
         </html>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
         XCTAssertEqual(document.size, SVGSize(width: 20, height: 20))
     }
 
@@ -78,7 +81,10 @@ final class SVGParserTests: XCTestCase {
         </svg>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
         XCTAssertEqual(document.nodes.count, 1)
 
         guard case .group(let group) = document.nodes[0] else {
@@ -99,7 +105,10 @@ final class SVGParserTests: XCTestCase {
         </svg>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
         XCTAssertNil(pathNode(id: "inside-defs", in: document))
 
         guard let circle = shapeNode(id: "kept-circle", in: document) else {
@@ -120,7 +129,10 @@ final class SVGParserTests: XCTestCase {
         </svg>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
         guard let clipNodes = document.clipPaths["clip"] else {
             return XCTFail("Expected clipPath definition for id 'clip'")
         }
@@ -152,7 +164,10 @@ final class SVGParserTests: XCTestCase {
         </svg>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
         guard let clipNodes = document.clipPaths["clip-window"] else {
             return XCTFail("Expected clipPath definition for id 'clip-window'")
         }
@@ -188,7 +203,10 @@ final class SVGParserTests: XCTestCase {
         </svg>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
         guard let foreground = shapeNode(id: "foreground", in: document) else {
             return XCTFail("Expected foreground shape")
         }
@@ -875,7 +893,7 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(document.unsupportedFeatures["element:animatecolor"], 1)
     }
 
-    func testParseTracksUnsupportedSMILAttributeAsFallback() throws {
+    func testParseTracksSupportedSMILStrokeDasharrayAttribute() throws {
         let svg = """
         <svg>
           <rect id='target' x='0' y='0' width='10' height='10'>
@@ -884,12 +902,86 @@ final class SVGParserTests: XCTestCase {
         </svg>
         """
 
-        let document = try parser.parse(source: .string(svg))
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
+        let animateCandidates = document.animations.filter { animation in
+            animation.kind == .animate && animation.targetElementID == "target"
+        }
+        let animationSummary = document.animations.map { animation in
+            let attributeValue = animation.attributeName ?? "nil"
+            let valueText = animation.values?.raw ?? "nil"
+            return "kind=\(animation.kind), target=\(animation.targetElementID), attribute=\(attributeValue), values=\(valueText)"
+        }
+        XCTAssertFalse(animateCandidates.isEmpty, "animate candidates: \(animationSummary)")
         let animation = animation(forTargetID: "target", in: document, kind: .animate)
 
         XCTAssertNotNil(animation)
-        XCTAssertEqual(document.unsupportedFeatures["smil:animate:attribute:stroke-dasharray"], 1)
+        XCTAssertNil(document.unsupportedFeatures["smil:animate:attribute:stroke-dasharray"])
         XCTAssertEqual(animation?.attributeName, "stroke-dasharray")
+        XCTAssertEqual(animation?.values?.raw, "4;8;2")
+    }
+
+    func testParseTracksSupportedCSSKeyframeAnimation() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <style>
+              .spin {
+                animation: spin 2s linear infinite;
+              }
+
+              @keyframes spin {
+                0% { fill: #f00; }
+                50% { fill: #0f0; }
+                to { fill: #00f; }
+              }
+            </style>
+          </defs>
+
+          <rect id='target' class='spin' x='0' y='0' width='20' height='20' fill='black'/>
+        </svg>
+        """
+
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
+        let animateCandidates = document.animations.filter { animation in
+            animation.kind == .animate && animation.targetElementID == "target"
+        }
+        let animationSummary = document.animations.map { animation -> String in
+            "kind=\(animation.kind), target=\(animation.targetElementID), attribute=\(animation.attributeName ?? "nil"), values=\(animation.values?.raw ?? "nil")"
+        }
+        XCTAssertFalse(animateCandidates.isEmpty, "animate candidates: \(animationSummary)")
+        let animation = animation(forTargetID: "target", in: document, kind: .animate)
+
+        XCTAssertNotNil(animation)
+        XCTAssertNil(document.unsupportedFeatures["css:keyframes:spin"])
+        XCTAssertEqual(animation?.attributeName, "fill")
+        XCTAssertEqual(animation?.values?.raw, "#f00;#0f0;#00f")
+        XCTAssertEqual(animation?.keyTimes, "0.0;0.5;1.0")
+        XCTAssertEqual(animation?.timing.dur, 2.0)
+        XCTAssertEqual(animation?.timing.repeatCount, .indefinite)
+    }
+
+    func testParseRecordsUnsupportedCSSKeyframeReference() throws {
+        let svg = """
+        <svg>
+          <defs>
+            <style>.spin { animation: missing 2s ease-in; }</style>
+          </defs>
+          <rect id='target' class='spin' x='0' y='0' width='20' height='20' fill='black'/>
+        </svg>
+        """
+
+        let document = try parser.parse(
+            source: .string(svg),
+            options: .init(enableStyleTag: true)
+        )
+        XCTAssertTrue(document.animations.isEmpty)
+        XCTAssertEqual(document.unsupportedFeatures["css:keyframes:missing"], 1)
     }
 
     func testParseDoesNotTrackSupportedSMILAttributeAsUnsupported() throws {

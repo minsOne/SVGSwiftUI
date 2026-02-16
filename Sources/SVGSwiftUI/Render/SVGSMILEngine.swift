@@ -7,6 +7,8 @@ private enum SVGSMILStyleAttribute: String {
     case strokeOpacity = "stroke-opacity"
     case strokeWidth = "stroke-width"
     case fontSize = "font-size"
+    case strokeDashArray = "stroke-dasharray"
+    case strokeDashOffset = "stroke-dashoffset"
     case fill
     case stroke
     case transform
@@ -298,6 +300,40 @@ struct SVGSMILEngine {
                 sample: sample
             ) {
                 style.fontSize = animatedValue
+                return true
+            }
+            return false
+        case .strokeDashOffset:
+            if animation.kind == .set {
+                return applySetValue(
+                    value: animation.toValue,
+                    into: &style.strokeDashOffset
+                )
+            }
+            let currentDashOffset = style.strokeDashOffset
+            if let animatedOffset = sampleNumericValue(
+                from: currentDashOffset,
+                animation: animation,
+                elapsed: elapsed,
+                sample: sample
+            ) {
+                style.strokeDashOffset = animatedOffset
+                return true
+            }
+            return false
+        case .strokeDashArray:
+            if animation.kind == .set,
+               let nextDashArray = parseStrokeDashArray(animation.toValue) {
+                style.strokeDashArray = nextDashArray
+                return true
+            }
+            if let animatedDashArray = sampleStrokeDashArrayValue(
+                baseValue: style.strokeDashArray,
+                animation: animation,
+                elapsed: elapsed,
+                sample: sample
+            ) {
+                style.strokeDashArray = animatedDashArray
                 return true
             }
             return false
@@ -1166,6 +1202,65 @@ struct SVGSMILEngine {
         return fromValue + (to - fromValue) * progress
     }
 
+    private static func sampleStrokeDashArrayValue(
+        baseValue: [Double],
+        animation: SVGSMILAnimation,
+        elapsed: TimeInterval,
+        sample: SVGSMILEngineTimelineSample
+    ) -> [Double]? {
+        let rawValues: [String] = parseAnimationValues(animation.values?.raw)
+        if rawValues.count >= 2 {
+            let parsed: [[Double]] = rawValues.compactMap(parseStrokeDashArray)
+            if parsed.count == rawValues.count {
+                let timelineSample = timelineSample(
+                    for: animation.timing,
+                    elapsed: elapsed,
+                    valueCount: parsed.count,
+                    interpolation: animation.interpolation,
+                    keyTimes: animation.keyTimes,
+                    keySplines: animation.keySplines,
+                    fillMode: animation.timing.fill
+                ) ?? sample
+                return interpolateStrokeDashArray(parsed, sample: timelineSample)
+            }
+        }
+
+        let progress: Double = sample.timelineProgress
+        let fromValue: [Double] = if let rawFrom = animation.fromValue {
+            parseStrokeDashArray(rawFrom) ?? baseValue
+        } else {
+            baseValue
+        }
+
+        let targetValue: [Double]? = if animation.kind == .set {
+            parseStrokeDashArray(animation.toValue)
+        } else if let rawTo = animation.toValue {
+            parseStrokeDashArray(rawTo)
+        } else if let rawBy = animation.byValue {
+            parseStrokeDashArray(rawBy)
+        } else {
+            nil
+        }
+        guard let target = targetValue else {
+            return nil
+        }
+
+        if animation.kind == .set {
+            if progress < 1 {
+                return fromValue
+            }
+            return target
+        }
+
+        if target == fromValue {
+            return target
+        }
+        return interpolateStrokeDashArray(
+            [fromValue, target],
+            sample: sample
+        )
+    }
+
     private static func sampleTransformValue(
         baseValue: CGAffineTransform,
         animation: SVGSMILAnimation,
@@ -1371,6 +1466,134 @@ struct SVGSMILEngine {
             return numbers
         }
         return []
+    }
+
+    private static func parseStrokeDashArray(_ value: String?) -> [Double]? {
+        guard let rawValue = value else {
+            return nil
+        }
+        let normalized = rawValue
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        if normalized.isEmpty {
+            return nil
+        }
+        if normalized == "none" {
+            return []
+        }
+        let replaced = normalized.replacingOccurrences(of: ",", with: " ")
+        let parts = replaced
+            .split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" || $0 == "\r" })
+        if parts.isEmpty {
+            return nil
+        }
+        var output: [Double] = []
+        output.reserveCapacity(parts.count)
+        for part in parts {
+            let numberText = part.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let parsed = parseSMILDouble(numberText) else {
+                return nil
+            }
+            output.append(parsed)
+        }
+        return output.isEmpty ? nil : output
+    }
+
+    private static func interpolateStrokeDashArray(
+        _ values: [[Double]],
+        sample: SVGSMILEngineTimelineSample
+    ) -> [Double]? {
+        guard !values.isEmpty else {
+            return []
+        }
+        if values.count == 1 {
+            return values[0]
+        }
+        if sample.usesKeyTimes {
+            let segmentCount: Int = values.count - 1
+            if segmentCount <= 0 {
+                return values[0]
+            }
+            let safeSegment: Int = min(sample.segmentIndex, segmentCount - 1)
+            return interpolateStrokeDashArray(
+                values[safeSegment],
+                with: values[safeSegment + 1],
+                progress: sample.segmentProgress
+            )
+        }
+        return interpolateStrokeDashArray(values, progress: sample.timelineProgress)
+    }
+
+    private static func interpolateStrokeDashArray(
+        _ values: [[Double]],
+        progress: Double
+    ) -> [Double]? {
+        guard !values.isEmpty else {
+            return []
+        }
+        if values.count == 1 {
+            return values[0]
+        }
+        let clampedProgress = clamp(progress, min: 0, max: 1)
+        if clampedProgress <= 0 {
+            return values[0]
+        }
+        if clampedProgress >= 1 {
+            return values[values.count - 1]
+        }
+        if values.count == 2 {
+            return interpolateStrokeDashArray(values[0], with: values[1], progress: clampedProgress)
+        }
+        let scaled = clampedProgress * Double(values.count - 1)
+        let segmentIndex: Int = min(Int(scaled), values.count - 2)
+        let segmentStart = Double(segmentIndex)
+        let segmentProgress = scaled - segmentStart
+        return interpolateStrokeDashArray(
+            values[segmentIndex],
+            with: values[segmentIndex + 1],
+            progress: segmentProgress
+        )
+    }
+
+    private static func interpolateStrokeDashArray(
+        _ left: [Double],
+        with right: [Double],
+        progress: Double
+    ) -> [Double]? {
+        let clampedProgress = clamp(progress, min: 0, max: 1)
+        if left == right {
+            return left
+        }
+        if left.isEmpty {
+            return clampedProgress >= 1 ? right : left
+        }
+        if right.isEmpty {
+            return clampedProgress <= 0 ? left : right
+        }
+        guard left.count == right.count else {
+            if clampedProgress <= 0 {
+                return left
+            }
+            if clampedProgress >= 1 {
+                return right
+            }
+            return nil
+        }
+        var output: [Double] = []
+        output.reserveCapacity(left.count)
+        for index in 0 ..< left.count {
+            let interpolated = interpolateNumber(
+                values: [left[index], right[index]],
+                sample: SVGSMILEngineTimelineSample(
+                    timelineProgress: clampedProgress,
+                    segmentProgress: clampedProgress,
+                    segmentIndex: 0,
+                    usesKeyTimes: false
+                )
+            )
+            output.append(interpolated)
+        }
+        return output
     }
 
     private static func makeTransform(type: String, values: [Double]) -> CGAffineTransform? {
@@ -1941,6 +2164,24 @@ struct SVGSMILEngine {
         if trimmed.hasSuffix("%") {
             let numberText = String(trimmed.dropLast(1))
             return Double(numberText)
+        }
+        if trimmed.hasSuffix("deg") {
+            let numberText = String(trimmed.dropLast(3))
+            return Double(numberText)
+        }
+        if trimmed.hasSuffix("rad") {
+            let numberText = String(trimmed.dropLast(3))
+            guard let radians = Double(numberText) else {
+                return nil
+            }
+            return radians * 180 / .pi
+        }
+        if trimmed.hasSuffix("turn") {
+            let numberText = String(trimmed.dropLast(4))
+            guard let turns = Double(numberText) else {
+                return nil
+            }
+            return turns * 360
         }
         return Double(trimmed)
     }
