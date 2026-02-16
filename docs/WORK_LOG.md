@@ -2,6 +2,42 @@
 
 ## 2026-02-16
 
+### Session 88
+- 작업: 데모앱 원격 SVG의 외부 CSS 스타일시트 인라인 처리 추가
+- 완료:
+  - `Examples/SVGSwiftUIDemo/Sources/ContentView.swift` `RemoteSVGValidationView`에 원격 SVG 파싱 전 전처리 파이프라인 추가:
+    - `<link ... rel*="stylesheet">` 태그 추출
+    - `href` 또는 `xlink:href`로 스타일시트 URL 해석
+    - 원격 스타일시트 동시 로드 후 `<style>...</style>` 블록으로 병합
+    - 원본 `<link>` 태그 제거 후 화면 렌더러에 병합 텍스트 전달
+  - 동일 화면 내 SMIL/지원성 분석 문구를 지원 범위 중심으로 보강.
+- 수정:
+  - `inlineExternalStylesheets` 초기 튜닝 시 `tuple.isEmpty`와 `NSRange` 처리 오타를 정정하여 Xcode 컴파일 오류 제거.
+- 검증:
+  - `swift test --no-parallel` (206 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination "platform=iOS Simulator,name=iPhone 17" build CODE_SIGNING_ALLOWED=NO` (빌드 성공)
+- 다음 액션:
+  - 원격 CSS 링크 샘플 1~2건에 대해 실제 렌더 결과 검증을 위한 UI 테스트 또는 수동 검증 케이스 추가 검토.
+
+### Session 87
+- 작업: SMIL Step 7(문서화/배포 체크) 마무리
+- 완료:
+  - `docs/SMIL_ROADMAP.md` Step 7의 두 항목(문서화, API/보안/패키징 체크)을 `[x]` 처리.
+  - `README.md`에 SMIL 지원/제약/제한사항과 배포 게이트(테스트/빌드/xcframework 생성) 항목을 추가.
+  - `Examples/SVGSwiftUIDemo/Sources/ContentView.swift`의 데모 섹션 설명을 SMIL/W3C 제한사항 반영 문구로 정제.
+- 검증:
+  - `swift test --no-parallel`
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination "platform=iOS Simulator,name=iPhone 17" build CODE_SIGNING_ALLOWED=NO`
+- `./Scripts/package-release.sh --version smoke --output build/xcframework-smil-check`
+  - 실행 결과:
+    - `swift test` 통과
+    - Demo 빌드 통과
+    - `package-release`는 `*.xcarchive` 내 기대 경로(`Products/usr/local/lib/SVGSwiftUI.framework`)가 없어
+      `** ARCHIVE SUCCEEDED **` 후 `xcodebuild -create-xcframework`에서 경로 검증 실패 (`-framework` 입력 경로 없음)
+  - 다음 액션: `Scripts/package-release.sh`에서 `archive` 산출물 탐색 경로를 동적 product/빌드 타입별로 보정하는 작업 필요.
+- 다음 액션:
+  - 검증 성공 시 `WORK_CONTINUATION.md` Step 7 반영 및 결과 커밋/푸시.
+
 ### Session 86
 - 작업: CSS `@keyframes` 및 `animation` 파서/병합 경로 1차 적용
 - 완료:

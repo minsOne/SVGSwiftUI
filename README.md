@@ -194,6 +194,22 @@ var body: some View {
 - 노드 제어: id 기반 override map + resolver closure
 - 캐시 키: 입력 데이터 + parser options + schema version
 
+### SMIL/CSS 애니메이션 지원 상태
+
+본 라이브러리는 SMIL/애니메이션을 기본적으로 지원하지만 100%가 아닌 **제어된 스펙 범위**입니다.
+
+- 파서 수집 지원: `animate`, `set`, `animateTransform`, `animateMotion`
+- 렌더 반영 지원:
+  - `animate` / `set`의 `from`/`to`/`by` 및 기본 `values` 보간
+  - `animateTransform`의 `rotate`, `scale`, `translate` 기본 보간
+  - `animateMotion`의 이동 좌표/경로 보간 및 `rotate`(fixed/auto/auto-reverse) 최소 동작
+  - CSS `@keyframes`와 `animation` 단축/개별 속성의 매핑(SMIL 엔진으로 변환)
+- 부분 지원(실험/제약):
+  - `keyTimes`, `keySplines`, `begin` 이벤트 체인, 일부 고급 SMIL 속성
+  - `repeatDur`, 다중 `begin`/`end` 의존성의 완전한 타이밍 정합
+  - 일부 SMIL 속성/요소(`animateColor`, `animateOpacity` 등)는 `unsupportedFeatures`로 폴백 처리
+- 미지원/확장 항목은 `docs/SMIL_FEATURE_MATRIX.md`에 실시간 갱신
+
 지원되지 않거나 제한적으로 동작하는 항목:
 - 고급 렌더 규칙 중 `mask`, `filter`, 그라디언트, 텍스트/이미지 고급 케이스는 미지원
 - `clipPath`는 `url(#id)` 참조의 기본 케이스만 제한적으로 지원
@@ -222,6 +238,17 @@ xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj \
 ```
 
 CI에서는 iOS Simulator를 자동 탐색한 뒤 실행되며, 스냅샷 동시 실행은 비활성화(`-parallel-testing-enabled NO`)로 재현성을 확보합니다.
+
+### 배포/CI 체크 포인트
+
+- `swift test --no-parallel`  
+  - 라이브러리 API 및 렌더 파이프라인 회귀 탐지
+- `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination "platform=iOS Simulator,name=iPhone 17" build CODE_SIGNING_ALLOWED=NO`
+  - 데모 앱 빌드 유효성 검사
+- `./Scripts/package-release.sh --version <ver> --output build/xcframework`
+  - xcframework 생성 경로 점검 및 아티팩트(`.zip`, `.sha256`) 존재성 확인
+
+모든 배포 산출물은 `.gitignore`에서 무시되며, 공개 저장소에는 코드/문서/테스트/스크립트만 반영됩니다.
 
 ## 개발 관련 문서
 

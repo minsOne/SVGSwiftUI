@@ -1335,12 +1335,18 @@ private struct RemoteSVGValidationView: View {
         if decodedSource.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             throw RemoteLoadError.emptyPayload
         }
-        return (data, decodedSource)
+        let resolvedURL = response.url ?? remoteURL
+        let inlineAwareSource = await inlineExternalStylesheets(in: decodedSource, baseURL: resolvedURL)
+        guard let encodedPayload = inlineAwareSource.data(using: .utf8) else {
+            throw RemoteLoadError.encodingFailure
+        }
+        return (encodedPayload, inlineAwareSource)
     }
 
     private enum RemoteLoadError: LocalizedError {
         case httpStatus(Int)
         case emptyPayload
+        case encodingFailure
 
         var errorDescription: String? {
             switch self {
@@ -1348,6 +1354,8 @@ private struct RemoteSVGValidationView: View {
                 return "HTTP \(code): 응답 상태가 유효하지 않습니다."
             case .emptyPayload:
                 return "응답 본문이 비어 있어 분석할 수 없습니다."
+            case .encodingFailure:
+                return "응답 소스를 UTF-8로 변환하지 못했습니다."
             }
         }
     }
@@ -1459,6 +1467,168 @@ private struct RemoteSVGValidationView: View {
         }
         return String(decoding: data, as: UTF8.self)
     }
+
+    private func inlineExternalStylesheets(
+        in sourceText: String,
+        baseURL: URL
+    ) async -> String {
+        let stylesheetInfo = extractStylesheetLinkInfo(from: sourceText, baseURL: baseURL)
+        if stylesheetInfo.matches.isEmpty {
+            return sourceText
+        }
+
+        let inlineStyle = await loadAndMergeExternalStylesheets(from: stylesheetInfo.urls)
+        if inlineStyle.isEmpty {
+            return removeStylesheetLinkTags(from: sourceText, matches: stylesheetInfo.matches)
+        }
+
+        let mutableSource = NSMutableString(string: sourceText)
+        for range in stylesheetInfo.matches.reversed() {
+            mutableSource.replaceCharacters(in: range, with: "")
+        }
+
+        let styleBlock = "\n<style>\n\(inlineStyle)\n</style>\n"
+        let closeRange = mutableSource.range(of: "</svg>", options: .caseInsensitive)
+        if closeRange.location == NSNotFound {
+            mutableSource.append(styleBlock)
+        } else {
+            mutableSource.insert(styleBlock, at: closeRange.location)
+        }
+
+        return String(mutableSource)
+    }
+
+    private func removeStylesheetLinkTags(
+        from sourceText: String,
+        matches: [NSRange]
+    ) -> String {
+        if matches.isEmpty {
+            return sourceText
+        }
+        let mutableSource = NSMutableString(string: sourceText)
+        for match in matches.reversed() {
+            mutableSource.replaceCharacters(in: match, with: "")
+        }
+        return String(mutableSource)
+    }
+
+    private func loadAndMergeExternalStylesheets(
+        from styleURLs: [URL]
+    ) async -> String {
+        var mergedStyles: String = ""
+        for styleURL in styleURLs {
+            guard let stylesheetText = await loadStylesheetPayload(from: styleURL) else {
+                continue
+            }
+            if mergedStyles.isEmpty {
+                mergedStyles = "/* \(styleURL.absoluteString) */\n" + stylesheetText
+            } else {
+                mergedStyles += "\n\n/* \(styleURL.absoluteString) */\n" + stylesheetText
+            }
+        }
+        return mergedStyles
+    }
+
+    private func loadStylesheetPayload(from styleURL: URL) async -> String? {
+        do {
+            let (data, response) = try await loader.data(from: styleURL)
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200...299).contains(httpResponse.statusCode) {
+                return nil
+            }
+            let text = decodeSVGText(from: data).trimmingCharacters(in: .whitespacesAndNewlines)
+            return text.isEmpty ? nil : text
+        } catch {
+            return nil
+        }
+    }
+
+    private func extractStylesheetLinkInfo(
+        from sourceText: String,
+        baseURL: URL
+    ) -> (matches: [NSRange], urls: [URL]) {
+        let linkPattern = #"<link\b[^>]*>"#
+        guard let linkRegex = try? NSRegularExpression(pattern: linkPattern, options: [.caseInsensitive]) else {
+            return ([], [])
+        }
+
+        let nsSource = sourceText as NSString
+        let range = NSRange(location: 0, length: nsSource.length)
+        let matches = linkRegex.matches(in: sourceText, options: [], range: range)
+
+        var stylesheetRanges: [NSRange] = []
+        var stylesheetURLs: [URL] = []
+        var seen: Set<String> = []
+
+        for match in matches {
+            let matchedRange = match.range
+            guard let tagRange = Range(matchedRange, in: sourceText) else {
+                continue
+            }
+            let rawTag = String(sourceText[tagRange])
+            guard let rawRel = attributeValue("rel", from: rawTag),
+                  isStylesheetRelationship(rawRel) else {
+                continue
+            }
+            guard let rawHref = attributeValue("href", from: rawTag)
+                    ?? attributeValue("xlink:href", from: rawTag),
+                  let stylesheetURL = resolveRemoteURL(rawHref, baseURL: baseURL) else {
+                continue
+            }
+            let absoluteText = stylesheetURL.absoluteString
+            if seen.insert(absoluteText).inserted {
+                stylesheetURLs.append(stylesheetURL)
+                stylesheetRanges.append(matchedRange)
+            }
+        }
+
+        return (stylesheetRanges, stylesheetURLs)
+    }
+
+    private func isStylesheetRelationship(_ rawRelValue: String) -> Bool {
+        let values = rawRelValue
+            .split(whereSeparator: \.isWhitespace)
+            .map { $0.lowercased() }
+        return values.contains("stylesheet")
+    }
+
+    private func resolveRemoteURL(
+        _ rawValue: String,
+        baseURL: URL
+    ) -> URL? {
+        let sanitized = rawValue
+            .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+        guard let candidate = URL(string: sanitized, relativeTo: baseURL) else {
+            return nil
+        }
+        return candidate.absoluteURL
+    }
+
+    private func attributeValue(_ name: String, from rawTag: String) -> String? {
+        let escapedName = NSRegularExpression.escapedPattern(for: name)
+        let pattern = "(?i)\\b" + escapedName + "\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)'|([^\\s\"'>/]+))"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+            return nil
+        }
+        let nsTag = rawTag as NSString
+        let range = NSRange(location: 0, length: nsTag.length)
+        guard let match = regex.firstMatch(in: rawTag, options: [], range: range) else {
+            return nil
+        }
+
+        for groupIndex in 1...3 {
+            if match.numberOfRanges > groupIndex {
+                let valueRange = match.range(at: groupIndex)
+                if valueRange.location != NSNotFound,
+                   let value = Range(valueRange, in: rawTag) {
+                    let rawValue = String(rawTag[value])
+                    return rawValue
+                }
+            }
+        }
+        return nil
+    }
 }
 
 private enum DemoCatalogMode: Int, CaseIterable {
@@ -1505,9 +1675,11 @@ private enum DemoCatalogMode: Int, CaseIterable {
         case .animation:
             return "미리 구성된 애니메이션 샘플만 모아 놓아 동작 확인에 집중할 수 있습니다."
         case .smil:
-            return "SMIL 샘플만 모아 렌더링 정합성과 타이밍 동작을 분리 점검합니다."
+            return "SMIL 샘플을 분리해 렌더 정합성과 타이밍 동작을 확인합니다. "
+                + "지원: animate/set/animateTransform/animateMotion 기본 동작, keyTimes/keySplines/이벤트형 begin는 제한됩니다."
         case .w3c:
-            return "단위 테스트 기반 W3C 시나리오 후보 샘플을 확인할 수 있습니다."
+            return "단위 테스트 기반 W3C 시나리오 후보 샘플을 확인할 수 있습니다. "
+                + "지원/미지원은 텍스트 코드와 unsupportedFeatures 힌트로 구분됩니다."
         case .remote:
             return "운영 URL로 SVG를 직접 받아 렌더링해 차이를 점검할 수 있습니다."
         }
