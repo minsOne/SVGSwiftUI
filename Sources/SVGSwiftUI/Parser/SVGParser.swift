@@ -80,10 +80,50 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             maxEmbeddedImageDepth: options.maxEmbeddedImageDepth
         )
         var unsupportedFeatures: [String: Int] = [:]
+        let sourceText = try decodeSVGText(from: data)
+        do {
+            return try parse(
+                sourceText: sourceText,
+                options: options,
+                embeddedImageState: state,
+                unsupportedFeatures: &unsupportedFeatures
+            )
+        } catch let error as SVGParserError {
+            if case .invalidSVGRoot = error,
+               let extracted = extractRootFromSVG(sourceText) {
+                return try parse(
+                    sourceText: extracted,
+                    options: options,
+                    embeddedImageState: state,
+                    unsupportedFeatures: &unsupportedFeatures
+                )
+            }
+            throw error
+        }
+    }
+
+    fileprivate func parse(
+        sourceText: String,
+        options: SVGParserOptions,
+        embeddedImageState: SVGEmbeddedImageState,
+        unsupportedFeatures: inout [String: Int]
+    ) throws -> SVGDocument {
+        guard !sourceText.isEmpty else {
+            throw SVGParserError.emptyInput
+        }
+
+        guard sourceText.localizedCaseInsensitiveContains("<svg") else {
+            throw SVGParserError.invalidSVGRoot
+        }
+
+        guard let data = sourceText.data(using: .utf8) else {
+            throw SVGParserError.invalidUTF8Input
+        }
+
         return try parse(
             data: data,
             options: options,
-            embeddedImageState: state,
+            embeddedImageState: embeddedImageState,
             unsupportedFeatures: &unsupportedFeatures
         )
     }
@@ -94,18 +134,6 @@ struct SVGParser: SVGDocumentParsing, Sendable {
         embeddedImageState: SVGEmbeddedImageState,
         unsupportedFeatures: inout [String: Int]
     ) throws -> SVGDocument {
-        guard !data.isEmpty else {
-            throw SVGParserError.emptyInput
-        }
-
-        guard let text = String(data: data, encoding: .utf8) else {
-            throw SVGParserError.invalidUTF8Input
-        }
-
-        guard text.localizedCaseInsensitiveContains("<svg") else {
-            throw SVGParserError.invalidSVGRoot
-        }
-
         let xmlParser = SVGXMLDocumentParser(options: options)
         let parsedDocument = try xmlParser.parse(data: data)
         mergeUnsupportedFeatures(
@@ -127,6 +155,233 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             filterDefinitions: parsedDocument.filterDefinitions,
             unsupportedFeatures: unsupportedFeatures
         )
+    }
+
+    private func decodeSVGText(from data: Data) throws -> String {
+        if let utf8Text = String(data: data, encoding: .utf8), !containsNULCharacters(in: utf8Text) {
+            return utf8Text
+        }
+
+        let bomStripped = stripBOM(from: data)
+        if let utf16BOM = decodeUTF16WithBOM(from: bomStripped) {
+            return utf16BOM
+        }
+        if let utf32BOM = decodeUTF32WithBOM(from: bomStripped) {
+            return utf32BOM
+        }
+
+        if looksLikeUTF16(data: data, littleEndian: true), let utf16Text = decodeUTF16Data(data, littleEndian: true) {
+            return utf16Text
+        }
+        if looksLikeUTF16(data: data, littleEndian: false), let utf16Text = decodeUTF16Data(data, littleEndian: false) {
+            return utf16Text
+        }
+        if looksLikeUTF32(data: data, littleEndian: true), let utf32Text = decodeUTF32Data(data, littleEndian: true) {
+            return utf32Text
+        }
+        if looksLikeUTF32(data: data, littleEndian: false), let utf32Text = decodeUTF32Data(data, littleEndian: false) {
+            return utf32Text
+        }
+
+        throw SVGParserError.invalidUTF8Input
+    }
+
+    private func stripBOM(from data: Data) -> Data {
+        if data.starts(with: [0xEF, 0xBB, 0xBF]) {
+            return data.dropFirst(3)
+        }
+        return data
+    }
+
+    private func decodeUTF16WithBOM(from data: Data) -> String? {
+        if data.starts(with: [0xFE, 0xFF]) {
+            return decodeUTF16Data(data.dropFirst(2), littleEndian: false)
+        }
+        if data.starts(with: [0xFF, 0xFE]) {
+            return decodeUTF16Data(data.dropFirst(2), littleEndian: true)
+        }
+        return nil
+    }
+
+    private func decodeUTF32WithBOM(from data: Data) -> String? {
+        if data.starts(with: [0x00, 0x00, 0xFE, 0xFF]) {
+            return decodeUTF32Data(data.dropFirst(4), littleEndian: false)
+        }
+        if data.starts(with: [0xFF, 0xFE, 0x00, 0x00]) {
+            return decodeUTF32Data(data.dropFirst(4), littleEndian: true)
+        }
+        return nil
+    }
+
+    private func decodeUTF16Data(_ data: Data, littleEndian: Bool) -> String? {
+        if data.count % 2 != 0 {
+            return nil
+        }
+        let unitCount = data.count / 2
+        guard unitCount > 0 else {
+            return String()
+        }
+
+        var codeUnits: [UInt16] = []
+        codeUnits.reserveCapacity(unitCount)
+        data.withUnsafeBytes { rawPointer in
+            let bytes = rawPointer.bindMemory(to: UInt8.self)
+            var index = 0
+            while index + 1 < bytes.count {
+                let first = UInt16(bytes[index])
+                let second = UInt16(bytes[index + 1])
+                let unit = littleEndian ? (first | (second << 8)) : (second | (first << 8))
+                codeUnits.append(unit)
+                index += 2
+            }
+        }
+        return String(decoding: codeUnits, as: UTF16.self)
+    }
+
+    private func decodeUTF32Data(_ data: Data, littleEndian: Bool) -> String? {
+        if data.count % 4 != 0 {
+            return nil
+        }
+        let unitCount = data.count / 4
+        guard unitCount > 0 else {
+            return String()
+        }
+
+        var codeUnits: [UInt32] = []
+        codeUnits.reserveCapacity(unitCount)
+        data.withUnsafeBytes { rawPointer in
+            let bytes = rawPointer.bindMemory(to: UInt8.self)
+            var index = 0
+            while index + 3 < bytes.count {
+                let b0 = UInt32(bytes[index])
+                let b1 = UInt32(bytes[index + 1])
+                let b2 = UInt32(bytes[index + 2])
+                let b3 = UInt32(bytes[index + 3])
+                let value = littleEndian
+                    ? (b0 | (b1 << 8) | (b2 << 16) | (b3 << 24))
+                    : (b3 | (b2 << 8) | (b1 << 16) | (b0 << 24))
+                codeUnits.append(value)
+                index += 4
+            }
+        }
+        return String(decoding: codeUnits, as: UTF32.self)
+    }
+
+    private func looksLikeUTF16(data: Data, littleEndian: Bool) -> Bool {
+        if data.count < 2 || data.count % 2 != 0 {
+            return false
+        }
+        if data.count > 4 {
+            let sampleCount = min(200, data.count / 2)
+            var zeroOnFirst = 0
+            var zeroOnSecond = 0
+            for offset in stride(from: 0, to: sampleCount, by: 2) {
+                if data[offset] == 0 {
+                    zeroOnFirst += 1
+                }
+                if data[offset + 1] == 0 {
+                    zeroOnSecond += 1
+                }
+            }
+            return littleEndian ? (zeroOnSecond > zeroOnFirst + 4) : (zeroOnFirst > zeroOnSecond + 4)
+        }
+        return false
+    }
+
+    private func looksLikeUTF32(data: Data, littleEndian: Bool) -> Bool {
+        if data.count < 4 || data.count % 4 != 0 {
+            return false
+        }
+        if data.count > 8 {
+            let sampleUnitCount = min(50, data.count / 4)
+            var zeroOnFirst = 0
+            var zeroOnSecond = 0
+            var zeroOnThird = 0
+            for unit in 0..<sampleUnitCount {
+                let base = unit * 4
+                if data[base] == 0 {
+                    zeroOnFirst += 1
+                }
+                if data[base + 1] == 0 {
+                    zeroOnSecond += 1
+                }
+                if data[base + 2] == 0 {
+                    zeroOnThird += 1
+                }
+            }
+            if littleEndian {
+                return zeroOnThird > 2 && zeroOnFirst > 2
+            } else {
+                return zeroOnFirst > 2 && data[1] == 0
+            }
+        }
+        return false
+    }
+
+    private func containsNULCharacters(in value: String) -> Bool {
+        return value.contains(where: { $0 == "\0" })
+    }
+
+    private func extractRootFromSVG(_ sourceText: String) -> String? {
+        guard let rootRange = sourceText.range(of: "<svg", options: .caseInsensitive) else {
+            return nil
+        }
+
+        let rootStartIndex: String.Index = rootRange.lowerBound
+        let searchText: String = String(sourceText[rootStartIndex...])
+        let markerPattern = #"<\s*/?\s*(?:[a-z][a-z0-9._:-]*:)?svg\b[^>]*>"#
+        let regex = try? NSRegularExpression(pattern: markerPattern, options: [.caseInsensitive])
+        let nsSearchText = searchText as NSString
+
+        let relativeStartOffset = sourceText.utf16.distance(from: sourceText.startIndex, to: rootStartIndex)
+        guard let rootRegex = regex else {
+            return searchText.isEmpty ? nil : searchText
+        }
+        let matches = rootRegex.matches(
+            in: searchText,
+            options: [],
+            range: NSRange(location: 0, length: nsSearchText.length)
+        )
+
+        guard !matches.isEmpty else {
+            return searchText.isEmpty ? nil : searchText
+        }
+
+        var depth = 0
+        for match in matches {
+            let upperBound = match.range.upperBound
+            guard
+                let tagRange = Range(match.range, in: searchText),
+                !searchText[tagRange].isEmpty
+            else {
+                continue
+            }
+            let matchedTag = String(searchText[tagRange])
+            let lowerMatchedTag = matchedTag.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+            let isClosingTag = lowerMatchedTag.hasPrefix("</")
+            let isSelfClosing = lowerMatchedTag.hasSuffix("/>")
+
+            if isClosingTag {
+                if depth > 0 {
+                    depth -= 1
+                    if depth == 0 {
+                        let absoluteEndOffset = relativeStartOffset + upperBound
+                        let absoluteEnd = String.Index(utf16Offset: absoluteEndOffset, in: sourceText)
+                        return String(sourceText[rootStartIndex...absoluteEnd])
+                    }
+                }
+            } else if isSelfClosing {
+                if depth == 0 {
+                    let absoluteEndOffset = relativeStartOffset + upperBound
+                    let absoluteEnd = String.Index(utf16Offset: absoluteEndOffset, in: sourceText)
+                    return String(sourceText[rootStartIndex...absoluteEnd])
+                }
+            } else {
+                depth = max(depth + 1, 1)
+            }
+        }
+
+        return String(sourceText[rootStartIndex...])
     }
 
     private func mergeUnsupportedFeatures(

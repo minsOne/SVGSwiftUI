@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+  <defs>
+    <filter id="blend-filter">
+      <feBlend in="SourceGraphic" in2="SourceGraphic" mode="multiply"/>
+    </filter>
+  </defs>
+  <rect width="10" height="10" fill="#ff0000" filter="url(#blend-filter)" />
+</svg>

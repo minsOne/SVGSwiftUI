@@ -12,6 +12,21 @@
   - 데모 샘플 2건 추가(`constellation-grid`, `transform-radial-spiral`)
   - `polyline-ribbon.svg`의 XML 오류(`cx`/`cy` 미인용) 수정
   - 데모 UI 테스트에서 신규 샘플 캔버스 존재 여부 확인 케이스 추가
+  - `D1-1` 샘플 메타 확장 완료(오버라이드 타깃 메타 등록)
+  - `D1-2` 노드 제어 UI 확장(색상/scale/offset/opacity) 완료
+  - `D1-3` 픽셀 기반 렌더 변경 검증 UITest 초안 추가
+- 세션 우선순위:
+  - D1-3(픽셀 비교 UITest) → D1-4(브라우저 기준 비교 확대) → D1-5(Conformance 연계)
+
+### 2026-02-16 (Session 62)
+- 작업: D1-3 UI 렌더 비교 검증 강화
+- 완료:
+  - 노드 오버라이드 타겟 제어 메타(`overrideTargets`)를 샘플 모델 전반에 반영
+  - `ContentView`에서 제어 UI(노드 선택/색상/stroke/scale/offset/opacity) 적용
+  - `testNodeOverrideChangesCanvasRendering` 추가: 동일 샘플 badge에서 오버라이드 조절 전/후 스크린샷 픽셀 차이율 검증
+- 검증:
+  - `swift test --no-parallel` 통과
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' build-for-testing` (이미지 미서명으로 실패하는 기존 iOS UI 테스트 코드 사인 문제 재발생)
 
 ## 잠금된 의사결정
 - 대상 플랫폼: iOS 15+
@@ -42,6 +57,18 @@
 - 검증:
   - `xmllint --noout` (확장 샘플 5건)
   - `swift test --no-parallel` 통과
+
+### 2026-02-16 (Session 61)
+- 작업: 데모 고난도 검증 실행 계획 수립
+- 완료:
+  - `docs/DEMO_SWIFTUI_WEB_VALIDATION_PLAN.md` 추가
+  - `docs/TASK_BOARD.md`에 D1 실행 항목 추가 및 `Last Updated` 갱신
+  - `WORK_CONTINUATION.md`에 Session 61 우선순위 반영
+- 검증:
+  - 문서 일관성 점검(`DOC` diff 확인)
+- 다음 액션:
+  - D1-1~D1-5 순차 실행
+  - 샘플 오버라이드 메타 정리 후 Demo UI 제어 확장 구현
 
 ### 2026-02-16 (Session 59)
 - 작업: `A16-4` strict 보강 적용

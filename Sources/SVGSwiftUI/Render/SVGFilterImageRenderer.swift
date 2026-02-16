@@ -61,22 +61,27 @@ internal enum SVGFilterImageRenderer {
         dash: [CGFloat],
         dashPhase: CGFloat,
         opacity: Double,
+        fillOpacity: CGFloat = 1.0,
+        strokeOpacity: CGFloat = 1.0,
         size: CGSize,
         primitives: [SVGFilterPrimitive]
     ) -> CGImage? {
         let normalizedSize: CGSize = normalizeRenderSize(size)
+        let effectiveFillOpacity: CGFloat = CGFloat(opacity) * fillOpacity
+        let effectiveStrokeOpacity: CGFloat = CGFloat(opacity) * strokeOpacity
         guard let sourceImage: CIImage = rasterizedImage(
             path: path,
             fillColor: fillColor,
             fillStyle: fillStyle,
             strokeColor: strokeColor,
+            fillOpacity: effectiveFillOpacity,
+            strokeOpacity: effectiveStrokeOpacity,
             strokeWidth: strokeWidth,
             lineCap: lineCap,
             lineJoin: lineJoin,
             miterLimit: miterLimit,
             dash: dash,
             dashPhase: dashPhase,
-            opacity: opacity,
             size: normalizedSize
         ) else {
             return nil
@@ -125,13 +130,14 @@ internal enum SVGFilterImageRenderer {
         fillColor: Color?,
         fillStyle: FillStyle,
         strokeColor: Color?,
+        fillOpacity: CGFloat,
+        strokeOpacity: CGFloat,
         strokeWidth: CGFloat,
         lineCap: CGLineCap,
         lineJoin: CGLineJoin,
         miterLimit: CGFloat,
         dash: [CGFloat],
         dashPhase: CGFloat,
-        opacity: Double,
         size: CGSize
     ) -> CIImage? {
         let width: Int = Int(ceil(size.width))
@@ -164,7 +170,7 @@ internal enum SVGFilterImageRenderer {
         if hasFill {
             if let fillCGColor: CGColor = color(
                 from: fillColor,
-                opacity: CGFloat(opacity)
+                opacity: fillOpacity
             ) {
                 context.setFillColor(fillCGColor)
                 context.addPath(cgPath)
@@ -174,7 +180,7 @@ internal enum SVGFilterImageRenderer {
         if hasStroke {
             if let strokeCGColor: CGColor = color(
                 from: strokeColor,
-                opacity: CGFloat(opacity)
+                opacity: strokeOpacity
             ) {
                 context.setStrokeColor(strokeCGColor)
                 context.setLineWidth(CGFloat(strokeWidth))

@@ -1,0 +1,12 @@
+<svg width="160" height="140" viewBox="0 0 160 140">
+  <path
+    id="styling-path"
+    d="M20 20 h100 v100 h-100 z"
+    fill="rgb(10,120,240)"
+    stroke="#123456"
+    stroke-width="4"
+    fill-opacity="0.7"
+    stroke-opacity="0.9"
+    opacity="0.95"
+  />
+</svg>

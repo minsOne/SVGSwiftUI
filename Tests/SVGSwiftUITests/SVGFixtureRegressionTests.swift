@@ -91,6 +91,29 @@ final class SVGFixtureRegressionTests: XCTestCase {
         )
     }
 
+    func testOrbitalLatticeStyleRulesAreResolved() throws {
+        let resourcesURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("../..", isDirectory: true)
+            .appendingPathComponent("Examples", isDirectory: true)
+            .appendingPathComponent("SVGSwiftUIDemo", isDirectory: true)
+            .appendingPathComponent("Resources", isDirectory: true)
+            .appendingPathComponent("orbital-lattice.svg", isDirectory: false)
+            .standardized
+
+        let data = try Data(contentsOf: resourcesURL)
+        let document = try parser.parse(data: data, options: .init(enableStyleTag: true))
+        let resolved = resolver.resolve(document: document)
+        let centerNode = tryUnwrap(resolved["lattice-center"])
+        let shellNode = tryUnwrap(resolved["orbital-shell-0"])
+        let frameNode = tryUnwrap(resolved["lattice-bg"])
+
+        XCTAssertEqual(centerNode.style.fill, SVGPaint.color(.init(red: 0.13333333333333333, green: 0.7725490196078432, blue: 0.3686274509803922, alpha: 1)))
+        XCTAssertEqual(shellNode.style.fill, SVGPaint.none)
+        XCTAssertEqual(shellNode.style.stroke, SVGPaint.color(.init(red: 0.5803921568627451, green: 0.6392156862745098, blue: 0.7215686274509804, alpha: 1)))
+        XCTAssertEqual(frameNode.style.fill, SVGPaint.color(.init(red: 0.9254901960784314, green: 0.996078431372549, blue: 1.0, alpha: 1)))
+    }
+
     func testFixtureShapeAndPathCommandsMatchExpectedGeometry() throws {
         let fixture = try fixtureContents(named: "shape_commands")
         let document = try parser.parse(source: .string(fixture))

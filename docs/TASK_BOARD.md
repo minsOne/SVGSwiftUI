@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (Session 59)
+Last Updated: 2026-02-16 (Session 63)
 
 ## Status Legend
 - `todo`: not started
@@ -14,6 +14,23 @@ Last Updated: 2026-02-16 (Session 59)
 - 정리: 변경 근거를 `WORK_LOG.md`에 세션 단위로 기록
 - 완료: `done` 변경 전에 커밋 및 푸시를 완료
 - 유지: 다음 작업 시작 전 `WORK_CONTINUATION` 상태와 `Last Updated`를 동기화
+- 특별 규칙: `SVGSwiftUIDemo.xcodeproj`는 직접 수정하지 않는다. 변경이 필요한 경우 `project.yml`만 수정 후 재생성한다.
+
+## Demo App xcodeproj Regeneration (mandatory)
+- 실행 조건:
+  - Missing bundle ID, scheme 탐색 실패, 리소스 반영 지연, 빌드 구성 꼬임이 발생할 때
+- 적용 절차:
+  1. 기준 소스 점검: `Examples/SVGSwiftUIDemo/project.yml` 내용 확인
+  2. 재생성: `cd Examples/SVGSwiftUIDemo && xcodegen generate --spec project.yml`
+  3. 빌드 검증: `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedDataRegen clean build CODE_SIGNING_ALLOWED=NO`
+  4. 번들 ID 검증: `plutil -extract CFBundleIdentifier raw build/DerivedDataRegen/Build/Products/Debug-iphonesimulator/SVGSwiftUIDemo.app/Info.plist`이 `com.minsone.SVGSwiftUIDemo`인지 확인
+  5. 시뮬레이터 설치/실행 검증:
+     - `xcrun simctl install <SIMULATOR_UDID> build/DerivedDataRegen/Build/Products/Debug-iphonesimulator/SVGSwiftUIDemo.app`
+     - `xcrun simctl launch <SIMULATOR_UDID> com.minsone.SVGSwiftUIDemo`
+  6. 결과를 `WORK_LOG.md`에 "xcodegen regenerate + sim install/launch" 항목으로 기록
+- 사후 정리:
+  - `project.pbxproj`만 변경점이 있어야 함을 확인
+  - 임시 생성물(`build/DerivedDataRegen`)은 커밋하지 않음
 
 ## v1 Milestones
 | ID | Phase | Task | Status | Notes |
@@ -79,6 +96,16 @@ Last Updated: 2026-02-16 (Session 59)
 | S2-2 | S2 | `clipPath` 미니멈 구현 설계/구현 | done | `url(#id)` 참조 기반 clipPath 저장/클리핑 적용, inline `style` `clip-path` 반영 |
 | S3-1 | S3 | 고해상도/메모리 튜닝 계획 | done | `drawNodes` 캐시 + `pathCache` 임계치 기반 게이팅 적용 |
 | S3-2 | S3 | 경계 지점 성능 프로파일 수집/정합성 | done | `SVGRenderPerformanceProfileTests`, profile 스크립트, CI 아티팩트 업로드 |
+
+## Demo Validation Expansion
+| ID | Phase | Task | Status | Notes |
+|---|---|---|---|---|
+| D1-1 | D1 | 샘플/노드 타깃 메타 확장 | done | `SampleSVG`에 20개 샘플과 `overrideTargets` 메타 등록 |
+| D1-2 | D1 | Demo 노드 제어 UI 확장 | done | 색상/크기/offset/opacity 제어 및 접근성 ID 정리 완료 |
+| D1-3 | D1 | Demo UITest 오버라이드 검증 시나리오 추가 | done | 항목별 애니메이션/노드 제어 on/off 및 렌더 반영 검증까지 추가 |
+| D1-4 | D1 | 브라우저 기준 비교 확장 | todo | Playwright baseline 대상 확장 + 허용오차 검증 |
+| D1-5 | D1 | W3C/WebKit 연계 강화 | todo | 신규 샘플 대응 fixture/manifest/coverage strict 정합 |
+
 
 ## Anti-Duplication Rules
 1. 작업 시작 전 해당 Task ID를 `in_progress`로 먼저 바꾼다.

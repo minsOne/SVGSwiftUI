@@ -12,3 +12,7 @@ DerivedData/
 *.xcodeproj/xcuserdata/
 *.xcuserdatad/
 *.xcuserstate
+build/
+**/build/
+*.xcresult/
+*.xcresult

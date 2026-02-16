@@ -2,6 +2,35 @@
 
 ## 2026-02-16
 
+### Session 63
+- 작업: 데모 고난도 샘플 3단계 정합 점검 추가 및 정리
+- 완료:
+  - `Tests/SVGSwiftUITests/SVGDemoResourceValidationTests.swift`에 고난도 샘플(6건) 대상 점검 테스트 3개를 단계별로 구성
+    - `testProblematicSamplesCanParseAndResolveStylesStep1`
+    - `testProblematicSamplesUnsupportedFeaturesStep2`
+    - `testProblematicSamplesRenderableGeometryStep3`
+  - 빈 테스트(`testProblematicDemoSamplesRenderNonTrivialGeometryWithStyles`)를 제거해 중복/허수 통과 테스트를 차단
+- 검증:
+  - `swift test --filter SVGDemoResourceValidationTests --no-parallel` (5 tests, 0 failures)
+  - `swift test --no-parallel` (170 tests, 0 failures)
+- 다음 액션:
+  - 다음 단계에서 D1-4/브라우저 기준 비교 확장의 신규 샘플들을 이 3단계 점검에 반영해 점진적으로 확장
+
+### Session 62
+- 작업: 데모 노드 제어 UI + 렌더 변경 검증 강화
+- 완료:
+  - `ContentView`의 노드 오버라이드 제어 UI(`DemoColorChoice`, Fill/Stroke 세그먼트, Scale/Offset/Opacity 슬라이더, 타겟 피커) 완성 및 접근성 ID 정리
+  - `SampleSVG` 샘플별 `overrideTargets` 메타 등록(총 20건)
+  - `testNodeOverrideChangesCanvasRendering` 추가: 캔버스 스크린샷 전/후 픽셀 변경율을 계산해 오버라이드 조작의 렌더 반영을 검증
+- 검증:
+  - `swift test --no-parallel` 통과 (162 tests)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,OS=26.2,name=iPhone 17' build-for-testing` (`route_offset.png` 코드 사인 미서명 문제로 실패)
+- 리스크:
+  - UI test 대상인 `demo.canvas.badge`는 렌더링 픽셀 비교를 수행하므로 향후 환경 차이(iOS 버전/시뮬레이터 렌더링 엔진)에 따른 임계값 조정이 필요할 수 있음
+- 다음 액션:
+  - D1-3를 `badge` 외 샘플 2~3개로 확장하고 변경율 임계값 기준 정리
+  - `D1-4`로 브라우저 기준 baseline 매칭/비교 로직 도입
+
 ### Session 60
 - 작업: 데모 샘플을 통한 고난도 SVG 검증 확장
 - 완료:

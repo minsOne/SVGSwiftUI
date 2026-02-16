@@ -7,15 +7,49 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B3A0A4A4D2C3B5E1F0012347 /* W3C in Resources */ = {isa = PBXBuildFile; fileRef = B3A0A4A4D2C3B5E1F0012345 /* W3C */; };
+		B3A0A4A4D2C3B5E1F0012348 /* WebKit in Resources */ = {isa = PBXBuildFile; fileRef = B3A0A4A4D2C3B5E1F0012346 /* WebKit */; };
+		004B56178C4C8EC5E3F46133 /* style-sheet.svg in Resources */ = {isa = PBXBuildFile; fileRef = 524CB5227FE07122E3761D8F /* style-sheet.svg */; };
+		022B8D4A6B772F4D99765F21 /* orbital_lattice_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 84BD04D1069D92D10E5C3AF0 /* orbital_lattice_default.png */; };
+		092D58A8544B6AFE61DDD0F0 /* badge.svg in Resources */ = {isa = PBXBuildFile; fileRef = CCC2FCAFA1F2D87B7EF62664 /* badge.svg */; };
 		1F5AA8B98530FB6FD9E52E77 /* SVGSwiftUIDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */; };
+		230E870EEBB0DBA4C10CFC2D /* transform-radial-spiral.svg in Resources */ = {isa = PBXBuildFile; fileRef = EF2F83A6967452831960F8F3 /* transform-radial-spiral.svg */; };
+		2A0A2EA2FF018E08A81F2C50 /* dense-grid-world.svg in Resources */ = {isa = PBXBuildFile; fileRef = 4AC4213758B97728F86344E8 /* dense-grid-world.svg */; };
+		2C7554A584DEEC5DE247B6EB /* geometry.svg in Resources */ = {isa = PBXBuildFile; fileRef = 67D1E5D6E87A9DC7CE643E0D /* geometry.svg */; };
 		386A9CE49A0909326EC0800B /* panel_stroke.png in Resources */ = {isa = PBXBuildFile; fileRef = 718E4A5AC89A382CDCD9684F /* panel_stroke.png */; };
+		4A14B37928A0018DA5B4990C /* route.svg in Resources */ = {isa = PBXBuildFile; fileRef = C8BE256CFABAF8D86B5A15DC /* route.svg */; };
+		4BFB8896CBB2867768B33E5C /* dense_grid_world_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A6B64D04F5A9EBFC16539F5 /* dense_grid_world_default.png */; };
 		4C09C89A50207F57F6CD5DF9 /* SVGSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A2F2D1B1AF94DDD5224EFA9F /* SVGSwiftUI */; };
 		4DF373AC1EB53A3978057074 /* route_offset.png in Resources */ = {isa = PBXBuildFile; fileRef = B1166026776CBA3F25046A29 /* route_offset.png */; };
+		5CAC944E74720051980895B4 /* polyline-ribbon.svg in Resources */ = {isa = PBXBuildFile; fileRef = 958620CC1E63FDC4EA31B2C6 /* polyline-ribbon.svg */; };
+		5D3F9E9CDBE8B66C9F1E4426 /* style_inline_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1837CDE8D380F463B2948D2A /* style_inline_default.png */; };
 		6365D2D17649068C19B1FBB3 /* badge_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 025ABB80D8E04C3A9815ABB2 /* badge_default.png */; };
-		2D1C0B9A8F7E6D5C4B3A2918 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 8F9A7B6C5D4E3F2101A2B3C4D /* Resources */; };
+		6543D5F2D3C4454199885651 /* path_commands_default.png in Resources */ = {isa = PBXBuildFile; fileRef = C9BF5E39F9C584BBB6356C93 /* path_commands_default.png */; };
+		67532E859422DE3F73572C69 /* aurora_wave_default.png in Resources */ = {isa = PBXBuildFile; fileRef = AE7051EB5D7F6477BE3FB5F6 /* aurora_wave_default.png */; };
+		73E280C7A0FC7F21F0E02346 /* orbital-lattice.svg in Resources */ = {isa = PBXBuildFile; fileRef = 06F5BFB0F4769831B0F3ACBC /* orbital-lattice.svg */; };
 		76C9213973DCE863A64F93B1 /* SVGSwiftUIDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4050A8761E9E23769BA6BE21 /* SVGSwiftUIDemoApp.swift */; };
 		78F71122F5434A0B6C0FB2BC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26DCCFDE4E59914EB04BDCF0 /* ContentView.swift */; };
+		7FC10F552C9087802ADA398F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C4DE1563293FF3F40974C688 /* LaunchScreen.storyboard */; };
+		818D86168D82F5871DB94755 /* spiral_paths_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 50547C7485CBC02925438CF6 /* spiral_paths_default.png */; };
+		8D3AC350A9FC913F78E6048E /* mesh-network.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1A6A00815E2F420383C497D0 /* mesh-network.svg */; };
+		926BC5629E63758558D8DCDD /* constellation-grid.svg in Resources */ = {isa = PBXBuildFile; fileRef = 4B334F874B320AFA1C5F41CD /* constellation-grid.svg */; };
 		94D1120D8F8DB606C6EB3592 /* SampleSVG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87489974ABD3ABBFE1A1F9C1 /* SampleSVG.swift */; };
+		A468D8F6F41EDD8EC9FCB7C1 /* polygon_polyline_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 471B6EB037BE2B65FA16A995 /* polygon_polyline_default.png */; };
+		AD329A91B615B72B6FDD58E6 /* style-inline.svg in Resources */ = {isa = PBXBuildFile; fileRef = C8AEBC2A8F0C735AAB29A130 /* style-inline.svg */; };
+		B0BD8B392A640B5DC08CE93F /* mesh_network_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 36F6BC86D6AD8421B936BE76 /* mesh_network_default.png */; };
+		B2161DE9991CD46873E9C588 /* animation-drift.svg in Resources */ = {isa = PBXBuildFile; fileRef = 338702CEE9CBE8D660EAEAC6 /* animation-drift.svg */; };
+		B97B38029693C38653CC2270 /* transform_radial_spiral_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 8902904A460E3BBA97B24326 /* transform_radial_spiral_default.png */; };
+		BB420E0854C03405DCB4016A /* aurora-wave.svg in Resources */ = {isa = PBXBuildFile; fileRef = 009510E01DF126DCE8C02C44 /* aurora-wave.svg */; };
+		BD3A0864B1595F44612C83DE /* spiral-paths.svg in Resources */ = {isa = PBXBuildFile; fileRef = C5847501705F66E400435BA6 /* spiral-paths.svg */; };
+		C10B3787EB97967EB556BC09 /* polygon-polyline.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7A89F3F1C64404E5A38EB0EB /* polygon-polyline.svg */; };
+		C2262D9291753395F17A1A3F /* panel.svg in Resources */ = {isa = PBXBuildFile; fileRef = 2CBF877A443927352981106D /* panel.svg */; };
+		C4CA9ED12EFF0D2C96C7A70F /* animation-pulse.svg in Resources */ = {isa = PBXBuildFile; fileRef = D9F36115DE6815FE94C2684F /* animation-pulse.svg */; };
+		D5337517778282CED825457A /* nested-groups.svg in Resources */ = {isa = PBXBuildFile; fileRef = 480694C21504D11F1DE06B80 /* nested-groups.svg */; };
+		E6A6340A4CD8632F6C3F9D34 /* constellation_grid_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E008EAB42FA006D7E524E71 /* constellation_grid_default.png */; };
+		EAB683870E7290D86343DAF1 /* geometry_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 78B1CF2C611B057AF8368D4A /* geometry_default.png */; };
+		F19FF5598200AD5A2EE566BA /* animation-luminous-core.svg in Resources */ = {isa = PBXBuildFile; fileRef = 24B0E61DF374DF9C40B8539C /* animation-luminous-core.svg */; };
+		F3FD0D407DD98D74DE6B4873 /* style_sheet_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 2898A3298C8A2A353FE98183 /* style_sheet_default.png */; };
+		FDD4C3E196F7A5D0818E07C8 /* path-commands.svg in Resources */ = {isa = PBXBuildFile; fileRef = 15F1FB182F4BDE2607B1E0A5 /* path-commands.svg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,17 +63,51 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		009510E01DF126DCE8C02C44 /* aurora-wave.svg */ = {isa = PBXFileReference; path = "aurora-wave.svg"; sourceTree = "<group>"; };
 		025ABB80D8E04C3A9815ABB2 /* badge_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_default.png; sourceTree = "<group>"; };
 		032D8A76B97B83B360C63372 /* SVGSwiftUIDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGSwiftUIDemoUITests.swift; sourceTree = "<group>"; };
+		06F5BFB0F4769831B0F3ACBC /* orbital-lattice.svg */ = {isa = PBXFileReference; path = "orbital-lattice.svg"; sourceTree = "<group>"; };
+		15F1FB182F4BDE2607B1E0A5 /* path-commands.svg */ = {isa = PBXFileReference; path = "path-commands.svg"; sourceTree = "<group>"; };
+		1837CDE8D380F463B2948D2A /* style_inline_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = style_inline_default.png; sourceTree = "<group>"; };
+		1A6A00815E2F420383C497D0 /* mesh-network.svg */ = {isa = PBXFileReference; path = "mesh-network.svg"; sourceTree = "<group>"; };
+		1A6B64D04F5A9EBFC16539F5 /* dense_grid_world_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dense_grid_world_default.png; sourceTree = "<group>"; };
+		24B0E61DF374DF9C40B8539C /* animation-luminous-core.svg */ = {isa = PBXFileReference; path = "animation-luminous-core.svg"; sourceTree = "<group>"; };
 		26DCCFDE4E59914EB04BDCF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2898A3298C8A2A353FE98183 /* style_sheet_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = style_sheet_default.png; sourceTree = "<group>"; };
+		2CBF877A443927352981106D /* panel.svg */ = {isa = PBXFileReference; path = panel.svg; sourceTree = "<group>"; };
+		338702CEE9CBE8D660EAEAC6 /* animation-drift.svg */ = {isa = PBXFileReference; path = "animation-drift.svg"; sourceTree = "<group>"; };
+		36F6BC86D6AD8421B936BE76 /* mesh_network_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mesh_network_default.png; sourceTree = "<group>"; };
 		4050A8761E9E23769BA6BE21 /* SVGSwiftUIDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGSwiftUIDemoApp.swift; sourceTree = "<group>"; };
+		471B6EB037BE2B65FA16A995 /* polygon_polyline_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = polygon_polyline_default.png; sourceTree = "<group>"; };
+		480694C21504D11F1DE06B80 /* nested-groups.svg */ = {isa = PBXFileReference; path = "nested-groups.svg"; sourceTree = "<group>"; };
+		4AC4213758B97728F86344E8 /* dense-grid-world.svg */ = {isa = PBXFileReference; path = "dense-grid-world.svg"; sourceTree = "<group>"; };
+		4B334F874B320AFA1C5F41CD /* constellation-grid.svg */ = {isa = PBXFileReference; path = "constellation-grid.svg"; sourceTree = "<group>"; };
+		50547C7485CBC02925438CF6 /* spiral_paths_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spiral_paths_default.png; sourceTree = "<group>"; };
+		524CB5227FE07122E3761D8F /* style-sheet.svg */ = {isa = PBXFileReference; path = "style-sheet.svg"; sourceTree = "<group>"; };
+		67D1E5D6E87A9DC7CE643E0D /* geometry.svg */ = {isa = PBXFileReference; path = geometry.svg; sourceTree = "<group>"; };
+		6E008EAB42FA006D7E524E71 /* constellation_grid_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = constellation_grid_default.png; sourceTree = "<group>"; };
 		718E4A5AC89A382CDCD9684F /* panel_stroke.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = panel_stroke.png; sourceTree = "<group>"; };
+		78B1CF2C611B057AF8368D4A /* geometry_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = geometry_default.png; sourceTree = "<group>"; };
+		7A89F3F1C64404E5A38EB0EB /* polygon-polyline.svg */ = {isa = PBXFileReference; path = "polygon-polyline.svg"; sourceTree = "<group>"; };
+		84BD04D1069D92D10E5C3AF0 /* orbital_lattice_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = orbital_lattice_default.png; sourceTree = "<group>"; };
 		87489974ABD3ABBFE1A1F9C1 /* SampleSVG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleSVG.swift; sourceTree = "<group>"; };
+		8902904A460E3BBA97B24326 /* transform_radial_spiral_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = transform_radial_spiral_default.png; sourceTree = "<group>"; };
+		958620CC1E63FDC4EA31B2C6 /* polyline-ribbon.svg */ = {isa = PBXFileReference; path = "polyline-ribbon.svg"; sourceTree = "<group>"; };
+		AE7051EB5D7F6477BE3FB5F6 /* aurora_wave_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = aurora_wave_default.png; sourceTree = "<group>"; };
 		B1166026776CBA3F25046A29 /* route_offset.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = route_offset.png; sourceTree = "<group>"; };
-		8F9A7B6C5D4E3F2101A2B3C4D /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
 		B1448F987321C138BE26B27E /* SVGSwiftUIDemo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SVGSwiftUIDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4DE1563293FF3F40974C688 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C5847501705F66E400435BA6 /* spiral-paths.svg */ = {isa = PBXFileReference; path = "spiral-paths.svg"; sourceTree = "<group>"; };
+		C8AEBC2A8F0C735AAB29A130 /* style-inline.svg */ = {isa = PBXFileReference; path = "style-inline.svg"; sourceTree = "<group>"; };
+		C8BE256CFABAF8D86B5A15DC /* route.svg */ = {isa = PBXFileReference; path = route.svg; sourceTree = "<group>"; };
+		C9BF5E39F9C584BBB6356C93 /* path_commands_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = path_commands_default.png; sourceTree = "<group>"; };
 		CC180D0D7DAD3390794B1317 /* SVGSwiftUIDemoUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SVGSwiftUIDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CCC2FCAFA1F2D87B7EF62664 /* badge.svg */ = {isa = PBXFileReference; path = badge.svg; sourceTree = "<group>"; };
+		D9F36115DE6815FE94C2684F /* animation-pulse.svg */ = {isa = PBXFileReference; path = "animation-pulse.svg"; sourceTree = "<group>"; };
+		EF2F83A6967452831960F8F3 /* transform-radial-spiral.svg */ = {isa = PBXFileReference; path = "transform-radial-spiral.svg"; sourceTree = "<group>"; };
 		FEFE7905ABB7C0E141E848DF /* SVGSwiftUI */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SVGSwiftUI; path = ../..; sourceTree = SOURCE_ROOT; };
+		B3A0A4A4D2C3B5E1F0012345 /* W3C */ = {isa = PBXFileReference; lastKnownFileType = folder; path = W3C; sourceTree = "<group>"; };
+		B3A0A4A4D2C3B5E1F0012346 /* WebKit */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WebKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,8 +134,8 @@
 			isa = PBXGroup;
 			children = (
 				02DD1B9E2C57933816098A50 /* Packages */,
+				41FFE6B79F60BD1EF9656A0C /* Resources */,
 				AC1D506ACE078758FA8CA98F /* Sources */,
-				8F9A7B6C5D4E3F2101A2B3C4D /* Resources */,
 				9E40EF9AB3A91BA21253AFEA /* UITests */,
 				80B290A1C3B93855B74F3447 /* Products */,
 			);
@@ -81,12 +149,54 @@
 			path = Baselines;
 			sourceTree = "<group>";
 		};
+		41FFE6B79F60BD1EF9656A0C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				338702CEE9CBE8D660EAEAC6 /* animation-drift.svg */,
+				24B0E61DF374DF9C40B8539C /* animation-luminous-core.svg */,
+				D9F36115DE6815FE94C2684F /* animation-pulse.svg */,
+				009510E01DF126DCE8C02C44 /* aurora-wave.svg */,
+				CCC2FCAFA1F2D87B7EF62664 /* badge.svg */,
+				4B334F874B320AFA1C5F41CD /* constellation-grid.svg */,
+				4AC4213758B97728F86344E8 /* dense-grid-world.svg */,
+				67D1E5D6E87A9DC7CE643E0D /* geometry.svg */,
+				C4DE1563293FF3F40974C688 /* LaunchScreen.storyboard */,
+				1A6A00815E2F420383C497D0 /* mesh-network.svg */,
+				480694C21504D11F1DE06B80 /* nested-groups.svg */,
+				06F5BFB0F4769831B0F3ACBC /* orbital-lattice.svg */,
+				2CBF877A443927352981106D /* panel.svg */,
+				15F1FB182F4BDE2607B1E0A5 /* path-commands.svg */,
+				7A89F3F1C64404E5A38EB0EB /* polygon-polyline.svg */,
+				958620CC1E63FDC4EA31B2C6 /* polyline-ribbon.svg */,
+				C8BE256CFABAF8D86B5A15DC /* route.svg */,
+				C5847501705F66E400435BA6 /* spiral-paths.svg */,
+				C8AEBC2A8F0C735AAB29A130 /* style-inline.svg */,
+				B3A0A4A4D2C3B5E1F0012345 /* W3C */,
+				B3A0A4A4D2C3B5E1F0012346 /* WebKit */,
+				524CB5227FE07122E3761D8F /* style-sheet.svg */,
+				EF2F83A6967452831960F8F3 /* transform-radial-spiral.svg */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		5E90A9806A8D45476F806EEE /* 26.2 */ = {
 			isa = PBXGroup;
 			children = (
+				AE7051EB5D7F6477BE3FB5F6 /* aurora_wave_default.png */,
 				025ABB80D8E04C3A9815ABB2 /* badge_default.png */,
+				6E008EAB42FA006D7E524E71 /* constellation_grid_default.png */,
+				1A6B64D04F5A9EBFC16539F5 /* dense_grid_world_default.png */,
+				78B1CF2C611B057AF8368D4A /* geometry_default.png */,
+				36F6BC86D6AD8421B936BE76 /* mesh_network_default.png */,
+				84BD04D1069D92D10E5C3AF0 /* orbital_lattice_default.png */,
 				718E4A5AC89A382CDCD9684F /* panel_stroke.png */,
+				C9BF5E39F9C584BBB6356C93 /* path_commands_default.png */,
+				471B6EB037BE2B65FA16A995 /* polygon_polyline_default.png */,
 				B1166026776CBA3F25046A29 /* route_offset.png */,
+				50547C7485CBC02925438CF6 /* spiral_paths_default.png */,
+				1837CDE8D380F463B2948D2A /* style_inline_default.png */,
+				2898A3298C8A2A353FE98183 /* style_sheet_default.png */,
+				8902904A460E3BBA97B24326 /* transform_radial_spiral_default.png */,
 			);
 			path = 26.2;
 			sourceTree = "<group>";
@@ -127,7 +237,7 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		"TEMP_6C20C69A-F118-4617-8D66-63F57DFD194E" /* iPhone_16e */ = {
+		"TEMP_7600073A-F2FC-4C29-8CFE-7D5B8904A000" /* iPhone_16e */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -142,6 +252,7 @@
 			buildConfigurationList = AC176ED15895215219EE43D7 /* Build configuration list for PBXNativeTarget "SVGSwiftUIDemo" */;
 			buildPhases = (
 				FB3BAD3BDB19FC7952606D2D /* Sources */,
+				58F5C1AAC5E0A40CA63C5FAF /* Resources */,
 				C9BE6026D7D7FA0D1958E20D /* Frameworks */,
 			);
 			buildRules = (
@@ -213,14 +324,55 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		58F5C1AAC5E0A40CA63C5FAF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FC10F552C9087802ADA398F /* LaunchScreen.storyboard in Resources */,
+				B3A0A4A4D2C3B5E1F0012347 /* W3C in Resources */,
+				B3A0A4A4D2C3B5E1F0012348 /* WebKit in Resources */,
+				B2161DE9991CD46873E9C588 /* animation-drift.svg in Resources */,
+				F19FF5598200AD5A2EE566BA /* animation-luminous-core.svg in Resources */,
+				C4CA9ED12EFF0D2C96C7A70F /* animation-pulse.svg in Resources */,
+				BB420E0854C03405DCB4016A /* aurora-wave.svg in Resources */,
+				092D58A8544B6AFE61DDD0F0 /* badge.svg in Resources */,
+				926BC5629E63758558D8DCDD /* constellation-grid.svg in Resources */,
+				2A0A2EA2FF018E08A81F2C50 /* dense-grid-world.svg in Resources */,
+				2C7554A584DEEC5DE247B6EB /* geometry.svg in Resources */,
+				8D3AC350A9FC913F78E6048E /* mesh-network.svg in Resources */,
+				D5337517778282CED825457A /* nested-groups.svg in Resources */,
+				73E280C7A0FC7F21F0E02346 /* orbital-lattice.svg in Resources */,
+				C2262D9291753395F17A1A3F /* panel.svg in Resources */,
+				FDD4C3E196F7A5D0818E07C8 /* path-commands.svg in Resources */,
+				C10B3787EB97967EB556BC09 /* polygon-polyline.svg in Resources */,
+				5CAC944E74720051980895B4 /* polyline-ribbon.svg in Resources */,
+				4A14B37928A0018DA5B4990C /* route.svg in Resources */,
+				BD3A0864B1595F44612C83DE /* spiral-paths.svg in Resources */,
+				AD329A91B615B72B6FDD58E6 /* style-inline.svg in Resources */,
+				004B56178C4C8EC5E3F46133 /* style-sheet.svg in Resources */,
+				230E870EEBB0DBA4C10CFC2D /* transform-radial-spiral.svg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E6A06529F5D0A07523C1DF4C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67532E859422DE3F73572C69 /* aurora_wave_default.png in Resources */,
 				6365D2D17649068C19B1FBB3 /* badge_default.png in Resources */,
+				E6A6340A4CD8632F6C3F9D34 /* constellation_grid_default.png in Resources */,
+				4BFB8896CBB2867768B33E5C /* dense_grid_world_default.png in Resources */,
+				EAB683870E7290D86343DAF1 /* geometry_default.png in Resources */,
+				B0BD8B392A640B5DC08CE93F /* mesh_network_default.png in Resources */,
+				022B8D4A6B772F4D99765F21 /* orbital_lattice_default.png in Resources */,
 				386A9CE49A0909326EC0800B /* panel_stroke.png in Resources */,
+				6543D5F2D3C4454199885651 /* path_commands_default.png in Resources */,
+				A468D8F6F41EDD8EC9FCB7C1 /* polygon_polyline_default.png in Resources */,
 				4DF373AC1EB53A3978057074 /* route_offset.png in Resources */,
-				2D1C0B9A8F7E6D5C4B3A2918 /* Resources in Resources */,
+				818D86168D82F5871DB94755 /* spiral_paths_default.png in Resources */,
+				5D3F9E9CDBE8B66C9F1E4426 /* style_inline_default.png in Resources */,
+				F3FD0D407DD98D74DE6B4873 /* style_sheet_default.png in Resources */,
+				B97B38029693C38653CC2270 /* transform_radial_spiral_default.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,6 +569,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -435,6 +588,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

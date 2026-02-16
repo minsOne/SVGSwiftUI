@@ -2,52 +2,162 @@
   "cases": [
     {
       "name": "badge_default",
-      "svg": "fixtures/badge.svg",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/badge.svg",
       "size": {
-        "width": 1058,
-        "height": 1134
-      },
-      "targetNodeID": "main-path",
-      "overrides": {
-        "fill": "#ff3f3f",
-        "offset": {
-          "x": 0,
-          "y": 0
-        }
+        "width": 120,
+        "height": 120
       }
     },
     {
       "name": "panel_stroke",
-      "svg": "fixtures/panel.svg",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/panel.svg",
       "size": {
-        "width": 842,
-        "height": 902
-      },
-      "targetNodeID": "panel-base",
-      "overrides": {
-        "fill": "#ff3f3f",
-        "stroke": "#0d40f2",
-        "strokeWidth": 3,
-        "offset": {
-          "x": 0,
-          "y": 0
-        }
+        "width": 180,
+        "height": 120
       }
     },
     {
       "name": "route_offset",
-      "svg": "fixtures/route.svg",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/route.svg",
       "size": {
-        "width": 1058,
-        "height": 1134
-      },
-      "targetNodeID": "route-line",
-      "overrides": {
-        "fill": "#ff3f3f",
-        "offset": {
-          "x": 30,
-          "y": -30
-        }
+        "width": 180,
+        "height": 120
+      }
+    },
+    {
+      "name": "geometry_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/geometry.svg",
+      "size": {
+        "width": 220,
+        "height": 150
+      }
+    },
+    {
+      "name": "path_commands_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/path-commands.svg",
+      "size": {
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "name": "polygon_polyline_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/polygon-polyline.svg",
+      "size": {
+        "width": 220,
+        "height": 140
+      }
+    },
+    {
+      "name": "style_inline_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/style-inline.svg",
+      "size": {
+        "width": 200,
+        "height": 160
+      }
+    },
+    {
+      "name": "style_sheet_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/style-sheet.svg",
+      "size": {
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "name": "mesh_network_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/mesh-network.svg",
+      "size": {
+        "width": 360,
+        "height": 260
+      }
+    },
+    {
+      "name": "spiral_paths_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/spiral-paths.svg",
+      "size": {
+        "width": 360,
+        "height": 220
+      }
+    },
+    {
+      "name": "orbital_lattice_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/orbital-lattice.svg",
+      "size": {
+        "width": 360,
+        "height": 260
+      }
+    },
+    {
+      "name": "aurora_wave_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/aurora-wave.svg",
+      "size": {
+        "width": 380,
+        "height": 240
+      }
+    },
+    {
+      "name": "constellation_grid_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/constellation-grid.svg",
+      "size": {
+        "width": 380,
+        "height": 260
+      }
+    },
+    {
+      "name": "dense_grid_world_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/dense-grid-world.svg",
+      "size": {
+        "width": 420,
+        "height": 280
+      }
+    },
+    {
+      "name": "transform_radial_spiral_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/transform-radial-spiral.svg",
+      "size": {
+        "width": 380,
+        "height": 260
+      }
+    },
+    {
+      "name": "animation_pulse_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/animation-pulse.svg",
+      "size": {
+        "width": 200,
+        "height": 160
+      }
+    },
+    {
+      "name": "animation_drift_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/animation-drift.svg",
+      "size": {
+        "width": 220,
+        "height": 140
+      }
+    },
+    {
+      "name": "animation_luminous_core_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/animation-luminous-core.svg",
+      "size": {
+        "width": 320,
+        "height": 220
+      }
+    },
+    {
+      "name": "nested_groups_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/nested-groups.svg",
+      "size": {
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "name": "polyline_ribbon_default",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/polyline-ribbon.svg",
+      "size": {
+        "width": 360,
+        "height": 240
       }
     }
   ]

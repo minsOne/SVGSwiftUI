@@ -1,0 +1,544 @@
+{
+  "fixtures": [
+    {
+      "id": "webkit-1.1-shapes-circle-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-circle-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-circle-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-circle-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-circle-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-circle-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-ellipse-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-ellipse-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-ellipse-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-ellipse-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-ellipse-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-ellipse-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-intro-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-intro-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-intro-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-line-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-line-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-line-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-polygon-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-polygon-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-polygon-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-polyline-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-polyline-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-polyline-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-rect-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-rect-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-rect-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-shapes-rect-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "shapes",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-shapes-rect-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/shapes-rect-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-03-f",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-03-f.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-03-f.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-04-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-04-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-04-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-05-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-05-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-05-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-06-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-06-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-06-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-07-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-07-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-07-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-08-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-08-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-08-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-09-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-09-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-09-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-10-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-10-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-10-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-12-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-12-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-12-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-13-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-13-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-13-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-14-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-14-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-14-t.svg"
+    },
+    {
+      "id": "webkit-1.1-paths-data-15-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "paths",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-paths-data-15-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/paths-data-15-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-coord-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-coord-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-coord-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-coord-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-coord-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-coord-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-trans-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-trans-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-trans-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-trans-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-trans-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-trans-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-trans-03-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-trans-03-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-trans-03-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-trans-04-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-trans-04-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-trans-04-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-trans-05-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-trans-05-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-trans-05-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-trans-06-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-trans-06-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-trans-06-t.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-units-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-units-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-units-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-units-02-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-units-02-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-units-02-b.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-units-03-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-units-03-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-units-03-b.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-viewattr-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-viewattr-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-viewattr-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-viewattr-02-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-viewattr-02-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-viewattr-02-b.svg"
+    },
+    {
+      "id": "webkit-1.1-coords-viewattr-03-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "coords",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-coords-viewattr-03-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/coords-viewattr-03-b.svg"
+    },
+    {
+      "id": "webkit-1.1-color-prof-01-f",
+      "suite": "W3C-SVG-1.1",
+      "category": "styling",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-color-prof-01-f.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/color-prof-01-f.svg"
+    },
+    {
+      "id": "webkit-1.1-color-prop-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "styling",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-color-prop-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/color-prop-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-color-prop-02-f",
+      "suite": "W3C-SVG-1.1",
+      "category": "styling",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-color-prop-02-f.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/color-prop-02-f.svg"
+    },
+    {
+      "id": "webkit-1.1-filters-blend-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "filter",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-filters-blend-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/filters-blend-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-filters-chain-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "filter",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-filters-chain-01-b.svg",
+      "reference": "",
+      "source": ""
+    },
+    {
+      "id": "webkit-1.1-filters-gauss-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "filter",
+      "mode": "parse",
+      "expected": "pass",
+      "svg": "fixtures/webkit-filters-gauss-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/filters-gauss-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-filters-composite-02-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "filter",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-filters-composite-02-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/filters-composite-02-b.svg"
+    },
+    {
+      "id": "webkit-1.1-fonts-elem-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "text",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-fonts-elem-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/fonts-elem-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-fonts-glyph-02-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "text",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-fonts-glyph-02-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/fonts-glyph-02-t.svg"
+    },
+    {
+      "id": "webkit-1.1-masking-intro-01-f",
+      "suite": "W3C-SVG-1.1",
+      "category": "mask",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-masking-intro-01-f.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/masking-intro-01-f.svg"
+    },
+    {
+      "id": "webkit-1.1-masking-mask-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "mask",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-masking-mask-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/masking-mask-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-painting-marker-01-f",
+      "suite": "W3C-SVG-1.1",
+      "category": "marker",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-painting-marker-01-f.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/painting-marker-01-f.svg"
+    },
+    {
+      "id": "webkit-1.1-painting-marker-02-f",
+      "suite": "W3C-SVG-1.1",
+      "category": "marker",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-painting-marker-02-f.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/painting-marker-02-f.svg"
+    },
+    {
+      "id": "webkit-1.1-struct-image-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "image",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-struct-image-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/struct-image-01-t.svg"
+    },
+    {
+      "id": "webkit-1.1-text-align-01-b",
+      "suite": "W3C-SVG-1.1",
+      "category": "text",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-text-align-01-b.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/text-align-01-b.svg"
+    },
+    {
+      "id": "webkit-1.1-text-fonts-01-t",
+      "suite": "W3C-SVG-1.1",
+      "category": "text",
+      "mode": "parse",
+      "expected": "unsupported",
+      "svg": "fixtures/webkit-text-fonts-01-t.svg",
+      "reference": "",
+      "source": "LayoutTests/svg/W3C-SVG-1.1/text-fonts-01-t.svg"
+    }
+  ]
+}

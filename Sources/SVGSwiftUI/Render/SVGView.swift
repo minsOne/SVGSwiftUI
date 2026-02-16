@@ -57,6 +57,7 @@ private struct SVGStaticPlaceholderView: View {
     @State private var cachedConfigurationFingerprint: String = ""
     @State private var canCacheDrawNodesForCurrentDocument: Bool = false
     @State private var canCachePathCacheForCurrentDocument: Bool = false
+    @State private var parsingFailureMessage: String = ""
 
     private var usesStaticConfiguration: Bool {
         configuration.resolver == nil
@@ -104,28 +105,40 @@ private struct SVGStaticPlaceholderView: View {
     var body: some View {
         GeometryReader { _ in
             Canvas { context, size in
+                let renderViewportTransform: SVGRenderViewportTransform? = viewportTransform(for: size)
+                let transform = renderViewportTransform?.transform ?? .identity
+                let strokeScale = renderViewportTransform?.strokeScale ?? 1.0
+
                 for node in drawNodes {
                     if node.clipPaths.isEmpty && node.filterPrimitives.isEmpty {
-                        drawNodeShape(node, in: &context)
+                        drawNodeShape(
+                            node,
+                            in: &context,
+                            renderTransform: transform,
+                            strokeScale: strokeScale
+                        )
                     } else if SVGFilterImageRenderer.requiresOffscreenProcessing(node.filterPrimitives) {
                         context.drawLayer { layer in
                             if !node.clipPaths.isEmpty {
                                 for clipPath in node.clipPaths {
-                                    layer.clip(to: clipPath, style: .init(eoFill: false))
+                                    let transformedClipPath = clipPath.applying(transform)
+                                    layer.clip(to: transformedClipPath, style: .init(eoFill: false))
                                 }
                             }
                             if let filteredImage: CGImage = SVGFilterImageRenderer.renderFilteredImage(
-                                path: node.path,
+                                path: node.path.applying(transform),
                                 fillColor: node.fillColor,
                                 fillStyle: node.fillStyle,
                                 strokeColor: node.strokeColor,
-                                strokeWidth: node.strokeWidth,
+                                strokeWidth: node.strokeWidth * strokeScale,
                                 lineCap: node.lineCap,
                                 lineJoin: node.lineJoin,
                                 miterLimit: node.miterLimit,
                                 dash: node.dash,
                                 dashPhase: node.dashPhase,
                                 opacity: node.opacity,
+                                fillOpacity: node.fillOpacity,
+                                strokeOpacity: node.strokeOpacity,
                                 size: size,
                                 primitives: node.filterPrimitives
                             ) {
@@ -134,29 +147,50 @@ private struct SVGStaticPlaceholderView: View {
                                     scale: 1,
                                     orientation: .up
                                 )
-                                layer.draw(image, at: CGPoint(x: size.width / 2, y: size.height / 2))
+                                layer.draw(image, in: CGRect(origin: .zero, size: size))
                             } else {
-                                drawNodeShape(node, in: &layer)
+                                drawNodeShape(
+                                    node,
+                                    in: &layer,
+                                    renderTransform: transform,
+                                    strokeScale: strokeScale
+                                )
                             }
                         }
                     } else {
                         context.drawLayer { layer in
                             if !node.clipPaths.isEmpty {
                                 for clipPath in node.clipPaths {
-                                    layer.clip(to: clipPath, style: .init(eoFill: false))
+                                    let transformedClipPath = clipPath.applying(transform)
+                                    layer.clip(to: transformedClipPath, style: .init(eoFill: false))
                                 }
                             }
                             applyFilterPrimitives(node.filterPrimitives, to: &layer)
-                            drawNodeShape(node, in: &layer)
+                            drawNodeShape(
+                                node,
+                                in: &layer,
+                                renderTransform: transform,
+                                strokeScale: strokeScale
+                            )
                         }
                     }
                 }
             }
             .overlay(alignment: .center) {
                 if parsingFailed {
-                    Text("Invalid SVG")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    VStack(spacing: 4) {
+                        Text("Invalid SVG")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        if let failureMessage = debugParsingFailureMessage {
+                            Text(failureMessage)
+                                .lineLimit(3)
+                                .minimumScaleFactor(0.8)
+                                .multilineTextAlignment(.center)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
             .task(id: RenderTaskID(
@@ -171,23 +205,98 @@ private struct SVGStaticPlaceholderView: View {
 
     private func drawNodeShape(
         _ node: SVGDrawNode,
-        in context: inout GraphicsContext
+        in context: inout GraphicsContext,
+        renderTransform: CGAffineTransform,
+        strokeScale: CGFloat
     ) {
-        let opacity = node.opacity
+        let renderedPath: Path = node.path.applying(renderTransform)
         if let fill = node.fillColor {
-            context.fill(node.path, with: .color(fill.opacity(opacity)), style: node.fillStyle)
+            let totalFillOpacity: Double = node.opacity * node.fillOpacity
+            context.fill(
+                renderedPath,
+                with: .color(fill.opacity(totalFillOpacity)),
+                style: node.fillStyle
+            )
         }
         if let stroke = node.strokeColor, node.strokeWidth > 0 {
+            let totalStrokeOpacity: Double = node.opacity * node.strokeOpacity
+            let scaledStrokeWidth: CGFloat = max(node.strokeWidth * strokeScale, 0.0)
             let strokeStyle = StrokeStyle(
-                lineWidth: node.strokeWidth,
+                lineWidth: scaledStrokeWidth,
                 lineCap: node.lineCap,
                 lineJoin: node.lineJoin,
                 miterLimit: node.miterLimit,
                 dash: node.dash,
                 dashPhase: node.dashPhase
             )
-            context.stroke(node.path, with: .color(stroke.opacity(opacity)), style: strokeStyle)
+            context.stroke(
+                renderedPath,
+                with: .color(stroke.opacity(totalStrokeOpacity)),
+                style: strokeStyle
+            )
         }
+    }
+
+    private func viewportTransform(for size: CGSize) -> SVGRenderViewportTransform? {
+        guard size.width > 0 && size.height > 0 else {
+            return nil
+        }
+        guard let transformSource = resolveRenderSourceRect() else {
+            return nil
+        }
+        let sourceWidth: CGFloat = transformSource.width
+        let sourceHeight: CGFloat = transformSource.height
+        if sourceWidth <= 0 || sourceHeight <= 0 {
+            return nil
+        }
+        let scaleX = size.width / sourceWidth
+        let scaleY = size.height / sourceHeight
+        let scale = min(scaleX, scaleY)
+        if !scale.isFinite || scale <= 0 {
+            return nil
+        }
+
+        let renderedWidth = sourceWidth * scale
+        let renderedHeight = sourceHeight * scale
+        let translateX = (-transformSource.minX * scale) + ((size.width - renderedWidth) / 2)
+        let translateY = (-transformSource.minY * scale) + ((size.height - renderedHeight) / 2)
+
+        let transform = CGAffineTransform(scaleX: scale, y: scale).translatedBy(x: translateX, y: translateY)
+        return SVGRenderViewportTransform(
+            transform: transform,
+            strokeScale: scale
+        )
+    }
+
+    private func resolveRenderSourceRect() -> CGRect? {
+        if let document {
+            if let size = document.size {
+                let width: CGFloat = CGFloat(size.width)
+                let height: CGFloat = CGFloat(size.height)
+                if width > 0 && height > 0 {
+                    return CGRect(
+                        x: 0.0,
+                        y: 0.0,
+                        width: width,
+                        height: height
+                    )
+                }
+            }
+
+            if let viewBox = document.viewBox {
+                let width: CGFloat = CGFloat(viewBox.width)
+                let height: CGFloat = CGFloat(viewBox.height)
+                if width > 0 && height > 0 {
+                    return CGRect(
+                        x: CGFloat(viewBox.x),
+                        y: CGFloat(viewBox.y),
+                        width: width,
+                        height: height
+                    )
+                }
+            }
+        }
+        return nil
     }
 
     private var configurationFingerprint: String {
@@ -246,15 +355,21 @@ private struct SVGStaticPlaceholderView: View {
             await refreshCacheMetrics()
         } catch {
             canCacheDrawNodesForCurrentDocument = false
-            canCachePathCacheForCurrentDocument = false
-            parsingFailed = true
-            document = nil
-            pathCache.removeAll()
+                canCachePathCacheForCurrentDocument = false
+                parsingFailureMessage = error.localizedDescription
+                parsingFailed = true
+                document = nil
+                pathCache.removeAll()
             clipPathCache.removeAll()
             cachedConfigurationFingerprint = ""
             cachedDrawNodes.removeAll()
             await refreshCacheMetrics()
         }
+    }
+
+    private var debugParsingFailureMessage: String? {
+        let hasMessage = !parsingFailureMessage.isEmpty
+        return hasMessage ? parsingFailureMessage : nil
     }
 
     private func updateCachedDrawNodes(
@@ -394,6 +509,8 @@ private struct SVGStaticPlaceholderView: View {
             fillColor: color(from: resolved.style.fill),
             fillStyle: fillStyle(from: resolved.style.fillRule),
             strokeColor: color(from: resolved.style.stroke),
+            fillOpacity: CGFloat(resolved.style.fillOpacity),
+            strokeOpacity: CGFloat(resolved.style.strokeOpacity),
             strokeWidth: CGFloat(resolved.style.strokeWidth),
             lineCap: lineCap(from: resolved.style.strokeLineCap),
             lineJoin: lineJoin(from: resolved.style.strokeLineJoin),
@@ -449,6 +566,8 @@ private struct SVGStaticPlaceholderView: View {
             fillColor: color(from: resolved.style.fill) ?? fallbackFill,
             fillStyle: fillStyle(from: resolved.style.fillRule),
             strokeColor: color(from: resolved.style.stroke) ?? fallbackStroke,
+            fillOpacity: CGFloat(resolved.style.fillOpacity),
+            strokeOpacity: CGFloat(resolved.style.strokeOpacity),
             strokeWidth: strokeWidth,
             lineCap: lineCap(from: resolved.style.strokeLineCap),
             lineJoin: lineJoin(from: resolved.style.strokeLineJoin),
@@ -795,6 +914,8 @@ private struct SVGDrawNode: Identifiable {
     let fillColor: Color?
     let fillStyle: FillStyle
     let strokeColor: Color?
+    let fillOpacity: CGFloat
+    let strokeOpacity: CGFloat
     let strokeWidth: CGFloat
     let lineCap: CGLineCap
     let lineJoin: CGLineJoin
@@ -804,5 +925,10 @@ private struct SVGDrawNode: Identifiable {
     let opacity: Double
     let clipPaths: [Path]
     let filterPrimitives: [SVGFilterPrimitive]
+}
+
+private struct SVGRenderViewportTransform: Sendable {
+    let transform: CGAffineTransform
+    let strokeScale: CGFloat
 }
 #endif

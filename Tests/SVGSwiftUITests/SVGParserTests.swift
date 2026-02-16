@@ -38,6 +38,32 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(dataDocument, sourceDocument)
     }
 
+    func testParseHandlesUTF16EncodedData() throws {
+        let svg = "<svg width='24' height='32'></svg>"
+        let utf16Bytes: [UInt8] = svg.utf16.flatMap { value in
+            let lowByte: UInt8 = UInt8(truncatingIfNeeded: value)
+            let highByte: UInt8 = UInt8(truncatingIfNeeded: value >> 8)
+            return [lowByte, highByte]
+        }
+        let utf16Data: Data = Data(utf16Bytes)
+
+        _ = try parser.parse(data: utf16Data)
+    }
+
+    func testParseRecoversWrappedSVGPayload() throws {
+        let svg = """
+        <html>
+          <body>
+            <svg width='20' height='20'>
+            </svg>
+          </body>
+        </html>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        XCTAssertEqual(document.size, SVGSize(width: 20, height: 20))
+    }
+
     func testParseSetsRootSizeNilForPercentageUnits() throws {
         let document = try parser.parse(source: .string("<svg width='100%' height='100%'></svg>"))
         XCTAssertNil(document.size)

@@ -1,0 +1,3 @@
+mode=parse
+expected=pass
+nodeCount=1
