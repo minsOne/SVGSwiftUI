@@ -14,6 +14,8 @@ struct SVGNodePathBuilder: Sendable {
         switch node {
         case .group:
             return nil
+        case .text:
+            return nil
         case .path(let pathNode):
             let path: CGPath = buildPathPath(pathNode)
             return applyTransform(
@@ -112,7 +114,7 @@ struct SVGNodePathBuilder: Sendable {
             }
             path.closeSubpath()
 
-        case .path, .group, .svg, .image:
+        case .path, .group, .svg, .image, .text:
             break
         }
         return path

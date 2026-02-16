@@ -1,0 +1,51 @@
+<svg width="260" height="220" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+  <rect id="smil-breath-grid-bg" x="0" y="0" width="260" height="220" fill="#111827"/>
+  <g id="smil-breath-grid-core" transform="translate(20 25)">
+    <rect id="smil-breath-grid-frame" x="0" y="0" width="220" height="170" fill="none" stroke="#e2e8f0" stroke-width="3" opacity="0.2"/>
+    <g id="smil-breath-grid-row-0">
+      <rect id="smil-breath-cell-0" x="12" y="12" width="28" height="28" rx="4" fill="#22d3ee"/>
+      <rect id="smil-breath-cell-1" x="54" y="12" width="28" height="28" rx="4" fill="#67e8f9"/>
+      <rect id="smil-breath-cell-2" x="96" y="12" width="28" height="28" rx="4" fill="#38bdf8"/>
+      <rect id="smil-breath-cell-3" x="138" y="12" width="28" height="28" rx="4" fill="#60a5fa"/>
+      <rect id="smil-breath-cell-4" x="180" y="12" width="28" height="28" rx="4" fill="#93c5fd"/>
+      <animateTransform
+        attributeName="transform"
+        attributeType="XML"
+        type="translate"
+        values="20 25; 20 29; 20 25"
+        dur="2.2s"
+        repeatCount="indefinite"
+      />
+    </g>
+    <g id="smil-breath-grid-row-1" transform="translate(0 40)">
+      <rect id="smil-breath-cell-5" x="12" y="12" width="28" height="28" rx="4" fill="#f472b6"/>
+      <rect id="smil-breath-cell-6" x="54" y="12" width="28" height="28" rx="4" fill="#fb7185"/>
+      <rect id="smil-breath-cell-7" x="96" y="12" width="28" height="28" rx="4" fill="#f9a8d4"/>
+      <rect id="smil-breath-cell-8" x="138" y="12" width="28" height="28" rx="4" fill="#fb923c"/>
+      <rect id="smil-breath-cell-9" x="180" y="12" width="28" height="28" rx="4" fill="#fcd34d"/>
+    </g>
+    <g id="smil-breath-grid-row-2" transform="translate(0 80)">
+      <rect id="smil-breath-cell-10" x="12" y="12" width="28" height="28" rx="4" fill="#c084fc"/>
+      <rect id="smil-breath-cell-11" x="54" y="12" width="28" height="28" rx="4" fill="#d8b4fe"/>
+      <rect id="smil-breath-cell-12" x="96" y="12" width="28" height="28" rx="4" fill="#e879f9"/>
+      <rect id="smil-breath-cell-13" x="138" y="12" width="28" height="28" rx="4" fill="#f472b6"/>
+      <rect id="smil-breath-cell-14" x="180" y="12" width="28" height="28" rx="4" fill="#fca5a5"/>
+    </g>
+    <g id="smil-breath-grid-row-3" transform="translate(0 120)">
+      <rect id="smil-breath-cell-15" x="12" y="12" width="28" height="28" rx="4" fill="#34d399"/>
+      <rect id="smil-breath-cell-16" x="54" y="12" width="28" height="28" rx="4" fill="#6ee7b7"/>
+      <rect id="smil-breath-cell-17" x="96" y="12" width="28" height="28" rx="4" fill="#86efac"/>
+      <rect id="smil-breath-cell-18" x="138" y="12" width="28" height="28" rx="4" fill="#86efac"/>
+      <rect id="smil-breath-cell-19" x="180" y="12" width="28" height="28" rx="4" fill="#5eead4"/>
+    </g>
+    <rect id="smil-breath-breath-panel" x="16" y="170" width="188" height="18" rx="9" fill="#1f2937"/>
+    <rect id="smil-breath-breath-core" x="16" y="170" width="120" height="18" rx="9" fill="#7dd3fc" opacity="0.9">
+      <animate
+        attributeName="width"
+        values="120;188;120"
+        dur="3s"
+        repeatCount="indefinite"
+      />
+    </rect>
+  </g>
+</svg>

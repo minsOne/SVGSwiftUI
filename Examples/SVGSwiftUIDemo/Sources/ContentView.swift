@@ -352,13 +352,16 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            SVGView(
-                source: .data(sourceData),
-                options: demoSVGRenderOptions,
-                configuration: configuration
-            )
+            ZStack {
+                Color(white: 0.97)
+                    .accessibilityHidden(true)
+                SVGView(
+                    source: .data(sourceData),
+                    options: demoSVGRenderOptions,
+                    configuration: configuration
+                )
+            }
             .frame(width: defaultCanvasSize.width, height: defaultCanvasSize.height)
-            .background(Color(white: 0.97))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)

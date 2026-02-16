@@ -109,7 +109,7 @@ final class SVGClipPathTests: XCTestCase {
 
         for node in nodes {
             switch node {
-            case .path, .shape:
+            case .path, .shape, .text:
                 if let nodePath = nodePathBuilder.buildPath(for: node, inheritedTransform: inheritedTransform) {
                     mutablePath.addPath(nodePath)
                     hasPath = true
@@ -157,7 +157,7 @@ final class SVGClipPathTests: XCTestCase {
             return nil
         case .shape(let shape):
             return shape.base.id == targetID ? shape : nil
-        case .path, .rasterImage:
+        case .path, .rasterImage, .text:
             return nil
         }
     }

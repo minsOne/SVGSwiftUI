@@ -1,0 +1,46 @@
+<svg width="300" height="180" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+  <rect id="smil-wave-shimmer-bg" x="0" y="0" width="300" height="180" fill="#0f172a"/>
+  <g id="smil-wave-shimmer-core" transform="translate(150 90)">
+    <path
+      id="smil-wave-shimmer-band"
+      d="M-120 0 C-90 -22 -60 -22 -30 0 S 30 22 60 0 S 120 -22 150 0"
+      fill="none"
+      stroke="#22d3ee"
+      stroke-width="10"
+      stroke-linecap="round"
+    />
+    <path
+      id="smil-wave-shimmer-halo"
+      d="M-132 0 C -95 -36 -45 -36  -15 0 S 45 36 75 0 S 135 -36 168 0"
+      fill="none"
+      stroke="#67e8f9"
+      stroke-width="4"
+      stroke-linecap="round"
+      opacity="0.4"
+    />
+    <circle id="smil-wave-shimmer-core-dot" cx="0" cy="0" r="10" fill="#67e8f9"/>
+    <g id="smil-wave-shimmer-lights">
+      <circle id="smil-wave-shimmer-light-0" cx="-90" cy="-22" r="5" fill="#22d3ee"/>
+      <circle id="smil-wave-shimmer-light-1" cx="-30" cy="4" r="5" fill="#a78bfa"/>
+      <circle id="smil-wave-shimmer-light-2" cx="30" cy="-4" r="5" fill="#2dd4bf"/>
+      <circle id="smil-wave-shimmer-light-3" cx="90" cy="22" r="5" fill="#facc15"/>
+    </g>
+    <animateTransform
+      attributeName="transform"
+      attributeType="XML"
+      type="translate"
+      values="-2 0; 2 0; -2 0"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+  </g>
+  <rect id="smil-wave-shimmer-lens" x="120" y="50" width="60" height="80" rx="14" fill="#1e293b" opacity="0.7"/>
+  <rect id="smil-wave-shimmer-beam" x="120" y="64" width="60" height="10" rx="5" fill="#38bdf8" opacity="0.9">
+    <animate
+      attributeName="x"
+      values="120;220;120"
+      dur="4s"
+      repeatCount="indefinite"
+    />
+  </rect>
+</svg>

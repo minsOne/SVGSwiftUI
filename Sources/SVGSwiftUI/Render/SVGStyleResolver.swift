@@ -1,3 +1,5 @@
+import Foundation
+
 struct SVGResolvedNodeStyle: Sendable, Equatable {
     var nodeID: String
     var element: SVGElementKind
@@ -188,9 +190,80 @@ struct SVGStyleResolver: Sendable {
                 style.filter = normalizedValue
             case "opacity":
                 style.opacity = parseNumeric(normalizedValue)
+            case "font-size":
+                style.fontSize = parseNumeric(normalizedValue)
+            case "font-family":
+                if let parsedFontFamily = parseFontFamily(normalizedValue) {
+                    style.fontFamily = parsedFontFamily
+                }
+            case "text-anchor":
+                style.textAnchor = parseTextAnchor(normalizedValue)
+            case "font-style":
+                style.fontStyle = parseFontStyle(normalizedValue)
+            case "font-weight":
+                style.fontWeight = parseFontWeight(normalizedValue)
             default:
                 continue
             }
+        }
+    }
+
+    private func parseFontFamily(_ value: String) -> String? {
+        let normalizedValue: String = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let candidates: [Substring] = normalizedValue.split(separator: ",", omittingEmptySubsequences: true)
+        for rawCandidate in candidates {
+            let trimmed = rawCandidate.trimmingCharacters(in: .whitespacesAndNewlines)
+            let candidate = trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+            if !candidate.isEmpty {
+                return candidate
+            }
+        }
+        return nil
+    }
+
+    private func parseFontStyle(_ value: String) -> SVGFontStyle {
+        let normalized = value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        switch normalized {
+        case "italic":
+            return .italic
+        case "oblique":
+            return .oblique
+        default:
+            return .normal
+        }
+    }
+
+    private func parseFontWeight(_ value: String) -> SVGFontWeight {
+        let normalized = value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        switch normalized {
+        case "normal":
+            return .normal
+        case "bold":
+            return .bold
+        case "bolder":
+            return .bolder
+        case "lighter":
+            return .lighter
+        default:
+            if let number = Int(normalized), (1...1000).contains(number) {
+                return .numeric(number)
+            }
+            return .normal
+        }
+    }
+
+    private func parseTextAnchor(_ value: String) -> SVGTextAnchor {
+        switch value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "middle":
+            return .middle
+        case "end":
+            return .end
+        default:
+            return .start
         }
     }
 

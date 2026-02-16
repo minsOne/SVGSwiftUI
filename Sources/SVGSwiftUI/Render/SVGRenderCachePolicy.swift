@@ -59,7 +59,7 @@ struct SVGRenderCachePolicy {
         switch node {
         case .group(let groupNode):
             return 1 + drawableNodeCount(in: groupNode.children)
-        case .path, .shape, .rasterImage:
+        case .path, .shape, .rasterImage, .text:
             return 1
         }
     }

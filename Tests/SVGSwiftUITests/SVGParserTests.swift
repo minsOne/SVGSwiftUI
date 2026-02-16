@@ -664,7 +664,7 @@ final class SVGParserTests: XCTestCase {
         """
 
         let document = try parser.parse(source: .string(svg))
-        XCTAssertEqual(document.unsupportedFeatures["element:text"], 1)
+        XCTAssertNil(document.unsupportedFeatures["element:text"])
         XCTAssertNil(pathNode(id: "label", in: document))
 
         guard let supportedRect = shapeNode(id: "supported", in: document) else {
@@ -715,7 +715,7 @@ final class SVGParserTests: XCTestCase {
             options: SVGParserOptions(enableDataURI: true)
         )
 
-        XCTAssertEqual(document.unsupportedFeatures["element:text"], 1)
+        XCTAssertNil(document.unsupportedFeatures["element:text"])
         XCTAssertEqual(document.nodes.count, 1)
         XCTAssertEqual(document.nodes.first?.nodeID, "auto:/0/0")
         guard case .group(let embeddedGroup) = document.nodes.first else {
@@ -1337,6 +1337,31 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(inlineStylePath.base.style.fillRule, .nonZero)
         XCTAssertEqual(inlineStylePath.base.style.strokeDashArray, [])
         XCTAssertEqual(inlineStylePath.base.style.strokeMiterLimit, 2.75)
+    }
+
+    func testParseFontPropertiesFromAttributesAndInlineStyle() throws {
+        let document = try parser.parse(source: .string("""
+        <svg>
+          <text id="font-style" x="10" y="20" font-family=" 'Helvetica Neue' , Arial " font-style="italic" font-weight="bold">hello</text>
+          <text id="font-inline" x="10" y="40" style='font-family: "Times New Roman", serif; font-style: oblique; font-weight: 500; font-size: 24px;'>world</text>
+        </svg>
+        """))
+
+        guard case .text(let first) = document.nodes[0] else {
+            return XCTFail("Expected first text node")
+        }
+        XCTAssertEqual(first.base.style.fontFamily, "Helvetica Neue")
+        XCTAssertEqual(first.base.style.fontStyle, .italic)
+        XCTAssertEqual(first.base.style.fontWeight, .bold)
+        XCTAssertNil(first.base.style.fontSize)
+
+        guard case .text(let second) = document.nodes[1] else {
+            return XCTFail("Expected second text node")
+        }
+        XCTAssertEqual(second.base.style.fontFamily, "Times New Roman")
+        XCTAssertEqual(second.base.style.fontStyle, .oblique)
+        XCTAssertEqual(second.base.style.fontWeight, .numeric(500))
+        XCTAssertEqual(second.base.style.fontSize, 24)
     }
 
     func testParsePathWithoutDUsesEmptyString() throws {

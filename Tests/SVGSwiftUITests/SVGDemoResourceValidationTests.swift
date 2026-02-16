@@ -32,7 +32,7 @@ final class SVGDemoResourceValidationTests: XCTestCase {
             fileName: "style-sheet.svg",
             keyNodeID: "sheet-circle",
             minimumRenderedShapeCount: 2,
-            expectedUnsupported: ["element:text": 1]
+                expectedUnsupported: [:]
         ),
         .init(
             fileName: "orbital-lattice.svg",
@@ -309,7 +309,7 @@ final class SVGDemoResourceValidationTests: XCTestCase {
                 inheritedTransform: nextTransform
             )
             return count
-        case .path, .shape, .rasterImage:
+        case .path, .shape, .rasterImage, .text:
             return 0
         }
     }

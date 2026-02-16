@@ -32,6 +32,9 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         "animation-aurora-wisp",
         "animation-nested-drift",
         "animation-transform-radiant",
+        "animation-smil-orbit-lumen",
+        "animation-smil-breath-grid",
+        "animation-smil-wave-shimmer",
         "geometry",
         "style-inline",
         "style-sheet",
@@ -53,6 +56,9 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         "animation-aurora-wisp",
         "animation-nested-drift",
         "animation-transform-radiant",
+        "animation-smil-orbit-lumen",
+        "animation-smil-breath-grid",
+        "animation-smil-wave-shimmer",
         "animation-smil-orbital",
         "animation-smil-drift-lines",
         "animation-smil-opacity-breath",
@@ -429,6 +435,7 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
 
     @MainActor
     func testCanvasMatchesBrowserBaselines() throws {
+        continueAfterFailure = true
         let app = launchApp()
         let browserBaselineCases = try loadBrowserBaselineCases()
         let snapshotMode = SnapshotMode.current(sourceFilePath: #filePath)
@@ -476,13 +483,14 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
                 XCTFail("Canvas를 찾지 못했습니다: \(canvasIdentifier)")
                 attachAccessibilityTreeSnapshot(
                     in: app,
-                    context: "missing canvas: \(canvasIdentifier)"
-                )
+                context: "missing canvas: \(canvasIdentifier)"
+            )
                 closeSampleDetail(in: app)
                 continue
             }
             XCTAssertTrue(canvas.waitForExistence(timeout: 1))
             scrollToIfNeeded(canvas, in: app, container: detailContainer)
+            ensureAnimationDisabledForSample(sampleID, in: app)
             waitForRenderSettled()
 
             let snapshotComparator = SnapshotComparator(
@@ -504,7 +512,8 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
             snapshotComparator.assertMatchesBaseline(
                 rasterImage: canvasImage,
                 baselineName: baselineCase.baselineName,
-                sourceFilePath: #filePath
+                sourceFilePath: #filePath,
+                compareTargetSize: baselineCase.expectedSize
             )
             closeSampleDetail(in: app)
         }
@@ -513,7 +522,7 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
     @MainActor
     func testBrowserOracleManifestCoversDemoSamples() throws {
         let manifestCases = try loadBrowserBaselineCases()
-        let requiredSampleSet = Set(Self.requiredCanvases)
+        let requiredSampleSet = Set(Self.requiredCanvases + Self.animatedCanvases)
         let manifestSampleSet = Set(manifestCases.map(\.sampleID))
         let duplicateSampleCases = Dictionary(grouping: manifestCases, by: \.sampleID)
             .filter { $0.value.count > 1 }
@@ -811,6 +820,20 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
             scrollToIfNeeded(canvas, in: app, container: detailContainer)
         }
         closeSampleDetail(in: app)
+    }
+
+    @MainActor
+    private func ensureAnimationDisabledForSample(_ sampleID: String, in app: XCUIApplication) {
+        let animationToggle = app.switches["demo.animationToggle.\(sampleID)"]
+        if !animationToggle.exists {
+            return
+        }
+
+        guard boolValue(from: animationToggle) == true else {
+            return
+        }
+        animationToggle.tap()
+        _ = waitForToggleValue(animationToggle, expected: false, timeout: 2.0)
     }
 
     @MainActor
@@ -1519,12 +1542,23 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
             }
             return nil
         }
-        if let cropped = rasterizedScreenshot(from: element, appFallback: app) {
+
+        if let screenshot = rasterImage(from: element.screenshot()) {
             if shouldLogCapture {
                 let message = String(
-                    "fallback capture succeeded: element=\(element.identifier), " +
-                    "elementFrame=\(element.frame)"
+                    "element screenshot succeeded: element=\(element.identifier), " +
+                        "elementFrame=\(element.frame), " +
+                        "screenshot size=\(screenshot.width)x\(screenshot.height)"
                 )
+                print(message)
+                appendCaptureDebugLog(message)
+            }
+            return screenshot
+        }
+
+        if let cropped = rasterizedScreenshot(from: element, appFallback: app) {
+            if shouldLogCapture {
+                let message = "fallback capture succeeded: element=\(element.identifier), elementFrame=\(element.frame)"
                 print(message)
                 appendCaptureDebugLog(message)
             }
@@ -1839,11 +1873,25 @@ private struct DemoBrowserBaselineCase {
     let sampleID: String
     let baselineName: String
     let sourceSVGPath: String
+    let expectedSize: CGSize?
 
     init(sampleID: String, baselineName: String, sourceSVGPath: String) {
         self.sampleID = sampleID
         self.baselineName = baselineName
         self.sourceSVGPath = sourceSVGPath
+        self.expectedSize = nil
+    }
+
+    init(
+        sampleID: String,
+        baselineName: String,
+        sourceSVGPath: String,
+        expectedSize: CGSize?
+    ) {
+        self.sampleID = sampleID
+        self.baselineName = baselineName
+        self.sourceSVGPath = sourceSVGPath
+        self.expectedSize = expectedSize
     }
 }
 
@@ -1864,14 +1912,29 @@ private struct DemoBrowserBaselineCase {
         return manifest.cases.map { entry in
             let svgPath = (manifestDirectory as NSString).appendingPathComponent(entry.svg)
             let svgURL = URL(fileURLWithPath: svgPath).standardized
-            let sampleID = svgURL.deletingPathExtension().lastPathComponent
+            let sampleID = entry.sampleID ?? svgURL.deletingPathExtension().lastPathComponent
+            let expectedSize = makeExpectedSize(from: entry.size)
             return DemoBrowserBaselineCase(
                 sampleID: sampleID,
                 baselineName: entry.name,
-                sourceSVGPath: svgURL.path
-        )
+                sourceSVGPath: svgURL.path,
+                expectedSize: expectedSize
+            )
+        }
     }
-}
+
+    private func makeExpectedSize(from size: BrowserOracleManifestSize?) -> CGSize? {
+        guard let size else {
+            return nil
+        }
+        guard let widthValue = size.width, let heightValue = size.height else {
+            return nil
+        }
+        if widthValue <= 0 || heightValue <= 0 {
+            return nil
+        }
+        return CGSize(width: widthValue, height: heightValue)
+    }
 
 private func findBrowserOracleManifestURL() -> URL? {
     let manifestFileName = "browser-oracle-manifest.json"
@@ -1933,6 +1996,13 @@ private struct BrowserOracleManifest: Decodable {
 private struct BrowserOracleManifestEntry: Decodable {
     let name: String
     let svg: String
+    let sampleID: String?
+    let size: BrowserOracleManifestSize?
+}
+
+private struct BrowserOracleManifestSize: Decodable {
+    let width: Int?
+    let height: Int?
 }
 
 private enum SnapshotMode {
@@ -1976,25 +2046,33 @@ private struct SnapshotComparator {
     func assertMatchesBaseline(
         rasterImage: RasterImage,
         baselineName: String,
-        sourceFilePath: StaticString
+        sourceFilePath: StaticString,
+        compareTargetSize: CGSize? = nil
     ) {
         guard let actualImageData = makePNGData(fromRGBA8Pixels: rasterImage.bytes, width: rasterImage.width, height: rasterImage.height) else {
             XCTFail("Could not encode canvas raster image data.")
             return
         }
-        assertMatchesBaseline(actualImageData: actualImageData, baselineName: baselineName, sourceFilePath: sourceFilePath)
+        assertMatchesBaseline(
+            actualImageData: actualImageData,
+            baselineName: baselineName,
+            sourceFilePath: sourceFilePath,
+            compareTargetSize: compareTargetSize
+        )
     }
 
     @MainActor
     func assertMatchesBaseline(
         screenshot: XCUIScreenshot,
         baselineName: String,
-        sourceFilePath: StaticString
+        sourceFilePath: StaticString,
+        compareTargetSize: CGSize? = nil
     ) {
         assertMatchesBaseline(
             actualImageData: screenshot.pngRepresentation,
             baselineName: baselineName,
-            sourceFilePath: sourceFilePath
+            sourceFilePath: sourceFilePath,
+            compareTargetSize: compareTargetSize
         )
     }
 
@@ -2002,7 +2080,8 @@ private struct SnapshotComparator {
     private func assertMatchesBaseline(
         actualImageData: Data,
         baselineName: String,
-        sourceFilePath: StaticString
+        sourceFilePath: StaticString,
+        compareTargetSize: CGSize? = nil
     ) {
         let baselineURL = baselineFileURL(name: baselineName, sourceFilePath: sourceFilePath)
         let baselineDirectory = baselineURL.deletingLastPathComponent()
@@ -2045,7 +2124,8 @@ private struct SnapshotComparator {
         }
         let comparison = compare(
             expectedImageData: expectedImageData,
-            actualImageData: actualImageData
+            actualImageData: actualImageData,
+            compareTargetSize: compareTargetSize
         )
         if let reason = comparison.reason {
             XCTFail("Baseline comparison failed for \(baselineName): \(reason)")
@@ -2103,7 +2183,11 @@ private struct SnapshotComparator {
         return rawTimestamp.replacingOccurrences(of: ":", with: "-")
     }
 
-    private func compare(expectedImageData: Data, actualImageData: Data) -> PixelComparisonResult {
+    private func compare(
+        expectedImageData: Data,
+        actualImageData: Data,
+        compareTargetSize: CGSize?
+    ) -> PixelComparisonResult {
         guard let expectedImage = makeCGImage(from: expectedImageData) else {
             return PixelComparisonResult(
                 mismatchRatio: 1.0,
@@ -2119,15 +2203,25 @@ private struct SnapshotComparator {
             )
         }
 
-        let expectedImageWidth = expectedImage.width
-        let expectedImageHeight = expectedImage.height
-        let targetWidth = expectedImageWidth
-        let targetHeight = expectedImageHeight
+        let resolvedTargetSize = resolvedCompareTargetSize(
+            requested: compareTargetSize,
+            expectedImage: expectedImage,
+            actualImage: actualImage
+        )
+        let targetWidth = Int(resolvedTargetSize.width)
+        let targetHeight = Int(resolvedTargetSize.height)
+        if targetWidth <= 0 || targetHeight <= 0 {
+            return PixelComparisonResult(
+                mismatchRatio: 1.0,
+                reason: "Invalid compare target size.",
+                diffImageData: nil
+            )
+        }
 
         let expectedRaster = rasterizeCGImage(
             expectedImage,
             to: CGSize(width: targetWidth, height: targetHeight),
-            preserveAspect: false
+            preserveAspect: true
         )
         let actualRaster = rasterizeCGImage(
             actualImage,
@@ -2198,6 +2292,17 @@ private struct SnapshotComparator {
             reason: nil,
             diffImageData: diffImageData
         )
+    }
+
+    private func resolvedCompareTargetSize(
+        requested compareTargetSize: CGSize?,
+        expectedImage: CGImage,
+        actualImage: CGImage
+    ) -> CGSize {
+        guard let requestedTarget = compareTargetSize else {
+            return CGSize(width: CGFloat(expectedImage.width), height: CGFloat(expectedImage.height))
+        }
+        return requestedTarget
     }
 
     private func clampTolerance(_ value: Double) -> UInt8 {
@@ -2282,7 +2387,15 @@ private struct SnapshotComparator {
                 return false
             }
 
-            context.interpolationQuality = .none
+            let sourceToTargetScaleX = Double(width) / Double(sourceWidth)
+            let sourceToTargetScaleY = Double(height) / Double(sourceHeight)
+
+            let isIdentityScaleX = abs(sourceToTargetScaleX - 1.0) <= 0.000_001
+            let isIdentityScaleY = abs(sourceToTargetScaleY - 1.0) <= 0.000_001
+            let useNearestResize = isIdentityScaleX && isIdentityScaleY
+
+            context.interpolationQuality = useNearestResize ? .none : .high
+            context.setShouldAntialias(!useNearestResize)
             context.draw(
                 normalizedSourceImage,
                 in: CGRect(x: 0.0, y: 0.0, width: drawWidth, height: drawHeight)
@@ -2297,6 +2410,20 @@ private struct SnapshotComparator {
             height: height,
             bytes: Array(pixelData)
         )
+    }
+
+    private func isIntegerScaleFactor(_ value: Double) -> Bool {
+        if !value.isFinite || value <= 0.0 {
+            return false
+        }
+        if abs(value - 1.0) <= 0.000_001 {
+            return true
+        }
+        if value < 1.0 {
+            return false
+        }
+        let rounded = value.rounded()
+        return abs(rounded - value) <= 0.001
     }
 
     private func cropToTargetWidth(image: CGImage, targetAspect: Double) -> CGImage? {

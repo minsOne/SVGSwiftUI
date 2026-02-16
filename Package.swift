@@ -12,6 +12,10 @@ let package = Package(
     products: [
         .library(
             name: "SVGSwiftUI",
+            targets: ["SVGSwiftUI"]
+        ),
+        .library(
+            name: "SVGSwiftUIDynamic",
             type: .dynamic,
             targets: ["SVGSwiftUI"]
         ),

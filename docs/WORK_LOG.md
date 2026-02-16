@@ -2,6 +2,23 @@
 
 ## 2026-02-16
 
+### Session 66
+- 작업: 폰트 스타일 및 텍스트 렌더링 파이프라인 정비, 고난도 애니메이션 데모/브라우저 기준 샘플 확장
+- 완료:
+  - `SVGStyle`에 폰트 계열/크기/스타일/굵기 속성 추가 (`font-family`, `font-size`, `font-style`, `font-weight`, `text-anchor`) 및 기본값/병합 규칙 반영
+  - `SVGParser`에 텍스트 노드 파싱 지원을 정리하고 `SVGStyleResolver`에서 인라인/스타일시트 폰트 속성 해석 보강
+  - `SVGView` 렌더 경로에 텍스트 노드 드로잉 추가, `text-anchor`·`font-style`/`font-weight` 반영 매핑 적용
+  - `NodeOverride` 기반 렌더 설정/오버라이드가 반영되는 구조 정렬 및 회귀 테스트 확대(폰트 파싱/해석)
+  - 데모에 애니메이션 전용 SVG 10건 추가 및 브라우저 기준 이미지 베이스라인 13건 등록
+  - `Scripts/browser-oracle/browser-oracle-manifest.json`에 애니메이션 fixture 항목 확장
+- 검증:
+  - `swift test --no-parallel` (173 tests, 0 failures)
+  - `swift test --filter SVGParserTests --no-parallel` (57 tests, 0 failures)
+  - `swift test --filter SVGDemoResourceValidationTests --no-parallel` (5 tests, 0 failures)
+- 리스크:
+  - 폰트 렌더링은 기본 SwiftUI 폰트 매핑을 사용하므로 웹 브라우저와의 픽셀 정확도는 플랫폼/폰트 가용성에 따라 편차가 생길 수 있음
+  - 애니메이션 샘플은 시각 회귀 기준을 추가 구축하지 않으면 런타임 성능/시각 동작 추적이 분산될 수 있음
+
 ### Session 63
 - 작업: 데모 고난도 샘플 3단계 정합 점검 추가 및 정리
 - 완료:

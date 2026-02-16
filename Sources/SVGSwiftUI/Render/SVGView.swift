@@ -209,6 +209,25 @@ private struct SVGStaticPlaceholderView: View {
         renderTransform: CGAffineTransform,
         strokeScale: CGFloat
     ) {
+        if let text = node.textContent, let textPosition = node.textPosition {
+            let fontSizeValue: CGFloat = node.textFontSize ?? 16
+            let textFont = textFont(
+                familyName: node.textFontFamily,
+                size: fontSizeValue,
+                fontStyle: node.textFontStyle,
+                fontWeight: node.textFontWeight
+            )
+            let textColor = node.fillColor ?? Color.primary
+            let alpha = CGFloat(node.opacity * node.fillOpacity)
+            let anchor = textAnchorPoint(node.textAnchor)
+            var content = Text(text)
+            content = content
+                .font(textFont)
+                .foregroundColor(textColor.opacity(Double(alpha)))
+            let renderedPoint = CGPointApplyAffineTransform(textPosition, renderTransform)
+            context.draw(content, at: renderedPoint, anchor: anchor)
+            return
+        }
         let renderedPath: Path = node.path.applying(renderTransform)
         if let fill = node.fillColor {
             let totalFillOpacity: Double = node.opacity * node.fillOpacity
@@ -234,6 +253,75 @@ private struct SVGStaticPlaceholderView: View {
                 with: .color(stroke.opacity(totalStrokeOpacity)),
                 style: strokeStyle
             )
+        }
+    }
+
+    private func textFont(
+        familyName: String?,
+        size: CGFloat,
+        fontStyle: SVGFontStyle,
+        fontWeight: SVGFontWeight
+    ) -> Font {
+        let name: String = familyName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "system"
+        let sanitizedSize: CGFloat = max(size, 1)
+        let resolvedWeight: Font.Weight = mappedFontWeight(fontWeight)
+
+        if name == "system" || name.isEmpty {
+            var font = Font.system(size: sanitizedSize, weight: resolvedWeight)
+            if fontStyle == .italic || fontStyle == .oblique {
+                font = font.italic()
+            }
+            return font
+        }
+        var font = Font.custom(name, size: sanitizedSize).weight(resolvedWeight)
+        if fontStyle == .italic || fontStyle == .oblique {
+            font = font.italic()
+        }
+        return font
+    }
+
+    private func mappedFontWeight(_ fontWeight: SVGFontWeight) -> Font.Weight {
+        switch fontWeight {
+        case .normal:
+            return .regular
+        case .bold:
+            return .bold
+        case .bolder:
+            return .heavy
+        case .lighter:
+            return .light
+        case .numeric(let value):
+            switch value {
+            case ..<150:
+                return .ultraLight
+            case 150..<250:
+                return .thin
+            case 250..<350:
+                return .light
+            case 350..<450:
+                return .regular
+            case 450..<550:
+                return .medium
+            case 550..<650:
+                return .semibold
+            case 650..<750:
+                return .bold
+            case 750..<850:
+                return .heavy
+            default:
+                return .black
+            }
+        }
+    }
+
+    private func textAnchorPoint(_ anchor: SVGTextAnchor) -> UnitPoint {
+        switch anchor {
+        case .start:
+            return .leading
+        case .middle:
+            return .center
+        case .end:
+            return .trailing
         }
     }
 
@@ -447,18 +535,25 @@ private struct SVGStaticPlaceholderView: View {
             if !node.children.isEmpty {
                 output.append(
                     contentsOf: buildDrawNodes(
-                    from: node.children,
-                    resolved: resolved,
-                    filterDefinitions: filterDefinitions,
-                    clipPathCache: clipPathCache,
-                    inheritedTransform: nodeTransform,
-                    inheritedClipPaths: activeClipPaths,
-                    canUsePathCache: canUsePathCache
-                )
+                        from: node.children,
+                        resolved: resolved,
+                        filterDefinitions: filterDefinitions,
+                        clipPathCache: clipPathCache,
+                        inheritedTransform: nodeTransform,
+                        inheritedClipPaths: activeClipPaths,
+                        canUsePathCache: canUsePathCache
+                    )
                 )
             }
         }
         return output
+    }
+
+    private func textNode(from node: SVGNode) -> SVGTextNode? {
+        if case .text(let textNode) = node {
+            return textNode
+        }
+        return nil
     }
 
     private func makeDrawNode(
@@ -476,6 +571,16 @@ private struct SVGStaticPlaceholderView: View {
         if let rasterNode = rasterImageNode(from: node) {
             return makeRasterDrawNode(
                 for: rasterNode,
+                resolved: resolved,
+                inheritedTransform: inheritedTransform,
+                filterDefinitions: filterDefinitions,
+                clipPaths: clipPaths
+            )
+        }
+
+        if let sourceText = textNode(from: node) {
+            return makeTextDrawNode(
+                for: sourceText,
                 resolved: resolved,
                 inheritedTransform: inheritedTransform,
                 filterDefinitions: filterDefinitions,
@@ -506,6 +611,13 @@ private struct SVGStaticPlaceholderView: View {
         return SVGDrawNode(
             id: resolved.nodeID,
             path: path,
+            textContent: nil,
+            textPosition: nil,
+            textAnchor: .start,
+            textFontFamily: nil,
+            textFontStyle: .normal,
+            textFontWeight: .normal,
+            textFontSize: nil,
             fillColor: color(from: resolved.style.fill),
             fillStyle: fillStyle(from: resolved.style.fillRule),
             strokeColor: color(from: resolved.style.stroke),
@@ -520,6 +632,59 @@ private struct SVGStaticPlaceholderView: View {
             opacity: resolved.style.opacity,
             clipPaths: clipPaths.map { Path($0) },
             filterPrimitives: filterPrimitives
+        )
+    }
+
+    private func makeTextDrawNode(
+        for sourceText: SVGTextNode,
+        resolved: SVGResolvedNodeStyle?,
+        inheritedTransform: CGAffineTransform,
+        filterDefinitions: [String: SVGFilterDefinition],
+        clipPaths: [CGPath]
+    ) -> SVGDrawNode? {
+        guard let resolved else {
+            return nil
+        }
+        let pathTransform: CGAffineTransform = transformBuilder.concatenate(
+            local: sourceText.base.transform,
+            inherited: inheritedTransform
+        )
+        let baseX: CGFloat = CGFloat(sourceText.x ?? 0)
+        let baseY: CGFloat = CGFloat(sourceText.y ?? 0)
+        let renderedPoint: CGPoint = CGPoint(x: baseX, y: baseY).applying(pathTransform)
+        let filteredPoint = applyTextOverrides(
+            renderedPoint,
+            scale: resolved.scale,
+            offset: resolved.offset
+        )
+        let textFontSize: CGFloat = CGFloat(resolved.style.fontSize) * CGFloat(resolved.scale?.width ?? 1)
+        return SVGDrawNode(
+            id: resolved.nodeID,
+            path: Path(),
+            textContent: sourceText.content,
+            textPosition: filteredPoint,
+            textAnchor: resolved.style.textAnchor,
+            textFontFamily: resolved.style.fontFamily,
+            textFontStyle: resolved.style.fontStyle,
+            textFontWeight: resolved.style.fontWeight,
+            textFontSize: textFontSize,
+            fillColor: color(from: resolved.style.fill),
+            fillStyle: fillStyle(from: resolved.style.fillRule),
+            strokeColor: color(from: resolved.style.stroke),
+            fillOpacity: CGFloat(resolved.style.fillOpacity),
+            strokeOpacity: CGFloat(resolved.style.strokeOpacity),
+            strokeWidth: CGFloat(resolved.style.strokeWidth),
+            lineCap: lineCap(from: resolved.style.strokeLineCap),
+            lineJoin: lineJoin(from: resolved.style.strokeLineJoin),
+            miterLimit: CGFloat(resolved.style.strokeMiterLimit),
+            dash: resolved.style.strokeDashArray.map { CGFloat($0) },
+            dashPhase: CGFloat(resolved.style.strokeDashOffset),
+            opacity: resolved.style.opacity,
+            clipPaths: clipPaths.map { Path($0) },
+            filterPrimitives: resolveFilterPrimitives(
+                from: resolved.style.filter,
+                filterDefinitions: filterDefinitions
+            )
         )
     }
 
@@ -563,6 +728,13 @@ private struct SVGStaticPlaceholderView: View {
         return SVGDrawNode(
             id: resolved.nodeID,
             path: Path(path),
+            textContent: nil,
+            textPosition: nil,
+            textAnchor: .start,
+            textFontFamily: nil,
+            textFontStyle: .normal,
+            textFontWeight: .normal,
+            textFontSize: nil,
             fillColor: color(from: resolved.style.fill) ?? fallbackFill,
             fillStyle: fillStyle(from: resolved.style.fillRule),
             strokeColor: color(from: resolved.style.stroke) ?? fallbackStroke,
@@ -625,6 +797,8 @@ private struct SVGStaticPlaceholderView: View {
                     mutablePath.addPath(nodePath)
                     hasPath = true
                 }
+            case .text:
+                break
             case .group(let group):
                 let nextTransform: CGAffineTransform = transformBuilder.concatenate(
                     local: group.base.transform,
@@ -822,7 +996,7 @@ private struct SVGStaticPlaceholderView: View {
                 inherited: inheritedTransform
             )
             switch node {
-            case .shape, .path:
+            case .shape, .path, .text:
                 if let path = nodePathBuilder.buildPath(for: node, inheritedTransform: inheritedTransform) {
                     cache[node.nodeID] = path
                 }
@@ -857,6 +1031,23 @@ private struct SVGStaticPlaceholderView: View {
             return path
         }
         return path.copy(using: &transform) ?? path
+    }
+
+    private func applyTextOverrides(
+        _ point: CGPoint,
+        scale: SVGSize?,
+        offset: SVGPoint?
+    ) -> CGPoint {
+        var output = point
+        if let scale {
+            output.x *= CGFloat(scale.width)
+            output.y *= CGFloat(scale.height)
+        }
+        if let offset {
+            output.x += CGFloat(offset.x)
+            output.y += CGFloat(offset.y)
+        }
+        return output
     }
 
     private func color(from paint: SVGPaint) -> Color? {
@@ -911,6 +1102,13 @@ private struct SVGStaticPlaceholderView: View {
 private struct SVGDrawNode: Identifiable {
     let id: String
     let path: Path
+    let textContent: String?
+    let textPosition: CGPoint?
+    let textAnchor: SVGTextAnchor
+    let textFontFamily: String?
+    let textFontStyle: SVGFontStyle
+    let textFontWeight: SVGFontWeight
+    let textFontSize: CGFloat?
     let fillColor: Color?
     let fillStyle: FillStyle
     let strokeColor: Color?

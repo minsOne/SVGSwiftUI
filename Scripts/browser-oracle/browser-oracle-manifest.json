@@ -97,6 +97,15 @@
       }
     },
     {
+      "name": "animation_aurora_wisp_default",
+      "sampleID": "animation-aurora-wisp",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/aurora-wave.svg",
+      "size": {
+        "width": 380,
+        "height": 240
+      }
+    },
+    {
       "name": "constellation_grid_default",
       "svg": "../../Examples/SVGSwiftUIDemo/Resources/constellation-grid.svg",
       "size": {
@@ -137,11 +146,119 @@
       }
     },
     {
+      "name": "animation_opacity_pulse_default",
+      "sampleID": "animation-opacity-pulse",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/path-commands.svg",
+      "size": {
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "name": "animation_badge_breath_default",
+      "sampleID": "animation-badge-breath",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/badge.svg",
+      "size": {
+        "width": 120,
+        "height": 120
+      }
+    },
+    {
       "name": "animation_luminous_core_default",
       "svg": "../../Examples/SVGSwiftUIDemo/Resources/animation-luminous-core.svg",
       "size": {
         "width": 320,
         "height": 220
+      }
+    },
+    {
+      "name": "animation_route_flow_default",
+      "sampleID": "animation-route-flow",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/route.svg",
+      "size": {
+        "width": 180,
+        "height": 120
+      }
+    },
+    {
+      "name": "animation_geometry_fade_default",
+      "sampleID": "animation-geometry-fade",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/geometry.svg",
+      "size": {
+        "width": 220,
+        "height": 150
+      }
+    },
+    {
+      "name": "animation_panel_bounce_default",
+      "sampleID": "animation-panel-bounce",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/panel.svg",
+      "size": {
+        "width": 180,
+        "height": 120
+      }
+    },
+    {
+      "name": "animation_style_sheet_fade_default",
+      "sampleID": "animation-style-sheet-fade",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/style-sheet.svg",
+      "size": {
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "name": "animation_polygon_pulse_default",
+      "sampleID": "animation-polygon-pulse",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/polygon-polyline.svg",
+      "size": {
+        "width": 220,
+        "height": 140
+      }
+    },
+    {
+      "name": "animation_nested_drift_default",
+      "sampleID": "animation-nested-drift",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/nested-groups.svg",
+      "size": {
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "name": "animation_orbit_lumen_default",
+      "sampleID": "animation-smil-orbit-lumen",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-orbit-lumen.svg",
+      "size": {
+        "width": 260,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_breath_grid_default",
+      "sampleID": "animation-smil-breath-grid",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-breath-grid.svg",
+      "size": {
+        "width": 260,
+        "height": 220
+      }
+    },
+    {
+      "name": "animation_wave_shimmer_default",
+      "sampleID": "animation-smil-wave-shimmer",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/W3C/animation/animation-smil-wave-shimmer.svg",
+      "size": {
+        "width": 300,
+        "height": 180
+      }
+    },
+    {
+      "name": "animation_transform_radiant_default",
+      "sampleID": "animation-transform-radiant",
+      "svg": "../../Examples/SVGSwiftUIDemo/Resources/transform-radial-spiral.svg",
+      "size": {
+        "width": 380,
+        "height": 260
       }
     },
     {

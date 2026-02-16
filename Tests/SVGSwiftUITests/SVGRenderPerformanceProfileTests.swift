@@ -171,7 +171,7 @@ private func collectPathCache(
                 transformBuilder: transformBuilder,
                 pathCache: &pathCache
             )
-        case .path, .shape:
+        case .path, .shape, .text:
             let nodeID: String = node.nodeID
             let path: CGPath? = nodePathBuilder.buildPath(
                 for: node,
@@ -211,7 +211,7 @@ private func renderPathCount(
                 pathCache: pathCache,
                 canUsePathCache: canUsePathCache
             )
-        case .path, .shape, .rasterImage:
+        case .path, .shape, .rasterImage, .text:
             let path: CGPath? = canUsePathCache
                 ? pathCache[node.nodeID]
                 : nodePathBuilder.buildPath(

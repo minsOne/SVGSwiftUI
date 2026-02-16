@@ -370,6 +370,25 @@ enum DemoSamples {
             animation: .pulse(nodeID: "smil-orbit-core", minScale: 0.86, maxScale: 1.22, duration: 1.9)
         ),
         SampleSVG(
+            id: "animation-smil-orbit-lumen",
+            title: "SMIL Orbit Lumen",
+            fileName: "animation-smil-orbit-lumen",
+            sourceFilePath: "W3C/animation/animation-smil-orbit-lumen.svg",
+            defaultNodeID: "smil-orbit-lumen-core",
+            overrideTargets: [
+                "smil-orbit-lumen-core",
+                "smil-orbit-lumen-core-group",
+                "smil-orbit-lumen-core-ring",
+                "smil-orbit-lumen-orbit",
+                "smil-orbit-lumen-satellite-0",
+                "smil-orbit-lumen-satellite-3",
+                "smil-orbit-lumen-satellite-5"
+            ],
+            category: "Animation",
+            notes: "궤도 회전에 코어 스케일 애니메이션을 추가한 SMIL 샘플입니다.",
+            animation: .pulse(nodeID: "smil-orbit-lumen-core", minScale: 0.86, maxScale: 1.24, duration: 2.4)
+        ),
+        SampleSVG(
             id: "animation-smil-drift-lines",
             title: "SMIL Drift Lines",
             fileName: "animation-smil-drift-lines",
@@ -385,6 +404,25 @@ enum DemoSamples {
             category: "Animation",
             notes: "SMIL animate 포함 드리프트 형상 샘플입니다.",
             animation: .drift(nodeID: "smil-drift-ball", offsetX: 72, offsetY: 0, duration: 2.8)
+        ),
+        SampleSVG(
+            id: "animation-smil-breath-grid",
+            title: "SMIL Breath Grid",
+            fileName: "animation-smil-breath-grid",
+            sourceFilePath: "W3C/animation/animation-smil-breath-grid.svg",
+            defaultNodeID: "smil-breath-grid-frame",
+            overrideTargets: [
+                "smil-breath-grid-frame",
+                "smil-breath-grid-row-0",
+                "smil-breath-grid-row-1",
+                "smil-breath-grid-row-2",
+                "smil-breath-grid-row-3",
+                "smil-breath-breath-panel",
+                "smil-breath-breath-core"
+            ],
+            category: "Animation",
+            notes: "행 단위로 이동 transform과 width 애니메이션을 포함한 SMIL 샘플입니다.",
+            animation: .drift(nodeID: "smil-breath-grid-row-0", offsetX: 6, offsetY: 2, duration: 2.4)
         ),
         SampleSVG(
             id: "animation-smil-opacity-breath",
@@ -550,6 +588,25 @@ enum DemoSamples {
             category: "Animation",
             notes: "연속 이동형 SMIL 예시로 동작 점검이 쉬운 샘플입니다.",
             animation: .drift(nodeID: "smil-wave-bubble-1", offsetX: 24, offsetY: 0, duration: 3.6)
+        ),
+        SampleSVG(
+            id: "animation-smil-wave-shimmer",
+            title: "SMIL Wave Shimmer",
+            fileName: "animation-smil-wave-shimmer",
+            sourceFilePath: "W3C/animation/animation-smil-wave-shimmer.svg",
+            defaultNodeID: "smil-wave-shimmer-band",
+            overrideTargets: [
+                "smil-wave-shimmer-band",
+                "smil-wave-shimmer-halo",
+                "smil-wave-shimmer-core-dot",
+                "smil-wave-shimmer-light-0",
+                "smil-wave-shimmer-light-1",
+                "smil-wave-shimmer-light-2",
+                "smil-wave-shimmer-light-3"
+            ],
+            category: "Animation",
+            notes: "파동형 path 애니메이션과 빛 스캐닝 rect 모션을 가진 SMIL 샘플입니다.",
+            animation: .pulse(nodeID: "smil-wave-shimmer-band", minScale: 0.94, maxScale: 1.08, duration: 2.1)
         ),
         SampleSVG(
             id: "animation-smil-orbit-multi-ring",

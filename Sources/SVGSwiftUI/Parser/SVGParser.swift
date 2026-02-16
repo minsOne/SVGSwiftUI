@@ -463,6 +463,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             ))]
         case .rasterImage:
             return [node]
+        case .text(let sourceText):
+            return [.text(sourceText)]
         }
     }
 
@@ -634,6 +636,16 @@ struct SVGParser: SVGDocumentParsing, Sendable {
                     mediaType: sourceRasterImage.mediaType
                 )
             )
+        case .text(let sourceText):
+            let base = rebaseSyntheticID(in: sourceText.base, parentSuffix: parentSyntheticSuffix)
+            return .text(
+                .init(
+                    base: base,
+                    x: sourceText.x,
+                    y: sourceText.y,
+                    content: sourceText.content
+                )
+            )
         }
     }
 
@@ -686,6 +698,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         case filter
         case shape(SVGElementKind)
         case image
+        case text
     }
 
     private struct Frame {
@@ -695,6 +708,7 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         var filterPrimitives: [SVGFilterPrimitive]
         var children: [SVGNode]
         var childCount: Int
+        var textContent: String
     }
 
     private let options: SVGParserOptions
@@ -820,6 +834,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
                 filterPrimitives: [],
                 children: [],
                 childCount: 0
+                ,
+                textContent: ""
             )
         )
     }
@@ -905,6 +921,11 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             if !frame.children.isEmpty || frame.base.attributes[embeddedImageSourceAttribute] != nil {
                 appendNode(.group(.init(base: frame.base, children: frame.children)), parser: parser)
             }
+        case .text:
+            let content = normalizeTextContent(frame.textContent)
+            if !content.isEmpty {
+                appendNode(buildTextNode(frame: frame), parser: parser)
+            }
         }
     }
 
@@ -917,15 +938,35 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         if styleDepth > 0 {
             styleBuffer.append(string)
+            return
+        }
+        guard !frames.isEmpty else {
+            return
+        }
+        let active = frames[frames.count - 1]
+        if case .text = active.kind {
+            var current = active
+            current.textContent.append(contentsOf: string)
+            frames[frames.count - 1] = current
         }
     }
 
     func parser(_ parser: XMLParser, foundCDATA CDATABlock: Data) {
-        guard styleDepth > 0 else {
+        guard let text = String(data: CDATABlock, encoding: .utf8), !text.isEmpty else {
             return
         }
-        if let text = String(data: CDATABlock, encoding: .utf8) {
+        if styleDepth > 0 {
             styleBuffer.append(text)
+        } else {
+            guard !frames.isEmpty else {
+                return
+            }
+            let active = frames[frames.count - 1]
+            if case .text = active.kind {
+                var current = active
+                current.textContent.append(contentsOf: text)
+                frames[frames.count - 1] = current
+            }
         }
     }
 
@@ -1194,6 +1235,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return .shape(.polyline)
         case "polygon":
             return .shape(.polygon)
+        case "text":
+            return .text
         default:
             return nil
         }
@@ -1215,6 +1258,8 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             return "filter"
         case .image:
             return "image"
+        case .text:
+            return "text"
         case .shape(let shapeKind):
             return shapeKind.rawValue
         }
@@ -1280,6 +1325,29 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             points = []
         }
         return .shape(.init(base: frame.base, kind: kind, values: values, points: points))
+    }
+
+    private func buildTextNode(frame: Frame) -> SVGNode {
+        let x: Double? = if let rawX = frame.attributes["x"] {
+            parseNumeric(rawX)
+        } else {
+            nil
+        }
+        let y: Double? = if let rawY = frame.attributes["y"] {
+            parseNumeric(rawY)
+        } else {
+            nil
+        }
+        let normalizedContent = normalizeTextContent(frame.textContent)
+        return .text(.init(base: frame.base, x: x, y: y, content: normalizedContent))
+    }
+
+    private func normalizeTextContent(_ textContent: String) -> String {
+        let trimmed = textContent.trimmingCharacters(in: .whitespacesAndNewlines)
+        let components: [String] = trimmed
+            .split(whereSeparator: { $0.isWhitespace })
+            .map(String.init)
+        return components.joined(separator: " ")
     }
 
     private func parsePoints(_ input: String) -> [SVGPoint] {
@@ -1385,41 +1453,125 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
         if let strokeLinejoin = attributes["stroke-linejoin"] {
             style.strokeLineJoin = parseStrokeLineJoin(strokeLinejoin)
         }
+        if let fontFamily = attributes["font-family"] {
+            if let parsedFontFamily = parseFontFamily(fontFamily) {
+                style.fontFamily = parsedFontFamily
+            }
+        }
+        if let fontSize = attributes["font-size"] {
+            style.fontSize = parseNumeric(fontSize)
+        }
+        if let textAnchor = attributes["text-anchor"] {
+            style.textAnchor = parseTextAnchor(textAnchor)
+        }
+        if let fontStyle = attributes["font-style"] {
+            style.fontStyle = parseFontStyle(fontStyle)
+        }
+        if let fontWeight = attributes["font-weight"] {
+            style.fontWeight = parseFontWeight(fontWeight)
+        }
     }
 
     private func applyStyleDeclarations(_ declarations: [String: String], to style: inout SVGStyle) {
         for (rawKey, rawValue) in declarations {
-            let key = rawKey
-        switch key {
-        case "fill":
-            style.fill = parsePaint(rawValue)
-        case "fill-opacity":
-            style.fillOpacity = parseNumeric(rawValue)
-        case "fill-rule":
-            style.fillRule = parseFillRule(rawValue)
-        case "stroke":
-            style.stroke = parsePaint(rawValue)
-        case "stroke-opacity":
-            style.strokeOpacity = parseNumeric(rawValue)
-        case "stroke-width":
-            style.strokeWidth = parseNumeric(rawValue)
-        case "stroke-miterlimit":
-            style.strokeMiterLimit = parseNumeric(rawValue)
-        case "stroke-dasharray":
-            style.strokeDashArray = parseDashArray(rawValue)
-        case "stroke-dashoffset":
-            style.strokeDashOffset = parseNumeric(rawValue)
-        case "stroke-linecap":
-            style.strokeLineCap = parseStrokeLineCap(rawValue)
-        case "stroke-linejoin":
-            style.strokeLineJoin = parseStrokeLineJoin(rawValue)
-        case "filter":
-            style.filter = rawValue
-        case "opacity":
+            let key: String = rawKey
+            switch key {
+            case "fill":
+                style.fill = parsePaint(rawValue)
+            case "fill-opacity":
+                style.fillOpacity = parseNumeric(rawValue)
+            case "fill-rule":
+                style.fillRule = parseFillRule(rawValue)
+            case "stroke":
+                style.stroke = parsePaint(rawValue)
+            case "stroke-opacity":
+                style.strokeOpacity = parseNumeric(rawValue)
+            case "stroke-width":
+                style.strokeWidth = parseNumeric(rawValue)
+            case "stroke-miterlimit":
+                style.strokeMiterLimit = parseNumeric(rawValue)
+            case "stroke-dasharray":
+                style.strokeDashArray = parseDashArray(rawValue)
+            case "stroke-dashoffset":
+                style.strokeDashOffset = parseNumeric(rawValue)
+            case "stroke-linecap":
+                style.strokeLineCap = parseStrokeLineCap(rawValue)
+            case "stroke-linejoin":
+                style.strokeLineJoin = parseStrokeLineJoin(rawValue)
+            case "filter":
+                style.filter = rawValue
+            case "opacity":
                 style.opacity = parseNumeric(rawValue)
+            case "font-size":
+                style.fontSize = parseNumeric(rawValue)
+            case "font-family":
+                if let parsedFontFamily = parseFontFamily(rawValue) {
+                    style.fontFamily = parsedFontFamily
+                }
+            case "text-anchor":
+                style.textAnchor = parseTextAnchor(rawValue)
+            case "font-style":
+                style.fontStyle = parseFontStyle(rawValue)
+            case "font-weight":
+                style.fontWeight = parseFontWeight(rawValue)
             default:
                 continue
             }
+        }
+    }
+
+    private func parseFontFamily(_ value: String) -> String? {
+        let normalizedValue: String = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let candidates: [Substring] = normalizedValue.split(separator: ",", omittingEmptySubsequences: true)
+        for rawCandidate in candidates {
+            let trimmed = rawCandidate.trimmingCharacters(in: .whitespacesAndNewlines)
+            let candidate = trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+            if !candidate.isEmpty {
+                return candidate
+            }
+        }
+        return nil
+    }
+
+    private func parseFontStyle(_ value: String) -> SVGFontStyle {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch normalized {
+        case "italic":
+            return .italic
+        case "oblique":
+            return .oblique
+        default:
+            return .normal
+        }
+    }
+
+    private func parseFontWeight(_ value: String) -> SVGFontWeight {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch normalized {
+        case "normal":
+            return .normal
+        case "bold":
+            return .bold
+        case "bolder":
+            return .bolder
+        case "lighter":
+            return .lighter
+        default:
+            if let number = Int(normalized), (1...1000).contains(number) {
+                return .numeric(number)
+            }
+            return .normal
+        }
+    }
+
+    private func parseTextAnchor(_ value: String) -> SVGTextAnchor {
+        switch value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "middle":
+            return .middle
+        case "end":
+            return .end
+        default:
+            return .start
         }
     }
 

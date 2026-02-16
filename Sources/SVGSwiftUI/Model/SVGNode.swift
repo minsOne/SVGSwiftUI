@@ -3,6 +3,7 @@ public enum SVGElementKind: String, Sendable, Equatable {
     case group = "g"
     case path
     case image
+    case text
     case rect
     case circle
     case ellipse
@@ -99,11 +100,31 @@ struct SVGShapeNode: Sendable, Equatable {
     }
 }
 
+struct SVGTextNode: Sendable, Equatable {
+    var base: SVGBaseNode
+    var x: Double?
+    var y: Double?
+    var content: String
+
+    init(
+        base: SVGBaseNode,
+        x: Double?,
+        y: Double?,
+        content: String
+    ) {
+        self.base = base
+        self.x = x
+        self.y = y
+        self.content = content
+    }
+}
+
 enum SVGNode: Sendable, Equatable {
     case group(SVGGroupNode)
     case path(SVGPathNode)
     case rasterImage(SVGRasterImageNode)
     case shape(SVGShapeNode)
+    case text(SVGTextNode)
 
     var elementKind: SVGElementKind {
         switch self {
@@ -115,6 +136,8 @@ enum SVGNode: Sendable, Equatable {
             return .image
         case .shape(let node):
             return node.kind
+        case .text:
+            return .text
         }
     }
 
@@ -127,6 +150,8 @@ enum SVGNode: Sendable, Equatable {
         case .rasterImage(let node):
             return node.base.id ?? node.base.syntheticID
         case .shape(let node):
+            return node.base.id ?? node.base.syntheticID
+        case .text(let node):
             return node.base.id ?? node.base.syntheticID
         }
     }
@@ -141,6 +166,8 @@ enum SVGNode: Sendable, Equatable {
             return node.base
         case .shape(let node):
             return node.base
+        case .text(let node):
+            return node.base
         }
     }
 
@@ -148,7 +175,7 @@ enum SVGNode: Sendable, Equatable {
         switch self {
         case .group(let node):
             return node.children
-        case .path, .rasterImage, .shape:
+        case .path, .rasterImage, .shape, .text:
             return []
         }
     }

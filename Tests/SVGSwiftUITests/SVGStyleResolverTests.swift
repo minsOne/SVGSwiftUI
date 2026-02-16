@@ -178,6 +178,67 @@ final class SVGStyleResolverTests: XCTestCase {
         XCTAssertEqual(node.style.filter, "url(#sheet)")
     }
 
+    func testStyleResolverAppliesFontPropertiesFromStylesheet() {
+        let textBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            style: .init(),
+            attributes: ["class": "heading"]
+        )
+        let document = SVGDocument(
+            nodes: [.text(.init(base: textBase, x: 0, y: 0, content: "hello"))],
+            styleRules: [
+                SVGStyleRule(
+                    selector: .class("heading"),
+                    declarations: [
+                        "font-family": "\"Source Sans Pro\", Arial, sans-serif",
+                        "font-style": "oblique",
+                        "font-weight": "700",
+                        "font-size": "18",
+                    ]
+                )
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["target"])
+        XCTAssertEqual(node.style.fontFamily, "Source Sans Pro")
+        XCTAssertEqual(node.style.fontStyle, SVGFontStyle.oblique)
+        XCTAssertEqual(node.style.fontWeight, SVGFontWeight.numeric(700))
+        XCTAssertEqual(node.style.fontSize, 18)
+    }
+
+    func testNodeStyleOverridesFontPropertiesFromStylesheet() {
+        let textBase = SVGBaseNode(
+            id: "target",
+            syntheticID: "auto:/0/0",
+            style: .init(
+                fontFamily: "Times New Roman",
+                fontStyle: .italic,
+                fontWeight: .normal
+            )
+        )
+        let document = SVGDocument(
+            nodes: [.text(.init(base: textBase, x: 0, y: 0, content: "hello"))],
+            styleRules: [
+                SVGStyleRule(
+                    selector: .id("target"),
+                    declarations: [
+                        "font-family": "Courier",
+                        "font-style": "oblique",
+                        "font-weight": "bold",
+                    ]
+                )
+            ]
+        )
+
+        let resolved = resolver.resolve(document: document)
+        let node = tryUnwrap(resolved["target"])
+        XCTAssertEqual(node.style.fontFamily, "Times New Roman")
+        XCTAssertEqual(node.style.fontStyle, .italic)
+        XCTAssertEqual(node.style.fontWeight, .normal)
+    }
+
     func testStyleRulesSpecificityAndSourceOrderAreRespected() {
         let pathBase = SVGBaseNode(
             id: "target",

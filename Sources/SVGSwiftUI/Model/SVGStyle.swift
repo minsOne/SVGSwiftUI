@@ -35,6 +35,20 @@ enum SVGLineJoin: Sendable, Equatable {
     case bevel
 }
 
+enum SVGFontStyle: String, Sendable, Equatable {
+    case normal
+    case italic
+    case oblique
+}
+
+enum SVGFontWeight: Sendable, Equatable {
+    case normal
+    case bold
+    case bolder
+    case lighter
+    case numeric(Int)
+}
+
 struct SVGStyle: Sendable, Equatable {
     var fill: SVGPaint?
     var fillOpacity: Double?
@@ -49,6 +63,11 @@ struct SVGStyle: Sendable, Equatable {
     var strokeLineCap: SVGLineCap?
     var strokeLineJoin: SVGLineJoin?
     var opacity: Double?
+    var fontSize: Double?
+    var fontFamily: String?
+    var textAnchor: SVGTextAnchor?
+    var fontStyle: SVGFontStyle?
+    var fontWeight: SVGFontWeight?
 
     init(
         fill: SVGPaint? = nil,
@@ -63,7 +82,12 @@ struct SVGStyle: Sendable, Equatable {
         strokeDashOffset: Double? = nil,
         strokeLineCap: SVGLineCap? = nil,
         strokeLineJoin: SVGLineJoin? = nil,
-        opacity: Double? = nil
+        opacity: Double? = nil,
+        fontSize: Double? = nil,
+        fontFamily: String? = nil,
+        textAnchor: SVGTextAnchor? = nil,
+        fontStyle: SVGFontStyle? = nil,
+        fontWeight: SVGFontWeight? = nil
     ) {
         self.fill = fill
         self.fillOpacity = fillOpacity
@@ -78,7 +102,18 @@ struct SVGStyle: Sendable, Equatable {
         self.strokeLineCap = strokeLineCap
         self.strokeLineJoin = strokeLineJoin
         self.opacity = opacity
+        self.fontSize = fontSize
+        self.fontFamily = fontFamily
+        self.textAnchor = textAnchor
+        self.fontStyle = fontStyle
+        self.fontWeight = fontWeight
     }
+}
+
+enum SVGTextAnchor: String, Sendable, Equatable {
+    case start
+    case middle
+    case end
 }
 
 struct SVGResolvedStyle: Sendable, Equatable {
@@ -95,6 +130,11 @@ struct SVGResolvedStyle: Sendable, Equatable {
     var strokeLineCap: SVGLineCap
     var strokeLineJoin: SVGLineJoin
     var opacity: Double
+    var fontSize: Double
+    var fontFamily: String
+    var textAnchor: SVGTextAnchor
+    var fontStyle: SVGFontStyle
+    var fontWeight: SVGFontWeight
 
     init(
         fill: SVGPaint = .color(SVGColor(red: 0, green: 0, blue: 0, alpha: 1)),
@@ -109,7 +149,12 @@ struct SVGResolvedStyle: Sendable, Equatable {
         strokeDashOffset: Double = 0.0,
         strokeLineCap: SVGLineCap = .butt,
         strokeLineJoin: SVGLineJoin = .miter,
-        opacity: Double = 1.0
+        opacity: Double = 1.0,
+        fontSize: Double = 16.0,
+        fontFamily: String = "system",
+        textAnchor: SVGTextAnchor = .start,
+        fontStyle: SVGFontStyle = .normal,
+        fontWeight: SVGFontWeight = .normal
     ) {
         self.fill = fill
         self.fillOpacity = fillOpacity
@@ -124,6 +169,11 @@ struct SVGResolvedStyle: Sendable, Equatable {
         self.strokeLineCap = strokeLineCap
         self.strokeLineJoin = strokeLineJoin
         self.opacity = opacity
+        self.fontSize = fontSize
+        self.fontFamily = fontFamily
+        self.textAnchor = textAnchor
+        self.fontStyle = fontStyle
+        self.fontWeight = fontWeight
     }
 }
 
@@ -142,7 +192,12 @@ extension SVGResolvedStyle {
             strokeDashOffset: style.strokeDashOffset ?? strokeDashOffset,
             strokeLineCap: style.strokeLineCap ?? strokeLineCap,
             strokeLineJoin: style.strokeLineJoin ?? strokeLineJoin,
-            opacity: style.opacity ?? opacity
+            opacity: style.opacity ?? opacity,
+            fontSize: style.fontSize ?? fontSize,
+            fontFamily: style.fontFamily ?? fontFamily,
+            textAnchor: style.textAnchor ?? textAnchor,
+            fontStyle: style.fontStyle ?? fontStyle,
+            fontWeight: style.fontWeight ?? fontWeight
         )
     }
 }
