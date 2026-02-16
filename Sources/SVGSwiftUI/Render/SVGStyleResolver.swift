@@ -1,9 +1,11 @@
 import Foundation
+import CoreGraphics
 
 struct SVGResolvedNodeStyle: Sendable, Equatable {
     var nodeID: String
     var element: SVGElementKind
     var style: SVGResolvedStyle
+    var transformOverride: CGAffineTransform?
     var scale: SVGSize?
     var offset: SVGPoint?
 
@@ -11,12 +13,14 @@ struct SVGResolvedNodeStyle: Sendable, Equatable {
         nodeID: String,
         element: SVGElementKind,
         style: SVGResolvedStyle,
+        transformOverride: CGAffineTransform? = nil,
         scale: SVGSize? = nil,
         offset: SVGPoint? = nil
     ) {
         self.nodeID = nodeID
         self.element = element
         self.style = style
+        self.transformOverride = transformOverride
         self.scale = scale
         self.offset = offset
     }

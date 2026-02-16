@@ -6,7 +6,8 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
 현재 기준 점검:
 - 파서는 기본 그래픽 요소 + SMIL 핵심 태그(`animate`, `set`, `animateTransform`, `animateMotion`)의 프레임을 수집해 `SVGDocument.animations`에 보관.
 - 미지원 항목(`animateColor` 등)은 `unsupportedFeatures`로 계속 추적.
-- 렌더러(`SVGView`)는 정적 노드 렌더링 중심이며, 타임라인/프레임 업데이트 루프가 애니메이션 속성 반영을 처리하지 않음.
+- `SVGView`는 Timeline 기반 업데이트 경로에서 `animateMotion`/`animateTransform`/`animate` 값을 반영하도록 동작.
+- M1-8 단계: W3C/웹 브라우저 비교 시나리오 연동 마무리(`browser-oracle` manifest 정합 + SMIL Baseline 검증).
 
 ---
 
@@ -23,7 +24,7 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
   - `docs/W3C_COVERAGE.md`, `docs/WEBKIT_COVERAGE.md`, 데모 타임라인 샘플 재확인.
   - 완료 기준: 현재 미지원 SMIL 요소와 샘플을 체크리스트로 정리.
 
-- [ ] 공개 API 영향도 점검
+- [x] 공개 API 영향도 점검
   - `SVGParser`, `SVGDocument`, 렌더 관련 타입 변경 영향 분석.
   - 완료 기준: 기존 v1 API를 깨지 않는 방향으로 설계한 패치 노트 초안 작성.
 
@@ -34,7 +35,7 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
 - [x] SMIL 공통 모델 추가
   - `Sources/SVGSwiftUI/Model/`에 `SVGAnimation.swift` 추가(내부 타입 우선)
   - 포함 요소:
-    - `SVGAnimation`, `SVGAnimationValue`, `SVGAnimationTiming`, `SVGAnimationValueInterpolation`
+    - `SVGSMILAnimation`, `SVGSMILAnimationValue`, `SVGSMILAnimationTiming`, `SVGSMILAnimationValueInterpolation`
     - 반복/중단/채우기 정책 열거형
   - 완료 기준:
     - `Sendable`, Equatable 성질 유지.
@@ -56,26 +57,30 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
   - 완료 기준:
     - `animate`, `set`, `animateTransform` 기본 시작/종료 이벤트 파싱 가능.
 
-- [ ] `animate` 파서 구현
+- [x] `animate` 파서 구현
   - 속성: `attributeName`, `from`, `to`, `by`, `dur`, `repeatCount`, `repeatDur`, `values`, `keyTimes`, `fill`, `begin`, `end`, `calcMode`.
   - 기본 타입 추론: `number`, `length`, `color`, `path`, `transform` 대응.
   - 완료 기준:
     - 유효한 attribute 조합에 대한 유닛 테스트 10개 이상.
     - 불완전/비표준 조합은 `unsupportedFeatures` 집계.
 
-- [ ] `set` / `animateColor` / `animateOpacity` 대응
+- [x] `set` / `animateColor` / `animateOpacity` 대응
   - `set`의 정적 값 전환을 공통 `animate` 엔진에서 처리.
   - color/opacity 특화 타입 디코더 추가.
   - 완료 기준:
     - 색상/투명도만 쓰는 샘플 3종 이상 통과.
 
-- [ ] `animateTransform` 파서 구현
-- [ ] `animateMotion` 기초 구현
+- [x] `animateTransform` 파서 구현
+- [x] `animateMotion` 기초 구현
   - path 기반 이동(`path`, `keyPoints`, `rotate`) 최소 스펙으로 지원.
   - 완료 기준:
     - 단일 path 기반 이동 샘플 2종 통과.
 
-- [ ] 타이밍 규칙 정리
+- [x] 타이밍 규칙 정리
+  - 완료 상태:
+    - `dur`, `begin`, `end`, `repeatCount`, `repeatDur`, `fill`의 1차 해석 완료.
+    - `indefinite` repeat는 `repeatCount` enum으로 보존.
+    - 현재 버전은 시간 토큰 기반 파싱이며 `indefinite`/이벤트형 토큰은 지원 범위에서 제외.
   - `begin="xsmil"`류 확장 규칙은 초기 단계에서 제외 가능 범위로 명시.
   - `indefinite/repeatCount="indefinite"` 처리.
   - 완료 기준:
@@ -91,8 +96,10 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
   - 완료 기준:
     - 순수 단위 테스트에서 수치 오차 범위 내 일치.
 
-- [ ] 값 보간기 구현
+- [x] 값 보간기 구현 (M1-5)
   - scalar, length, color, point, transform matrix 보간.
+  - 현재 범위는 `from/to/by/values`의 주요 수치형/색상/transform 기본 케이스.
+  - `keyTimes`, `keySplines`, 고급 충돌 해석은 다음 단계로 이관.
   - 완료 기준:
     - 각 타입별 보간 유닛 테스트.
 
@@ -102,7 +109,7 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
   - 완료 기준:
     - 우선순위 테스트 케이스 10개 이상.
 
-- [ ] 렌더 타임라인 연동
+- [x] 렌더 타임라인 연동
 - `SVGView`에 SwiftUI 타임 소스로부터 현재 시간을 주입하고, 매 프레임 `drawNodes`를 재해석.
   - 기존 static 캐시가 깨지지 않도록 시간 의존 경로만 분리.
   - 완료 기준:
@@ -136,7 +143,7 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
   - 완료 기준:
     - 파서 레이어 테스트 100% 통과 + 신규 커버리지 증가.
 
-- [ ] UI/시각 테스트
+- [x] UI/시각 테스트
   - `Examples/SVGSwiftUIDemo`에 "Animation" 탭으로 SMIL 샘플 분리.
   - 각 샘플별:
     - 렌더 시작/중간/끝 상태 캡처
@@ -144,7 +151,7 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
   - 완료 기준:
     - 기존 `SVGDemo` UITest 구조에 새 시나리오 분리 완료.
 
-- [ ] W3C/ WebKit 근접 검증
+- [x] W3C/ WebKit 근접 검증
   - W3C 애니메이션 관련 subset fixture 기반 smoke test로 시작.
   - 이후 `WEBKIT_LAYOUT_TESTS_PLAN.md` 연동 단계로 승격.
   - 완료 기준:

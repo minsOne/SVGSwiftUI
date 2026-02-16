@@ -731,13 +731,13 @@ final class SVGParserTests: XCTestCase {
         let svg = """
         <svg width='120' height='120'>
           <g id='motion-group'>
-            <animate attributeName='opacity' values='0;1;0' dur='3s'/>
+            <animate attributeName='opacity' values='0;1;0' dur='3s' begin='1s;2.5s'/>
           </g>
           <circle id='target' cx='50' cy='50' r='20'>
-            <set attributeName='opacity' to='0.5' begin='1s' dur='2s'/>
+            <set attributeName='opacity' to='0.5' begin='500ms' dur='2s'/>
           </circle>
           <rect id='spin' width='10' height='10'>
-            <animateTransform attributeName='transform' type='rotate' from='0 5 5' to='360 5 5' dur='4s'/>
+            <animateTransform attributeName='transform' type='rotate' from='0 5 5' to='360 5 5' dur='4s' repeatCount='indefinite'/>
           </rect>
         </svg>
         """
@@ -751,12 +751,45 @@ final class SVGParserTests: XCTestCase {
         let motionGroupAnimation = animation(forTargetID: "motion-group", in: document, kind: .animate)
         XCTAssertEqual(motionGroupAnimation?.targetElementID, "motion-group")
         XCTAssertEqual(motionGroupAnimation?.targetSyntheticID, "auto:/0/0")
+        XCTAssertEqual(motionGroupAnimation?.timing.dur, 3.0)
+        XCTAssertEqual(motionGroupAnimation?.timing.begin, [1.0, 2.5])
+        XCTAssertEqual(motionGroupAnimation?.interpolation, .linear)
+        XCTAssertEqual(motionGroupAnimation?.values?.kind, "values")
 
         let targetCircleAnimation = animation(forTargetID: "target", in: document, kind: .set)
         XCTAssertEqual(targetCircleAnimation?.attributes["attributename"], "opacity")
+        XCTAssertEqual(targetCircleAnimation?.timing.begin, [0.5])
+        XCTAssertEqual(targetCircleAnimation?.timing.dur, 2.0)
+        XCTAssertEqual(targetCircleAnimation?.attributeName, "opacity")
+        XCTAssertEqual(targetCircleAnimation?.values, nil)
 
         let rectAnimation = animation(forTargetID: "spin", in: document, kind: .animateTransform)
         XCTAssertEqual(rectAnimation?.attributes["from"], "0 5 5")
+        XCTAssertEqual(rectAnimation?.type, "rotate")
+        XCTAssertEqual(rectAnimation?.fromValue, "0 5 5")
+        XCTAssertEqual(rectAnimation?.toValue, "360 5 5")
+        XCTAssertEqual(rectAnimation?.timing.repeatCount, .indefinite)
+        XCTAssertEqual(rectAnimation?.timing.repeatDur, nil)
+    }
+
+    func testParseSMILCalcModeAndUnsupportedTimeSyntaxFallsBackToDefaults() throws {
+        let svg = """
+        <svg>
+          <rect id='target' width='10' height='10'>
+            <animate attributeName='opacity' from='0' to='1' calcMode='paced' begin='invalid;1.5s' dur='indefinite'/>
+          </rect>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        guard let animation = animation(forTargetID: "target", in: document, kind: .animate) else {
+            return XCTFail("Expected animate to be collected")
+        }
+
+        XCTAssertEqual(animation.interpolation, .paced)
+        XCTAssertEqual(animation.timing.begin, [1.5])
+        XCTAssertNil(animation.timing.dur)
+        XCTAssertEqual(animation.timing.fill, .remove)
     }
 
     func testParseFallsBackToUnsupportedForUnknownSMILElements() throws {

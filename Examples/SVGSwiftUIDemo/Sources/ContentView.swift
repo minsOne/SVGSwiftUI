@@ -132,6 +132,13 @@ struct ContentView: View {
                 .tag(DemoCatalogMode.animation)
                 .accessibilityIdentifier("demo.tab.animation")
 
+            catalogRoot(for: .smil)
+                .tabItem {
+                    Label("SMIL", systemImage: "timeline")
+                }
+                .tag(DemoCatalogMode.smil)
+                .accessibilityIdentifier("demo.tab.smil")
+
             catalogRoot(for: .w3c)
                 .tabItem {
                     Label("W3C 케이스", systemImage: "checkmark.seal")
@@ -154,6 +161,8 @@ struct ContentView: View {
             return samples
         case .animation:
             return animatedSamples
+        case .smil:
+            return DemoSamples.smilSamples
         case .w3c:
             return DemoSamples.w3cCatalogSamples
         case .remote:
@@ -202,6 +211,8 @@ struct ContentView: View {
             contentIdentifier = "demo.content"
         case .animation:
             contentIdentifier = "demo.content.animation"
+        case .smil:
+            contentIdentifier = "demo.content.smil"
         case .w3c:
             contentIdentifier = "demo.content.w3c"
         case .remote:
@@ -1035,6 +1046,7 @@ private struct RemoteSVGValidationView: View {
 private enum DemoCatalogMode: Int, CaseIterable {
     case all
     case animation
+    case smil
     case w3c
     case remote
 
@@ -1044,6 +1056,8 @@ private enum DemoCatalogMode: Int, CaseIterable {
             return "SVGSwiftUI Demo"
         case .animation:
             return "애니메이션"
+        case .smil:
+            return "SMIL"
         case .w3c:
             return "W3C 케이스"
         case .remote:
@@ -1057,6 +1071,8 @@ private enum DemoCatalogMode: Int, CaseIterable {
             return "SVG 샘플 목록"
         case .animation:
             return "애니메이션 샘플"
+        case .smil:
+            return "SMIL 샘플"
         case .w3c:
             return "W3C 검증 샘플"
         case .remote:
@@ -1070,6 +1086,8 @@ private enum DemoCatalogMode: Int, CaseIterable {
             return "샘플 제목을 선택하면 렌더링, 애니메이션, 노드 제어, 소스 코드를 확인할 수 있습니다."
         case .animation:
             return "미리 구성된 애니메이션 샘플만 모아 놓아 동작 확인에 집중할 수 있습니다."
+        case .smil:
+            return "SMIL 샘플만 모아 렌더링 정합성과 타이밍 동작을 분리 점검합니다."
         case .w3c:
             return "단위 테스트 기반 W3C 시나리오 후보 샘플을 확인할 수 있습니다."
         case .remote:

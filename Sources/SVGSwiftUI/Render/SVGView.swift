@@ -58,9 +58,33 @@ private struct SVGStaticPlaceholderView: View {
     @State private var canCacheDrawNodesForCurrentDocument: Bool = false
     @State private var canCachePathCacheForCurrentDocument: Bool = false
     @State private var parsingFailureMessage: String = ""
+    @State private var baseResolvedStyles: [String: SVGResolvedNodeStyle] = [:]
+    @State private var animationsByTargetID: [String: [SVGSMILAnimation]] = [:]
+    @State private var animationStartDate: Date = .init()
 
     private var usesStaticConfiguration: Bool {
         configuration.resolver == nil
+    }
+
+    private var hasSMILAnimation: Bool {
+        guard let document else {
+            return false
+        }
+        return !document.animations.isEmpty
+    }
+
+    private var hasTransformAnimation: Bool {
+        for animations in animationsByTargetID.values {
+            for animation in animations {
+                let attributeName: String = animation.attributeName?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased() ?? ""
+                if attributeName == "transform" {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     private let styleResolver = SVGStyleResolver()
@@ -104,76 +128,13 @@ private struct SVGStaticPlaceholderView: View {
 
     var body: some View {
         GeometryReader { _ in
-            Canvas { context, size in
-                let renderViewportTransform: SVGRenderViewportTransform? = viewportTransform(for: size)
-                let transform = renderViewportTransform?.transform ?? .identity
-                let strokeScale = renderViewportTransform?.strokeScale ?? 1.0
-
-                for node in drawNodes {
-                    if node.clipPaths.isEmpty && node.filterPrimitives.isEmpty {
-                        drawNodeShape(
-                            node,
-                            in: &context,
-                            renderTransform: transform,
-                            strokeScale: strokeScale
-                        )
-                    } else if SVGFilterImageRenderer.requiresOffscreenProcessing(node.filterPrimitives) {
-                        context.drawLayer { layer in
-                            if !node.clipPaths.isEmpty {
-                                for clipPath in node.clipPaths {
-                                    let transformedClipPath = clipPath.applying(transform)
-                                    layer.clip(to: transformedClipPath, style: .init(eoFill: false))
-                                }
-                            }
-                            if let filteredImage: CGImage = SVGFilterImageRenderer.renderFilteredImage(
-                                path: node.path.applying(transform),
-                                fillColor: node.fillColor,
-                                fillStyle: node.fillStyle,
-                                strokeColor: node.strokeColor,
-                                strokeWidth: node.strokeWidth * strokeScale,
-                                lineCap: node.lineCap,
-                                lineJoin: node.lineJoin,
-                                miterLimit: node.miterLimit,
-                                dash: node.dash,
-                                dashPhase: node.dashPhase,
-                                opacity: node.opacity,
-                                fillOpacity: node.fillOpacity,
-                                strokeOpacity: node.strokeOpacity,
-                                size: size,
-                                primitives: node.filterPrimitives
-                            ) {
-                                let image = Image(
-                                    decorative: filteredImage,
-                                    scale: 1,
-                                    orientation: .up
-                                )
-                                layer.draw(image, in: CGRect(origin: .zero, size: size))
-                            } else {
-                                drawNodeShape(
-                                    node,
-                                    in: &layer,
-                                    renderTransform: transform,
-                                    strokeScale: strokeScale
-                                )
-                            }
-                        }
-                    } else {
-                        context.drawLayer { layer in
-                            if !node.clipPaths.isEmpty {
-                                for clipPath in node.clipPaths {
-                                    let transformedClipPath = clipPath.applying(transform)
-                                    layer.clip(to: transformedClipPath, style: .init(eoFill: false))
-                                }
-                            }
-                            applyFilterPrimitives(node.filterPrimitives, to: &layer)
-                            drawNodeShape(
-                                node,
-                                in: &layer,
-                                renderTransform: transform,
-                                strokeScale: strokeScale
-                            )
-                        }
+            Group {
+                if hasSMILAnimation {
+                    TimelineView(.periodic(from: animationStartDate, by: 1.0 / 30.0)) { timeline in
+                        renderCanvas(for: timeline.date)
                     }
+                } else {
+                    renderCanvas(for: Date())
                 }
             }
             .overlay(alignment: .center) {
@@ -201,6 +162,109 @@ private struct SVGStaticPlaceholderView: View {
                 await loadDocument()
             }
         }
+    }
+
+    @ViewBuilder
+    private func renderCanvas(for date: Date) -> some View {
+        Canvas { context, size in
+            let renderViewportTransform: SVGRenderViewportTransform? = viewportTransform(for: size)
+            let transform = renderViewportTransform?.transform ?? .identity
+            let strokeScale = renderViewportTransform?.strokeScale ?? 1.0
+            let nodesToRender: [SVGDrawNode] = if hasSMILAnimation {
+                animatedDrawNodes(for: date)
+            } else {
+                drawNodes
+            }
+
+            for node in nodesToRender {
+                if node.clipPaths.isEmpty && node.filterPrimitives.isEmpty {
+                    drawNodeShape(
+                        node,
+                        in: &context,
+                        renderTransform: transform,
+                        strokeScale: strokeScale
+                    )
+                } else if SVGFilterImageRenderer.requiresOffscreenProcessing(node.filterPrimitives) {
+                    context.drawLayer { layer in
+                        if !node.clipPaths.isEmpty {
+                            for clipPath in node.clipPaths {
+                                let transformedClipPath = clipPath.applying(transform)
+                                layer.clip(to: transformedClipPath, style: .init(eoFill: false))
+                            }
+                        }
+                        if let filteredImage: CGImage = SVGFilterImageRenderer.renderFilteredImage(
+                            path: node.path.applying(transform),
+                            fillColor: node.fillColor,
+                            fillStyle: node.fillStyle,
+                            strokeColor: node.strokeColor,
+                            strokeWidth: node.strokeWidth * strokeScale,
+                            lineCap: node.lineCap,
+                            lineJoin: node.lineJoin,
+                            miterLimit: node.miterLimit,
+                            dash: node.dash,
+                            dashPhase: node.dashPhase,
+                            opacity: node.opacity,
+                            fillOpacity: node.fillOpacity,
+                            strokeOpacity: node.strokeOpacity,
+                            size: size,
+                            primitives: node.filterPrimitives
+                        ) {
+                            let image = Image(
+                                decorative: filteredImage,
+                                scale: 1,
+                                orientation: .up
+                            )
+                            layer.draw(image, in: CGRect(origin: .zero, size: size))
+                        } else {
+                            drawNodeShape(
+                                node,
+                                in: &layer,
+                                renderTransform: transform,
+                                strokeScale: strokeScale
+                            )
+                        }
+                    }
+                } else {
+                    context.drawLayer { layer in
+                        if !node.clipPaths.isEmpty {
+                            for clipPath in node.clipPaths {
+                                let transformedClipPath = clipPath.applying(transform)
+                                layer.clip(to: transformedClipPath, style: .init(eoFill: false))
+                            }
+                        }
+                        applyFilterPrimitives(node.filterPrimitives, to: &layer)
+                        drawNodeShape(
+                            node,
+                            in: &layer,
+                            renderTransform: transform,
+                            strokeScale: strokeScale
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private func animatedDrawNodes(for date: Date) -> [SVGDrawNode] {
+        guard let document else {
+            return []
+        }
+        let elapsed: TimeInterval = date.timeIntervalSince(animationStartDate)
+        let shouldUsePathCache: Bool = canCachePathCacheForCurrentDocument && !hasTransformAnimation
+        let resolvedStyles: [String: SVGResolvedNodeStyle] = SVGSMILEngine.applyAnimations(
+            to: baseResolvedStyles,
+            animationsByTargetID: animationsByTargetID,
+            at: elapsed
+        )
+        return buildDrawNodes(
+            from: document.nodes,
+            resolved: resolvedStyles,
+            filterDefinitions: document.filterDefinitions,
+            clipPathCache: clipPathCache,
+            inheritedTransform: .identity,
+            inheritedClipPaths: [],
+            canUsePathCache: shouldUsePathCache
+        )
     }
 
     private func drawNodeShape(
@@ -394,7 +458,7 @@ private struct SVGStaticPlaceholderView: View {
     @MainActor
     private func loadDocument() async {
         let fingerprint = configurationFingerprint
-        do {
+            do {
             let data = try source.loadData()
             let key = SVGParseCacheKey.from(sourceData: data, options: options)
             let sourceByteCount: Int = data.count
@@ -407,12 +471,20 @@ private struct SVGStaticPlaceholderView: View {
                 canCacheDrawNodesForCurrentDocument = canCache.shouldCacheDrawNodes
                 canCachePathCacheForCurrentDocument = canCache.shouldCachePathCache
                 document = cached
+                let resolved = styleResolver.resolve(
+                    document: cached,
+                    configuration: configuration
+                )
+                baseResolvedStyles = resolved
+                animationsByTargetID = SVGSMILEngine.groupAnimationsByTarget(cached.animations)
+                animationStartDate = Date()
                 pathCache = canCache.shouldCachePathCache
                     ? buildPathCache(from: cached.nodes)
                     : [:]
                 clipPathCache = buildClipPathCache(from: cached.clipPaths)
                 updateCachedDrawNodes(
                     from: cached,
+                    resolved: resolved,
                     using: fingerprint,
                     canCache: canCache.shouldCacheDrawNodes
                 )
@@ -428,6 +500,13 @@ private struct SVGStaticPlaceholderView: View {
             )
             canCacheDrawNodesForCurrentDocument = canCache.shouldCacheDrawNodes
             canCachePathCacheForCurrentDocument = canCache.shouldCachePathCache
+            let resolved = styleResolver.resolve(
+                document: parsed,
+                configuration: configuration
+            )
+            baseResolvedStyles = resolved
+            animationsByTargetID = SVGSMILEngine.groupAnimationsByTarget(parsed.animations)
+            animationStartDate = Date()
             await cache.insert(parsed, for: key, cost: data.count)
             document = parsed
             pathCache = canCache.shouldCachePathCache
@@ -436,6 +515,7 @@ private struct SVGStaticPlaceholderView: View {
             clipPathCache = buildClipPathCache(from: parsed.clipPaths)
             updateCachedDrawNodes(
                 from: parsed,
+                resolved: resolved,
                 using: fingerprint,
                 canCache: canCache.shouldCacheDrawNodes
             )
@@ -447,7 +527,9 @@ private struct SVGStaticPlaceholderView: View {
                 parsingFailureMessage = error.localizedDescription
                 parsingFailed = true
                 document = nil
-                pathCache.removeAll()
+            baseResolvedStyles = [:]
+            animationsByTargetID = [:]
+            pathCache.removeAll()
             clipPathCache.removeAll()
             cachedConfigurationFingerprint = ""
             cachedDrawNodes.removeAll()
@@ -462,6 +544,7 @@ private struct SVGStaticPlaceholderView: View {
 
     private func updateCachedDrawNodes(
         from document: SVGDocument,
+        resolved: [String: SVGResolvedNodeStyle],
         using fingerprint: String,
         canCache: Bool
     ) {
@@ -471,10 +554,6 @@ private struct SVGStaticPlaceholderView: View {
             return
         }
 
-        let resolved = styleResolver.resolve(
-            document: document,
-            configuration: configuration
-        )
         cachedDrawNodes = buildDrawNodes(
             from: document.nodes,
             resolved: resolved,
@@ -508,6 +587,7 @@ private struct SVGStaticPlaceholderView: View {
         var output: [SVGDrawNode] = []
         for node in nodes {
             let nodeID: String = node.nodeID
+            let animatedTransform: CGAffineTransform? = resolved[nodeID]?.transformOverride
             let maybeClipPath = clipPath(
                 from: node,
                 clipPathCache: clipPathCache
@@ -517,16 +597,20 @@ private struct SVGStaticPlaceholderView: View {
                 activeClipPaths.append(nextClipPath)
             }
 
-            let nodeTransform: CGAffineTransform = transformBuilder.concatenate(
-                local: node.base.transform,
-                inherited: inheritedTransform
-            )
+            let nodeTransform: CGAffineTransform = if let transformOverride = animatedTransform {
+                transformOverride.concatenating(inheritedTransform)
+            } else {
+                transformBuilder.concatenate(
+                    local: node.base.transform,
+                    inherited: inheritedTransform
+                )
+            }
 
             if let built = makeDrawNode(
                 for: node,
                 resolved: resolved[nodeID],
                 filterDefinitions: filterDefinitions,
-                inheritedTransform: inheritedTransform,
+                inheritedTransform: nodeTransform,
                 canUsePathCache: canUsePathCache,
                 clipPaths: activeClipPaths
             ) {

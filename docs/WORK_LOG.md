@@ -2,6 +2,63 @@
 
 ## 2026-02-16
 
+### Session 74
+- 작업: `M1-8` SMIL W3C/웹 브라우저 비교 시나리오 연동 마무리
+- 완료:
+  - `SVGDemoBaselineUITests`에 SMIL 정합 전용 테스트 `testBrowserOracleManifestCoversSmilSamples` 추가.
+  - `testBrowserOracleManifestCoversDemoSamples`에서 manifest 샘플셋과 required/animated 셋 정합성 검증을 명확화.
+  - `docs/TASK_BOARD.md`에서 `M1-8` 상태를 `done`으로 변경.
+- 검증:
+  - `python` 스크립트로 `requiredCanvases + animatedCanvases`와 manifest sample set 정합성 점검.
+  - `python` 스크립트로 `smilCanvases`와 manifest smil sample set 정합성 점검.
+- 다음 액션:
+  - `D1-4` 브라우저 baseline 확대 및 UI 비교 안정화로 전환.
+
+### Session 72
+- 작업: M1-5 animateTransform/색상/길이 보간기 마무리
+- 완료:
+  - `SVGSMILEngineTests.swift` 정리 후 컴파일 오류 제거.
+  - animateTransform 케이스를 추가/보강:
+    - 회전 보간
+    - 스케일 보간
+    - translate values 리스트 보간
+  - 색상 `from/to` 보간, 길이(`px`) 보간 테스트를 추가.
+  - 기존 animateMotion 테스트(경로/회전) 포함 통합 수행.
+- 검증:
+  - `swift test --filter SVGSMILEngineTests --no-parallel`
+  - `swift test --no-parallel` (189 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iPhone 17,OS=26.2' build-for-testing CODE_SIGNING_ALLOWED=NO`
+- 다음 액션:
+  - `M1-6` animateMotion 기초 경로 보간 + 회전 정책 보강
+
+### Session 73
+- 작업: `M1-6` animateMotion key 회전 모드 보강
+- 완료:
+  - `SVGSMILEngineTests`에 `rotate="auto-reverse"` 케이스 추가.
+  - `rotate=auto`/`rotate=fixed`/`from-to` 경로 보간과 함께 `auto-reverse` 동작을 함께 검증.
+- 검증:
+  - `swift test --filter SVGSMILEngineTests/testApplyAnimateMotionSupportsAutoReverseRotation --no-parallel`
+  - `swift test --filter SVGSMILEngineTests --no-parallel`
+  - `swift test --no-parallel` (189 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iPhone 17,OS=26.2' build-for-testing CODE_SIGNING_ALLOWED=NO`
+- 다음 액션:
+  - `M1-7` SMIL UI 탭 및 샘플별 애니메이션 검증 시나리오 분리
+
+### Session 71
+- 작업: M1-4 SMIL 렌더 타임라인 동기화 마무리
+- 완료:
+  - `Sources/SVGSwiftUI/Render/SVGView.swift`의 기존 SMIL 타임라인 렌더 파이프라인(`TimelineView` + `animatedDrawNodes(for:)`)을 기준으로, `SVGSMILEngine` 연산 적용이 프레임 단위로 동작하도록 검증.
+  - `SVGSMILEngine`의 animateMotion 처리에서 회전 모드(`fixed/auto/auto-reverse`)를 포함한 좌표/경로 기반 테스트 8건을 정리.
+  - `testApplyAnimateMotionSupportsAutoRotation`, `testApplyAnimateMotionSupportsFixedRotation`, `testApplyAnimateMotionTranslatesAlongPath`를 포함한 SMIL 엔진 테스트를 통과.
+- 검증:
+  - `swift test --filter SVGSMILEngineTests --no-parallel`
+  - `swift test --no-parallel` (186 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' build-for-testing CODE_SIGNING_ALLOWED=NO`
+- 리스크:
+  - `animateMotion`은 좌표 기반 이동 및 path 기반 이동의 회전 해석은 최소 스펙 기준으로 검증됐으나, keyTimes/keySplines/이벤트 begin 연동은 현재 다음 단계(M1-5+)에서 연속 처리 필요.
+- 다음 액션:
+  - `M1-5` animateTransform/색상/길이 보간기와 충돌 해소 정책 구현.
+
 ### Session 68
 - 작업: SMIL 로드맵 1차 준비(기준 문서·범위 정리)
 - 완료:
@@ -35,6 +92,26 @@
   - `animatetransform`, `animatemotion`는 추출은 되지만 타이밍/보간/노드 반영은 `M1-3`에서 추가 예정
 - 다음 액션:
   - `M1-3`에서 타이밍 속성 파싱 + 샘플러/보간 타입 초안 구현 후 문서 연동
+
+### Session 70
+- 작업: M1-3 파서 타임라인/속성 스켈레톤 구현
+- 완료:
+  - `SVGSMILAnimation`에 타이밍/속성 축적 필드를 확장:
+    - `timing` (dur/begin/end/repeatCount/repeatDur/fill)
+    - `attributeName`, `values`, `type`, `fromValue`, `toValue`, `byValue`, `keyTimes`, `keySplines`, `interpolation`
+  - SMIL 시간 값 파서 유틸 추가:
+    - `s`/`ms` 단위 파싱 및 세미콜론(begin/end) 토큰 분리
+    - `indefinite` repeatCount 분기 처리
+  - `SVGParserTests`에 M1-3 타임 파싱 회귀 케이스 1건 추가:
+    - `testParseSMILCalcModeAndUnsupportedTimeSyntaxFallsBackToDefaults`
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (SMIL 테스트 60개 통과)
+  - `swift test --no-parallel` (전체 통과)
+- 리스크:
+  - 이벤트형 `begin`/`end`(`id.begin`)는 현재 파서 단계에서 시간 토큰만 보존.
+  - 보간 타입 추론과 `keyTimes`/`keySplines` 적용은 다음 단계(M1-4~)로 분리.
+- 다음 액션:
+  - `M1-4` 렌더 타임라인 연결 단계로 전환해 `SVGView` 업데이트 경로에 샘플 타임라인을 주입
 
 ### Session 66
 - 작업: 폰트 스타일 및 텍스트 렌더링 파이프라인 정비, 고난도 애니메이션 데모/브라우저 기준 샘플 확장

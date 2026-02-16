@@ -73,6 +73,8 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         "animation-smil-orbit-multi-ring"
     ]
 
+    static let smilCanvases: [String] = animatedCanvases.filter { $0.hasPrefix("animation-smil-") }
+
     static let nodeControlCanvases: [String] = requiredCanvases
 
     static let renderSettleTimeout: TimeInterval = 2.0
@@ -579,6 +581,10 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         if w3cRootContainer.exists {
             return
         }
+        let smilRootContainer = app.otherElements["demo.content.smil"]
+        if smilRootContainer.exists {
+            return
+        }
         let remoteRootContainer = app.otherElements["demo.content.remote"]
         if remoteRootContainer.exists {
             return
@@ -588,6 +594,7 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
             rootContainer,
             animationRootContainer,
             w3cRootContainer,
+            smilRootContainer,
             remoteRootContainer
         ].first(where: { $0.exists }) ?? rootContainer
         let backButton = app.navigationBars.buttons["SVGSwiftUI Demo"]
@@ -704,6 +711,10 @@ final class SVGSwiftUIDemoUITests: XCTestCase {
         let w3cContent = app.otherElements["demo.content.w3c"]
         if w3cContent.exists {
             return w3cContent
+        }
+        let smilContent = app.otherElements["demo.content.smil"]
+        if smilContent.exists {
+            return smilContent
         }
         let remoteContent = app.otherElements["demo.content.remote"]
         if remoteContent.exists {

@@ -116,10 +116,52 @@ extension SVGSwiftUIDemoUITests {
             XCTFail("브라우저 오라클 manifest의 SVG 경로 중 존재하지 않는 파일이 있습니다: \(firstMissing)")
         }
 
-        XCTAssertEqual(
-            manifestSampleSet,
-            requiredSampleSet,
-            "브라우저 오라클 manifest 샘플과 requiredCanvases가 일치하지 않습니다."
+        let missingSampleCases = requiredSampleSet.subtracting(manifestSampleSet)
+        if !missingSampleCases.isEmpty {
+            let missingList = missingSampleCases
+                .sorted()
+                .joined(separator: ", ")
+            XCTFail("브라우저 오라클 manifest에서 requiredCanvases + animatedCanvases에 등록된 샘플이 누락됩니다: \(missingList)")
+        }
+
+        let unexpectedSampleCases = manifestSampleSet.subtracting(requiredSampleSet)
+        if !unexpectedSampleCases.isEmpty {
+            let unknownList = unexpectedSampleCases
+                .sorted()
+                .joined(separator: ", ")
+            XCTFail("브라우저 오라클 manifest에 불필요한 샘플이 존재합니다: \(unknownList)")
+        }
+    }
+
+    @MainActor
+    func testBrowserOracleManifestCoversSmilSamples() throws {
+        let manifestCases = try loadBrowserBaselineCases()
+        let manifestSmilSet = Set(
+            manifestCases
+                .filter { caseItem in
+                    caseItem.sampleID.hasPrefix("animation-smil-")
+                }
+                .map(\.sampleID)
         )
+        let smilSampleSet = Set(Self.smilCanvases)
+
+        if manifestSmilSet != smilSampleSet {
+            let missingSmilCases = smilSampleSet.subtracting(manifestSmilSet)
+            let unexpectedSmilCases = manifestSmilSet.subtracting(smilSampleSet)
+            var failures: [String] = []
+            if !missingSmilCases.isEmpty {
+                failures.append(
+                    "manifest 미포함 SMIL 샘플: " +
+                    missingSmilCases.sorted().joined(separator: ", ")
+                )
+            }
+            if !unexpectedSmilCases.isEmpty {
+                failures.append(
+                    "manifest에만 존재하는 SMIL 샘플: " +
+                    unexpectedSmilCases.sorted().joined(separator: ", ")
+                )
+            }
+            XCTFail("브라우저 오라클 manifest SMIL 샘플 정합 실패\n" + failures.joined(separator: "\n"))
+        }
     }
 }

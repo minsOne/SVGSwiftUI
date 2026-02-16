@@ -55,6 +55,15 @@ extension SVGSwiftUIDemoUITests {
             waitForIdentifier("demo.content.w3c", in: app, timeout: 3),
             "W3C 탭의 목록 컨테이너가 표시되지 않았습니다."
         )
+
+        XCTAssertTrue(
+            selectDemoCatalogTab("demo.tab.smil", fallbackLabel: "SMIL", in: app),
+            "SMIL 탭으로 전환되지 않았습니다."
+        )
+        XCTAssertTrue(
+            waitForIdentifier("demo.content.smil", in: app, timeout: 3),
+            "SMIL 탭의 목록 컨테이너가 표시되지 않았습니다."
+        )
     }
 
     @MainActor

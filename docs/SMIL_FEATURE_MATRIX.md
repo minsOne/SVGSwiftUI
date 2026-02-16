@@ -7,13 +7,13 @@
 
 | 기능 | 현재 상태 | 이유 | 대표 샘플 | 테스트 |
 |---|---|---|---|---|
-| `animate` | 파서 수집 | `SVGSMILAnimation`로 프레임 수집. 렌더/타이밍 미지원 | `animation-smil-drift-lines`, `animation-smil-wave-cascade`, `animation-smil-color-lattice` | `SVGParserTests` 신규 케이스 추가 |
-| `animateTransform` | 파서 수집 | `SVGSMILAnimation`로 프레임 수집. 렌더/타이밍 미지원 | `animation-smil-radar-spin`, `animation-smil-orbital`, `animation-smil-pulse-sunburst` | `SVGParserTests` 신규 케이스 추가 |
-| `set` | 파서 수집 | `SVGSMILAnimation`로 프레임 수집. 렌더/타이밍 미지원 | `animation-smil-drift-lines` (속성 변경), `animation-smil-breath-grid` | `SVGParserTests` 신규 케이스 추가 |
-| `animateMotion` | 파서 수집 | `SVGSMILAnimation`로 프레임 수집. 렌더/경로 보간 미지원 | 샘플 미등록 (`WebKit/W3C 샘플 대상 조달 필요) | 테스트 미구축 |
-| SMIL 시간 모델 (`dur`, `begin`, `repeatCount`) | 미지원 | 타임라인 엔진/샘플러 부재 | 전 샘플 | 신규 그룹 필요 |
-| 보간 값 (`values` / `keyTimes` / `keySplines`) | 미지원 | 샘플러/보간기 부재 | 전 샘플 | 신규 그룹 필요 |
-| 경로 기반 이동 (`path`, `keyPoints`, `rotate`) | 미지원 | `animateMotion` 미지원과 동일 | 전 샘플 | 신규 그룹 필요 |
+| `animate` | 파서 수집 + 타이밍/속성 스켈레톤 해석 | `SVGSMILAnimation`에 `timing`, `attributeName`, `from/to/by`, `values`, `calcMode` 일부 저장 | `animation-smil-drift-lines`, `animation-smil-wave-cascade`, `animation-smil-color-lattice` | `SVGParserTests`로 `dur/begin/repeatCount` 해석 검증 |
+| `animateTransform` | 파서 + 렌더 기본 보간 지원 | `SVGSMILAnimation`에 `type`, `from/to/by`, `values`를 기준으로 transform 보간 적용 | `animation-smil-radar-spin`, `animation-smil-orbital`, `animation-smil-pulse-sunburst` | `SVGParserTests` + `SVGSMILEngineTests` |
+| `set` | 파서 수집 + 타이밍/속성 스켈레톤 해석 | `SVGSMILAnimation`에 `attributeName`, `to`, `dur`, `begin` 저장 | `animation-smil-drift-lines` (속성 변경), `animation-smil-breath-grid` | `SVGParserTests` 신규 케이스 추가 |
+| `animateMotion` | 파서+기본 렌더 보간 지원 | `from/to` 좌표 이동과 `path` 기본 이동/회전 처리 지원(`auto`, `auto-reverse`, `fixed`) | `animation-smil-orbit-lumen`, `animation-smil-wave-shimmer` (샘플 단계 확충 예정) | `SVGSMILEngineTests` |
+| SMIL 시간 모델 (`dur`, `begin`, `repeatCount`) | 부분 지원 | 기본 dur/begin/repeat는 동작, keyTimes/keySplines/이벤트 begin 미지원 | 전 샘플 | M1-6+에서 고도화 |
+| 보간 값 (`values` / `keyTimes` / `keySplines`) | 부분 지원 | `from/to/by/values` 기본 보간은 지원, keyTimes/keySplines는 미지원 | 전 샘플 | M1-6에서 고도화 |
+| 경로 기반 이동 (`path`, `keyPoints`, `rotate`) | 부분 지원 | `path` + `rotate`(auto/auto-reverse/fixed) 처리 시작. `keyPoints` 미지원 | 전 샘플 | M1-7에서 keyPoints/정밀도 보강 |
 
 ## 2) 비지원 상태 라벨 규칙
 

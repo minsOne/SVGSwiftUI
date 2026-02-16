@@ -99,6 +99,11 @@ enum DemoSamples {
         return uniqueSamples(from: curated + w3cFixtureSamples + webKitFixtureSamples)
     }()
 
+    static let smilSamples: [SampleSVG] = {
+        let filtered = all.filter { $0.id.hasPrefix("animation-smil-") }
+        return filtered
+    }()
+
     static let w3cCatalogCaseIDs: Set<String> = Set(w3cCatalogSamples.map(\.id))
 
     static let all: [SampleSVG] = [

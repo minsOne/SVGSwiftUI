@@ -992,14 +992,132 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     ) {
         let targetElementID = targetFrame.base.id ?? targetFrame.base.syntheticID
         let normalizedAttributes = normalizeAttributes(source.attributes)
+        let timing = parseSMILAnimationTiming(attributes: normalizedAttributes)
+        let valueInterpolation: SVGSMILAnimationValueInterpolation = parseSMILInterpolation(
+            from: normalizedAttributes["calcmode"]
+        )
+        let valuesValue: SVGSMILAnimationValue? = if let rawValues = normalizedAttributes["values"] {
+            SVGSMILAnimationValue(kind: "values", raw: rawValues)
+        } else {
+            nil
+        }
         let animation = SVGSMILAnimation(
             id: source.base.id,
             kind: kind,
             targetElementID: targetElementID,
             targetSyntheticID: targetFrame.base.syntheticID,
-            attributes: normalizedAttributes
+            attributes: normalizedAttributes,
+            timing: timing,
+            attributeName: normalizedAttributes["attributename"],
+            values: valuesValue,
+            type: normalizedAttributes["type"],
+            keyTimes: normalizedAttributes["keytimes"],
+            keySplines: normalizedAttributes["keysplines"],
+            interpolation: valueInterpolation,
+            fromValue: normalizedAttributes["from"],
+            toValue: normalizedAttributes["to"],
+            byValue: normalizedAttributes["by"]
         )
         smilAnimations.append(animation)
+    }
+
+    private func parseSMILAnimationTiming(attributes: [String: String]) -> SVGSMILAnimationTiming {
+        let begin = parseSMILTimeSequence(attributeKey: "begin", from: attributes)
+        let end = parseSMILTimeSequence(attributeKey: "end", from: attributes)
+        let dur = parseSMILTimeValue(attributes["dur"])
+        let repeatDur = parseSMILTimeValue(attributes["repeatdur"])
+        let fill = parseSMILFillMode(attributes["fill"])
+        let repeatCount = parseSMILRepeatCount(attributes["repeatcount"])
+        return SVGSMILAnimationTiming(
+            begin: begin,
+            dur: dur,
+            end: end,
+            repeatCount: repeatCount,
+            repeatDur: repeatDur,
+            fill: fill
+        )
+    }
+
+    private func parseSMILInterpolation(from value: String?) -> SVGSMILAnimationValueInterpolation {
+        let normalized: String = value?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased() ?? ""
+        if normalized.isEmpty {
+            return .linear
+        }
+        return SVGSMILAnimationValueInterpolation(rawValue: normalized) ?? .linear
+    }
+
+    private func parseSMILFillMode(_ value: String?) -> SVGSMILAnimationFill {
+        let normalized: String = value?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased() ?? ""
+        if normalized.isEmpty {
+            return .remove
+        }
+        return SVGSMILAnimationFill(rawValue: normalized) ?? .remove
+    }
+
+    private func parseSMILRepeatCount(_ value: String?) -> SVGSMILAnimationRepeatCount? {
+        guard let rawValue = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !rawValue.isEmpty else {
+            return nil
+        }
+        let lowercased: String = rawValue.lowercased()
+        if lowercased == "indefinite" {
+            return .indefinite
+        }
+        guard let parsed: Double = parseSMILTimeValue(rawValue) else {
+            return nil
+        }
+        return .finite(parsed)
+    }
+
+    private func parseSMILTimeSequence(
+        attributeKey: String,
+        from attributes: [String: String]
+    ) -> [Double] {
+        guard let rawValue = attributes[attributeKey] else {
+            return []
+        }
+        let tokens: [String] = rawValue
+            .split(separator: ";")
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        var output: [Double] = []
+        output.reserveCapacity(tokens.count)
+        for token in tokens {
+            if let parsed = parseSMILTimeValue(token) {
+                output.append(parsed)
+            }
+        }
+        return output
+    }
+
+    private func parseSMILTimeValue(_ value: String?) -> Double? {
+        guard let value else {
+            return nil
+        }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return nil
+        }
+        if trimmed == "indefinite" {
+            return nil
+        }
+        if trimmed.hasSuffix("ms") {
+            let numeric: String = String(trimmed.dropLast(2))
+            guard let millisecond = parseNumeric(numeric) else {
+                return nil
+            }
+            return millisecond / 1000.0
+        }
+        if trimmed.hasSuffix("s") {
+            let numeric: String = String(trimmed.dropLast(1))
+            return parseNumeric(numeric)
+        }
+        return parseNumeric(trimmed)
     }
 
     private func normalizeAttributes(_ attributes: [String: String]) -> [String: String] {
