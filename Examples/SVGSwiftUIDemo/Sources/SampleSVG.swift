@@ -253,6 +253,323 @@ enum DemoSamples {
             animation: .pulse(nodeID: "luminous-core", minScale: 0.85, maxScale: 1.25, duration: 1.8)
         ),
         SampleSVG(
+            id: "animation-opacity-pulse",
+            title: "Animated Opacity",
+            fileName: "path-commands",
+            defaultNodeID: "cmd-close",
+            overrideTargets: ["cmd-close", "cmd-move-line", "cmd-bezier", "cmd-arc"],
+            category: "Animation",
+            notes: "투명도 페이드 인/아웃을 통해 opacity 애니메이션 동작을 확인",
+            animation: .opacity(nodeID: "cmd-close", minOpacity: 0.15, maxOpacity: 1.0, duration: 2.0)
+        ),
+        SampleSVG(
+            id: "animation-badge-breath",
+            title: "Animated Badge Breath",
+            fileName: "badge",
+            defaultNodeID: "badge-group",
+            overrideTargets: ["badge-group", "badge-ring", "main-path"],
+            category: "Animation",
+            notes: "아이콘 핵심 루프의 scale 변화를 확인",
+            animation: .pulse(nodeID: "badge-group", minScale: 0.88, maxScale: 1.24, duration: 1.8)
+        ),
+        SampleSVG(
+            id: "animation-route-flow",
+            title: "Animated Route Flow",
+            fileName: "route",
+            defaultNodeID: "route-line",
+            overrideTargets: ["route-line", "route-arrow"],
+            category: "Animation",
+            notes: "경로 노드의 offset 이동을 통해 drift 동작을 확인",
+            animation: .drift(nodeID: "route-line", offsetX: 38, offsetY: 0, duration: 2.4)
+        ),
+        SampleSVG(
+            id: "animation-geometry-fade",
+            title: "Animated Geometry Fade",
+            fileName: "geometry",
+            defaultNodeID: "geo-circle",
+            overrideTargets: ["geo-circle", "geo-rect", "geo-ellipse", "geo-line"],
+            category: "Animation",
+            notes: "원형 노드의 투명도 변화를 통해 alpha 애니메이션 확인",
+            animation: .opacity(nodeID: "geo-circle", minOpacity: 0.25, maxOpacity: 1.0, duration: 1.8)
+        ),
+        SampleSVG(
+            id: "animation-panel-bounce",
+            title: "Animated Panel Dot",
+            fileName: "panel",
+            defaultNodeID: "panel-dot",
+            overrideTargets: ["panel-dot", "panel-divider", "panel-base"],
+            category: "Animation",
+            notes: "패널 내 포인트의 scale 변화를 통해 펄스 동작 확인",
+            animation: .pulse(nodeID: "panel-dot", minScale: 0.65, maxScale: 1.35, duration: 2.1)
+        ),
+        SampleSVG(
+            id: "animation-style-sheet-fade",
+            title: "Animated Style Sheet Fade",
+            fileName: "style-sheet",
+            defaultNodeID: "sheet-circle",
+            overrideTargets: ["sheet-circle", "text"],
+            category: "Animation",
+            notes: "스타일 시트 샘플에서 stroke/fill 요소를 타겟한 opacity 동작",
+            animation: .opacity(nodeID: "sheet-circle", minOpacity: 0.2, maxOpacity: 1.0, duration: 2.0)
+        ),
+        SampleSVG(
+            id: "animation-polygon-pulse",
+            title: "Animated Polygon Pulse",
+            fileName: "polygon-polyline",
+            defaultNodeID: "poly-star",
+            overrideTargets: ["poly-star", "poly-group", "polyline-wave", "poly-triangle"],
+            category: "Animation",
+            notes: "폴리곤 노드의 scale 변화를 통한 간단한 애니메이션 동작 확인",
+            animation: .pulse(nodeID: "poly-star", minScale: 0.8, maxScale: 1.22, duration: 1.7)
+        ),
+        SampleSVG(
+            id: "animation-aurora-wisp",
+            title: "Animated Aurora Wisp",
+            fileName: "aurora-wave",
+            defaultNodeID: "aurora-vision",
+            overrideTargets: ["aurora-vision", "aurora-glow", "aurora-backdrop", "aurora-ribbon-1"],
+            category: "Animation",
+            notes: "필터 기반 복합 도형에서 노드 투명도 변화를 확인",
+            animation: .opacity(nodeID: "aurora-glow", minOpacity: 0.2, maxOpacity: 1.0, duration: 2.2)
+        ),
+        SampleSVG(
+            id: "animation-nested-drift",
+            title: "Animated Nested Drift",
+            fileName: "nested-groups",
+            defaultNodeID: "inner-layer-1",
+            overrideTargets: ["inner-layer-1", "inner-layer-2", "nested-a", "nested-b", "root-group"],
+            category: "Animation",
+            notes: "중첩 그룹의 레이어를 offset 변경해 drift 동작 확인",
+            animation: .drift(nodeID: "inner-layer-1", offsetX: 16, offsetY: 10, duration: 2.0)
+        ),
+        SampleSVG(
+            id: "animation-transform-radiant",
+            title: "Animated Transform Core",
+            fileName: "transform-radial-spiral",
+            defaultNodeID: "spiral-core",
+            overrideTargets: ["spiral-core", "spiral-body", "spiral-core-shell", "spiral-glow", "spiral-bg"],
+            category: "Animation",
+            notes: "중첩 transform 구조에서 핵심 코어 scale 동작을 확인",
+            animation: .pulse(nodeID: "spiral-core", minScale: 0.9, maxScale: 1.18, duration: 2.3)
+        ),
+        SampleSVG(
+            id: "animation-smil-orbital",
+            title: "SMIL Orbital",
+            fileName: "animation-smil-orbital",
+            sourceFilePath: "W3C/animation/animation-smil-orbital.svg",
+            defaultNodeID: "smil-orbit-core",
+            overrideTargets: [
+                "smil-orbit-core",
+                "smil-orbit-ring",
+                "smil-orbit-halo",
+                "smil-orbit-satellite",
+                "smil-orbit-shell"
+            ],
+            category: "Animation",
+            notes: "SMIL animateTransform 예제가 포함된 궤도형 샘플입니다.",
+            animation: .pulse(nodeID: "smil-orbit-core", minScale: 0.86, maxScale: 1.22, duration: 1.9)
+        ),
+        SampleSVG(
+            id: "animation-smil-drift-lines",
+            title: "SMIL Drift Lines",
+            fileName: "animation-smil-drift-lines",
+            sourceFilePath: "W3C/animation/animation-smil-drift-lines.svg",
+            defaultNodeID: "smil-drift-ball",
+            overrideTargets: [
+                "smil-drift-ball",
+                "smil-drift-track",
+                "smil-drift-line-1",
+                "smil-drift-line-2",
+                "smil-drift-line-3"
+            ],
+            category: "Animation",
+            notes: "SMIL animate 포함 드리프트 형상 샘플입니다.",
+            animation: .drift(nodeID: "smil-drift-ball", offsetX: 72, offsetY: 0, duration: 2.8)
+        ),
+        SampleSVG(
+            id: "animation-smil-opacity-breath",
+            title: "SMIL Opacity Breath",
+            fileName: "animation-smil-opacity-breath",
+            sourceFilePath: "W3C/animation/animation-smil-opacity-breath.svg",
+            defaultNodeID: "smil-breath-core",
+            overrideTargets: [
+                "smil-breath-core",
+                "smil-breath-haze",
+                "smil-breath-rim",
+                "smil-breath-beam"
+            ],
+            category: "Animation",
+            notes: "SMIL opacity/색상 애니메이션 샘플입니다.",
+            animation: .opacity(nodeID: "smil-breath-haze", minOpacity: 0.2, maxOpacity: 1.0, duration: 2.0)
+        ),
+        SampleSVG(
+            id: "animation-smil-radar-spin",
+            title: "SMIL Radar Sweep",
+            fileName: "animation-smil-radar-spin",
+            sourceFilePath: "W3C/animation/animation-smil-radar-spin.svg",
+            defaultNodeID: "smil-radar-core",
+            overrideTargets: [
+                "smil-radar-core",
+                "smil-radar-sweep",
+                "smil-radar-dot-a",
+                "smil-radar-dot-b",
+                "smil-radar-dot-c"
+            ],
+            category: "Animation",
+            notes: "SMIL animateTransform 방식의 레이더형 샘플입니다.",
+            animation: .pulse(nodeID: "smil-radar-core", minScale: 0.84, maxScale: 1.2, duration: 1.8)
+        ),
+        SampleSVG(
+            id: "animation-smil-mosaic-grid",
+            title: "SMIL Mosaic Grid",
+            fileName: "animation-smil-mosaic-grid",
+            sourceFilePath: "W3C/animation/animation-smil-mosaic-grid.svg",
+            defaultNodeID: "smil-mosaic-center",
+            overrideTargets: [
+                "smil-mosaic-center",
+                "smil-mosaic-a",
+                "smil-mosaic-b",
+                "smil-mosaic-c",
+                "smil-mosaic-d",
+                "smil-mosaic-e"
+            ],
+            category: "Animation",
+            notes: "스타일/클래스가 섞인 격자형 SMIL 샘플입니다.",
+            animation: .pulse(nodeID: "smil-mosaic-center", minScale: 0.9, maxScale: 1.3, duration: 2.2)
+        ),
+        SampleSVG(
+            id: "animation-smil-path-signal",
+            title: "SMIL Path Signal",
+            fileName: "animation-smil-path-signal",
+            sourceFilePath: "W3C/animation/animation-smil-path-signal.svg",
+            defaultNodeID: "smil-path-marker",
+            overrideTargets: [
+                "smil-path-marker",
+                "smil-path-track",
+                "smil-path-node-a",
+                "smil-path-node-b",
+                "smil-path-node-c"
+            ],
+            category: "Animation",
+            notes: "SMIL motion 요소 샘플(구조 점검용)입니다.",
+            animation: .drift(nodeID: "smil-path-marker", offsetX: 10, offsetY: 6, duration: 1.9)
+        ),
+        SampleSVG(
+            id: "animation-smil-pulse-sunburst",
+            title: "SMIL Pulse Sunburst",
+            fileName: "animation-smil-pulse-sunburst",
+            sourceFilePath: "W3C/animation/animation-smil-pulse-sunburst.svg",
+            defaultNodeID: "smil-pulse-sun-core",
+            overrideTargets: [
+                "smil-pulse-sun-core",
+                "smil-pulse-sun-ring-1",
+                "smil-pulse-sun-ring-2",
+                "smil-pulse-ray",
+                "smil-pulse-ray-2",
+                "smil-pulse-ray-3",
+                "smil-pulse-ray-4",
+                "smil-pulse-ray-5",
+                "smil-pulse-ray-6"
+            ],
+            category: "Animation",
+            notes: "SMIL으로 반경이 확장되는 태양형 애니메이션을 포함한 샘플입니다.",
+            animation: .pulse(nodeID: "smil-pulse-sun-core", minScale: 0.9, maxScale: 1.3, duration: 2.6)
+        ),
+        SampleSVG(
+            id: "animation-smil-spin-petal",
+            title: "SMIL Spinning Petal",
+            fileName: "animation-smil-spin-petal",
+            sourceFilePath: "W3C/animation/animation-smil-spin-petal.svg",
+            defaultNodeID: "smil-petal-wheel",
+            overrideTargets: [
+                "smil-petal-center",
+                "smil-petal-wheel",
+                "smil-petal-arm-group",
+                "smil-petal-arm-1",
+                "smil-petal-arm-2",
+                "smil-petal-arm-3",
+                "smil-petal-arm-4"
+            ],
+            category: "Animation",
+            notes: "반복 회전 transform을 포함한 SMIL 샘플입니다.",
+            animation: .pulse(nodeID: "smil-petal-wheel", minScale: 0.9, maxScale: 1.15, duration: 2.0)
+        ),
+        SampleSVG(
+            id: "animation-smil-color-lattice",
+            title: "SMIL Color Lattice",
+            fileName: "animation-smil-color-lattice",
+            sourceFilePath: "W3C/animation/animation-smil-color-lattice.svg",
+            defaultNodeID: "smil-lattice-square-1",
+            overrideTargets: [
+                "smil-lattice-bg",
+                "smil-lattice-square-1",
+                "smil-lattice-square-2",
+                "smil-lattice-square-3",
+                "smil-lattice-square-4",
+                "smil-lattice-square-5",
+                "smil-lattice-square-6",
+                "smil-lattice-square-7",
+                "smil-lattice-square-8"
+            ],
+            category: "Animation",
+            notes: "그리드 상자 구성이 포함된 SMIL 샘플입니다.",
+            animation: .drift(nodeID: "smil-lattice-bg", offsetX: 4, offsetY: 1, duration: 2.2)
+        ),
+        SampleSVG(
+            id: "animation-smil-pendulum-sweep",
+            title: "SMIL Pendulum Sweep",
+            fileName: "animation-smil-pendulum-sweep",
+            sourceFilePath: "W3C/animation/animation-smil-pendulum-sweep.svg",
+            defaultNodeID: "smil-pendulum-bob-group",
+            overrideTargets: [
+                "smil-pendulum-bob",
+                "smil-pendulum-bob-group",
+                "smil-pendulum-glow",
+                "smil-pendulum-rod",
+                "smil-pendulum-pivot"
+            ],
+            category: "Animation",
+            notes: "중심에서 왕복 회전하는 진자형 SMIL 샘플입니다.",
+            animation: .drift(nodeID: "smil-pendulum-bob-group", offsetX: 28, offsetY: 4, duration: 2.2)
+        ),
+        SampleSVG(
+            id: "animation-smil-wave-cascade",
+            title: "SMIL Wave Cascade",
+            fileName: "animation-smil-wave-cascade",
+            sourceFilePath: "W3C/animation/animation-smil-wave-cascade.svg",
+            defaultNodeID: "smil-wave-bubble-1",
+            overrideTargets: [
+                "smil-wave-path",
+                "smil-wave-bubble-1",
+                "smil-wave-bubble-2",
+                "smil-wave-bubble-3",
+                "smil-wave-gridline-1",
+                "smil-wave-gridline-2",
+                "smil-wave-bg"
+            ],
+            category: "Animation",
+            notes: "연속 이동형 SMIL 예시로 동작 점검이 쉬운 샘플입니다.",
+            animation: .drift(nodeID: "smil-wave-bubble-1", offsetX: 24, offsetY: 0, duration: 3.6)
+        ),
+        SampleSVG(
+            id: "animation-smil-orbit-multi-ring",
+            title: "SMIL Multi Ring Orbit",
+            fileName: "animation-smil-orbit-multi-ring",
+            sourceFilePath: "W3C/animation/animation-smil-orbit-multi-ring.svg",
+            defaultNodeID: "smil-orbit-multi-core",
+            overrideTargets: [
+                "smil-orbit-multi-core",
+                "smil-orbit-multi-ring-a",
+                "smil-orbit-multi-ring-b",
+                "smil-orbit-multi-ring-a-1",
+                "smil-orbit-multi-ring-b-1",
+                "smil-orbit-multi-bg"
+            ],
+            category: "Animation",
+            notes: "이중 회전 고리 구성이 포함된 SMIL 샘플입니다.",
+            animation: .pulse(nodeID: "smil-orbit-multi-core", minScale: 0.88, maxScale: 1.12, duration: 2.8)
+        ),
+        SampleSVG(
             id: "aurora-wave",
             title: "Aurora Wave",
             fileName: "aurora-wave",
@@ -653,7 +970,7 @@ enum DemoSamples {
         }
         let normalized = normalizedResourcePath(path)
         var candidates: [String] = []
-        var appendCandidate: (String) -> Void = { value in
+        let appendCandidate: (String) -> Void = { value in
             if !value.isEmpty, !candidates.contains(value) {
                 candidates.append(value)
             }

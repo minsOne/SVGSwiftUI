@@ -99,6 +99,9 @@ private struct DemoNodeOverride {
 struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private let samples = DemoSamples.all
+    private var animatedSamples: [SampleSVG] {
+        samples.filter { $0.animation.isAnimated }
+    }
     private let demoSVGRenderOptions = SVGParserOptions(
         enableStyleTag: true,
         enableDataURI: false,
@@ -122,12 +125,26 @@ struct ContentView: View {
                 .tag(DemoCatalogMode.all)
                 .accessibilityIdentifier("demo.tab.samples")
 
+            catalogRoot(for: .animation)
+                .tabItem {
+                    Label("애니메이션", systemImage: "arrow.clockwise")
+                }
+                .tag(DemoCatalogMode.animation)
+                .accessibilityIdentifier("demo.tab.animation")
+
             catalogRoot(for: .w3c)
                 .tabItem {
                     Label("W3C 케이스", systemImage: "checkmark.seal")
                 }
                 .tag(DemoCatalogMode.w3c)
                 .accessibilityIdentifier("demo.tab.w3c")
+
+            catalogRoot(for: .remote)
+                .tabItem {
+                    Label("원격 SVG", systemImage: "link")
+                }
+                .tag(DemoCatalogMode.remote)
+                .accessibilityIdentifier("demo.tab.remote")
         }
     }
 
@@ -135,14 +152,32 @@ struct ContentView: View {
         switch mode {
         case .all:
             return samples
+        case .animation:
+            return animatedSamples
         case .w3c:
             return DemoSamples.w3cCatalogSamples
+        case .remote:
+            return []
         }
     }
 
     @ViewBuilder
     private func catalogRoot(for mode: DemoCatalogMode) -> some View {
-        if horizontalSizeClass == .regular {
+        if mode == .remote {
+            if horizontalSizeClass == .regular {
+                NavigationView {
+                    remoteSVGValidationView
+                        .accessibilityIdentifier("demo.content.remote")
+                }
+                .navigationViewStyle(DoubleColumnNavigationViewStyle())
+            } else {
+                NavigationView {
+                    remoteSVGValidationView
+                        .accessibilityIdentifier("demo.content.remote")
+                }
+                .navigationViewStyle(StackNavigationViewStyle())
+            }
+        } else if horizontalSizeClass == .regular {
             NavigationView {
                 demoSampleList(for: mode)
             }
@@ -155,17 +190,25 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
+    
     private func demoSampleList(for mode: DemoCatalogMode) -> some View {
         let sampleSet = samples(for: mode)
         let listTitle = mode.navigationTitle
         let sectionTitle = mode.sectionTitle
         let description = mode.sectionDescription
-        let contentIdentifier = mode == .all
-            ? "demo.content"
-            : "demo.content.w3c"
+        let contentIdentifier: String
+        switch mode {
+        case .all:
+            contentIdentifier = "demo.content"
+        case .animation:
+            contentIdentifier = "demo.content.animation"
+        case .w3c:
+            contentIdentifier = "demo.content.w3c"
+        case .remote:
+            contentIdentifier = "demo.content.remote"
+        }
 
-        List {
+        return List {
             Section(header: Text(listTitle)) {
                 Text(description)
                     .font(.caption)
@@ -176,7 +219,7 @@ struct ContentView: View {
 
             Section(sectionTitle) {
                 ForEach(sampleSet) { sample in
-                    sampleListRow(for: sample)
+                    sampleListRow(for: sample, shouldFitCanvasToViewport: mode == .w3c)
                 }
             }
         }
@@ -185,8 +228,16 @@ struct ContentView: View {
         .accessibilityIdentifier(contentIdentifier)
     }
 
-    private func sampleListRow(for sample: SampleSVG) -> some View {
-        NavigationLink(destination: sampleDetail(for: sample)) {
+    private func sampleListRow(
+        for sample: SampleSVG,
+        shouldFitCanvasToViewport: Bool = false
+    ) -> some View {
+        NavigationLink(
+            destination: sampleDetail(
+                for: sample,
+                shouldFitCanvasToViewport: shouldFitCanvasToViewport
+            )
+        ) {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(sample.title)
@@ -213,41 +264,66 @@ struct ContentView: View {
         .accessibilityIdentifier("demo.sampleRow.\(sample.id)")
     }
 
-    private func sampleDetail(for sample: SampleSVG) -> some View {
+    private func sampleDetail(
+        for sample: SampleSVG,
+        shouldFitCanvasToViewport: Bool = false
+    ) -> some View {
         let useTimeline = runningAnimations.contains(sample.id)
         if useTimeline {
             return AnyView(
-                TimelineView(.animation) { timeline in
-                    sampleDetailContent(for: sample, at: timeline.date.timeIntervalSinceReferenceDate)
+                GeometryReader { proxy in
+                    TimelineView(.animation) { timeline in
+                        sampleDetailContent(
+                            for: sample,
+                            at: timeline.date.timeIntervalSinceReferenceDate,
+                            shouldFitCanvasToViewport: shouldFitCanvasToViewport,
+                            containerSize: proxy.size
+                        )
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
                         .accessibilityIdentifier("demo.sampleDetail.\(sample.id)")
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .navigationTitle(sample.title)
+                    .navigationBarTitleDisplayMode(.inline)
                 }
-                .navigationTitle(sample.title)
-                .navigationBarTitleDisplayMode(.inline)
             )
         }
 
         return AnyView(
-            ScrollView {
-                sampleDetailContent(for: sample, at: 0.0)
+            GeometryReader { proxy in
+                ScrollView {
+                    sampleDetailContent(
+                        for: sample,
+                        at: 0.0,
+                        shouldFitCanvasToViewport: shouldFitCanvasToViewport,
+                        containerSize: proxy.size
+                    )
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .accessibilityIdentifier("demo.sampleDetail.\(sample.id)")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .navigationTitle(sample.title)
+                .navigationBarTitleDisplayMode(.inline)
             }
-            .navigationTitle(sample.title)
-            .navigationBarTitleDisplayMode(.inline)
         )
     }
 
-    private func sampleDetailContent(for sample: SampleSVG, at timestamp: TimeInterval) -> some View {
+    private func sampleDetailContent(
+        for sample: SampleSVG,
+        at timestamp: TimeInterval,
+        shouldFitCanvasToViewport: Bool,
+        containerSize: CGSize
+    ) -> some View {
         let configuration = renderConfiguration(for: sample, at: timestamp)
         let sourceData = DemoSamples.sourceData(for: sample)
         let sourceText = DemoSamples.source(for: sample)
         let sampleNodeState = nodeOverrideStates[sample.id, default: DemoNodeOverrideState(selectedTargetID: sample.defaultNodeID)]
-        let preferredCanvasSize = DemoSamples.preferredCanvasSize(for: sample)
-        let canvasWidth = preferredCanvasSize?.width ?? 240
-        let canvasHeight = preferredCanvasSize?.height ?? 210
+        let preferredCanvasSize = DemoSamples.preferredCanvasSize(for: sample) ?? CGSize(width: 240, height: 210)
+        let defaultCanvasSize = shouldFitCanvasToViewport
+            ? fittedCanvasSize(for: preferredCanvasSize, containerWidth: containerSize.width)
+            : preferredCanvasSize
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
@@ -281,7 +357,7 @@ struct ContentView: View {
                 options: demoSVGRenderOptions,
                 configuration: configuration
             )
-            .frame(width: canvasWidth, height: canvasHeight)
+            .frame(width: defaultCanvasSize.width, height: defaultCanvasSize.height)
             .background(Color(white: 0.97))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
@@ -594,6 +670,22 @@ struct ContentView: View {
         return merged
     }
 
+    private func fittedCanvasSize(for sourceSize: CGSize, containerWidth: CGFloat) -> CGSize {
+        let horizontalMargin: CGFloat = 32
+        let availableWidth = max(containerWidth - horizontalMargin, 1)
+        let widthScale = availableWidth / sourceSize.width
+        let screenHeight = UIScreen.main.bounds.height
+        let availableHeight = max(screenHeight - 360, 1)
+        let heightScale = availableHeight / sourceSize.height
+        let scale = min(widthScale, heightScale)
+
+        if scale.isFinite && scale > 0 {
+            return CGSize(width: sourceSize.width * scale, height: sourceSize.height * scale)
+        }
+
+        return sourceSize
+    }
+
     private func animationProgress(for timestamp: TimeInterval, duration: Double) -> Double {
         let safeDuration = max(duration, 0.1)
         let normalized = timestamp.truncatingRemainder(dividingBy: safeDuration) / safeDuration
@@ -655,6 +747,11 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var remoteSVGValidationView: some View {
+        RemoteSVGValidationView(parserOptions: demoSVGRenderOptions)
     }
 
     private func sourceExpandedBinding(for sampleID: String) -> Binding<Bool> {
@@ -740,16 +837,214 @@ struct ContentView: View {
     }
 }
 
+private struct RemoteSVGValidationView: View {
+    let parserOptions: SVGParserOptions
+
+    @State private var urlText: String = "https://"
+    @State private var errorMessage: String?
+    @State private var fetchedURL: String?
+    @State private var svgText: String = ""
+    @State private var svgData: Data?
+    @State private var isLoading: Bool = false
+    @State private var sourceExpanded: Bool = false
+    @State private var lastLoadedAt: Date?
+    @State private var cachedSVG: [String: Data] = [:]
+    @State private var cachedSource: [String: String] = [:]
+
+    private let loader: URLSession = .shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            List {
+                Section("운영 URL 입력") {
+                    TextField("예: https://example.com/asset.svg", text: $urlText)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .keyboardType(.URL)
+                        .accessibilityIdentifier("demo.remote.urlField")
+
+                    HStack {
+                        Button("SVG 불러오기", action: {
+                            Task { await loadRemoteSVG() }
+                        })
+                        .buttonStyle(.borderedProminent)
+                        .disabled(isLoading)
+                        .accessibilityIdentifier("demo.remote.loadButton")
+
+                        if isLoading {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        }
+                    }
+                }
+
+                if let errorMessage = errorMessage {
+                    Section("오류") {
+                        Text(errorMessage)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .padding(.vertical, 4)
+                            .accessibilityIdentifier("demo.remote.error")
+                    }
+                }
+
+                if let urlValue = fetchedURL, let currentData = svgData {
+                    Section("렌더링") {
+                        Text("요청 URL: \(urlValue)")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text("용량: \(currentData.count) bytes")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        if let lastLoadedAt {
+                            Text("마지막 로드: \(lastLoadedAt.formatted(date: .numeric, time: .standard))")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        SVGView(
+                            source: .data(currentData),
+                            options: parserOptions
+                        )
+                        .frame(maxWidth: .infinity, minHeight: 220, maxHeight: 360)
+                        .background(Color(white: 0.97))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.black.opacity(0.1), lineWidth: 1)
+                        )
+                        .accessibilityIdentifier("demo.remote.canvas")
+                    }
+
+                    Section("SVG 소스") {
+                        DisclosureGroup(
+                            "원본 소스 열기/접기",
+                            isExpanded: $sourceExpanded
+                        ) {
+                            Text(svgText)
+                                .font(.system(.caption2, design: .monospaced))
+                                .textSelection(.enabled)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, 8)
+                                .accessibilityIdentifier("demo.remote.source")
+                        }
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle("원격 SVG")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .padding(.top, 2)
+    }
+
+    private var normalizedURLText: String {
+        urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    @MainActor
+    private func loadRemoteSVG() async {
+        let trimmedURL = normalizedURLText
+        guard !trimmedURL.isEmpty else {
+            errorMessage = "URL을 입력해 주세요."
+            svgData = nil
+            svgText = ""
+            fetchedURL = nil
+            return
+        }
+        guard let remoteURL = URL(string: trimmedURL) else {
+            errorMessage = "유효하지 않은 URL 형식입니다."
+            svgData = nil
+            svgText = ""
+            fetchedURL = nil
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        sourceExpanded = false
+
+        if let cachedSVGData = cachedSVG[remoteURL.absoluteString],
+           let cachedSourceText = cachedSource[remoteURL.absoluteString] {
+            svgData = cachedSVGData
+            svgText = cachedSourceText
+            fetchedURL = remoteURL.absoluteString
+            lastLoadedAt = Date()
+            isLoading = false
+            return
+        }
+
+        do {
+            let (data, response) = try await loader.data(from: remoteURL)
+            if let httpResponse = response as? HTTPURLResponse {
+                guard (200...299).contains(httpResponse.statusCode) else {
+                    errorMessage = "HTTP \(httpResponse.statusCode): 응답 상태가 유효하지 않습니다."
+                    svgData = nil
+                    svgText = ""
+                    fetchedURL = nil
+                    isLoading = false
+                    return
+                }
+            }
+            let decodedSource = decodeSVGText(from: data)
+            if decodedSource.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                errorMessage = "SVG 텍스트를 추출할 수 없습니다."
+                svgData = nil
+                svgText = ""
+                fetchedURL = nil
+                isLoading = false
+                return
+            }
+
+            cachedSVG[remoteURL.absoluteString] = data
+            cachedSource[remoteURL.absoluteString] = decodedSource
+            fetchedURL = remoteURL.absoluteString
+            svgData = data
+            svgText = decodedSource
+            lastLoadedAt = Date()
+            isLoading = false
+        } catch {
+            errorMessage = "요청 실패: \(error.localizedDescription)"
+            svgData = nil
+            svgText = ""
+            fetchedURL = nil
+            isLoading = false
+        }
+    }
+
+    private func decodeSVGText(from data: Data) -> String {
+        if let utf8Text = String(data: data, encoding: .utf8) {
+            return utf8Text
+        }
+        if let utf16Text = String(data: data, encoding: .utf16) {
+            return utf16Text
+        }
+        if let utf16LittleEndian = String(data: data, encoding: .utf16LittleEndian) {
+            return utf16LittleEndian
+        }
+        if let utf16BigEndian = String(data: data, encoding: .utf16BigEndian) {
+            return utf16BigEndian
+        }
+        return String(decoding: data, as: UTF8.self)
+    }
+}
+
 private enum DemoCatalogMode: Int, CaseIterable {
     case all
+    case animation
     case w3c
+    case remote
 
     var navigationTitle: String {
         switch self {
         case .all:
             return "SVGSwiftUI Demo"
+        case .animation:
+            return "애니메이션"
         case .w3c:
             return "W3C 케이스"
+        case .remote:
+            return "원격 SVG"
         }
     }
 
@@ -757,8 +1052,12 @@ private enum DemoCatalogMode: Int, CaseIterable {
         switch self {
         case .all:
             return "SVG 샘플 목록"
+        case .animation:
+            return "애니메이션 샘플"
         case .w3c:
             return "W3C 검증 샘플"
+        case .remote:
+            return "원격 SVG"
         }
     }
 
@@ -766,8 +1065,12 @@ private enum DemoCatalogMode: Int, CaseIterable {
         switch self {
         case .all:
             return "샘플 제목을 선택하면 렌더링, 애니메이션, 노드 제어, 소스 코드를 확인할 수 있습니다."
+        case .animation:
+            return "미리 구성된 애니메이션 샘플만 모아 놓아 동작 확인에 집중할 수 있습니다."
         case .w3c:
             return "단위 테스트 기반 W3C 시나리오 후보 샘플을 확인할 수 있습니다."
+        case .remote:
+            return "운영 URL로 SVG를 직접 받아 렌더링해 차이를 점검할 수 있습니다."
         }
     }
 }
