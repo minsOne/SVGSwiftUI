@@ -18,19 +18,22 @@ struct SVGBaseNode: Sendable, Equatable {
     var style: SVGStyle
     var transform: SVGTransform
     var attributes: [String: String]
+    var animationReferences: [SVGSMILAnimationBinding]
 
     init(
         id: String? = nil,
         syntheticID: String,
         style: SVGStyle = .init(),
         transform: SVGTransform = .identity,
-        attributes: [String: String] = [:]
+        attributes: [String: String] = [:],
+        animationReferences: [SVGSMILAnimationBinding] = []
     ) {
         self.id = id
         self.syntheticID = syntheticID
         self.style = style
         self.transform = transform
         self.attributes = attributes
+        self.animationReferences = animationReferences
     }
 }
 

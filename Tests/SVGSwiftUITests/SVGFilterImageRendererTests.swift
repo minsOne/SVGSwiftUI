@@ -427,6 +427,108 @@ final class SVGFilterImageRendererTests: XCTestCase {
         )
     }
 
+    func testRenderFilteredImageReflectsAnimatedFillColor() throws {
+        let targetID = "target"
+        let sourceImageSize: CGSize = CGSize(width: 20, height: 20)
+        let baseStyle = SVGResolvedStyle(fill: .color(SVGColor(red: 1, green: 0, blue: 0, alpha: 1)))
+        let resolvedStyles: [String: SVGResolvedNodeStyle] = [
+            targetID: SVGResolvedNodeStyle(
+                nodeID: targetID,
+                element: .rect,
+                style: baseStyle
+            )
+        ]
+        let fillAnimation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: targetID,
+            targetSyntheticID: targetID,
+            attributes: [
+                "attributename": "fill",
+                "from": "#ff0000",
+                "to": "#0000ff"
+            ],
+            timing: .init(begin: [0], dur: 1, end: [], repeatCount: nil, repeatDur: nil, fill: .freeze),
+            attributeName: "fill",
+            values: nil,
+            type: nil,
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: "#ff0000",
+            toValue: "#0000ff",
+            byValue: nil
+        )
+
+        let startStyles = SVGSMILEngine.applyAnimations(
+            to: resolvedStyles,
+            animationsByTargetID: [targetID: [fillAnimation]],
+            at: 0
+        )
+        let endStyles = SVGSMILEngine.applyAnimations(
+            to: resolvedStyles,
+            animationsByTargetID: [targetID: [fillAnimation]],
+            at: 1
+        )
+
+        guard let startFill = paintColor(startStyles[targetID]?.style.fill) else {
+            return XCTFail("Expected animated start fill")
+        }
+        guard let endFill = paintColor(endStyles[targetID]?.style.fill) else {
+            return XCTFail("Expected animated end fill")
+        }
+
+        let identityMatrix: [Double] = [
+            1, 0, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 1, 0
+        ]
+
+        guard let startFiltered = renderFilteredImage(
+            fillColor: startFill,
+            sourceImageSize: sourceImageSize,
+            primitives: [
+                .colorMatrix(values: identityMatrix, inSource: "SourceGraphic", result: nil)
+            ]
+        ) else {
+            XCTFail("Expected rendered start frame")
+            return
+        }
+        guard let endFiltered = renderFilteredImage(
+            fillColor: endFill,
+            sourceImageSize: sourceImageSize,
+            primitives: [
+                .colorMatrix(values: identityMatrix, inSource: "SourceGraphic", result: nil)
+            ]
+        ) else {
+            XCTFail("Expected rendered end frame")
+            return
+        }
+
+        let point = CGPoint(x: 10, y: 10)
+        guard let startPixel = pixel(from: startFiltered, at: point) else {
+            XCTFail("Expected start pixel")
+            return
+        }
+        guard let endPixel = pixel(from: endFiltered, at: point) else {
+            XCTFail("Expected end pixel")
+            return
+        }
+
+        XCTAssertTrue(
+            startPixel.r != endPixel.r
+                || startPixel.g != endPixel.g
+                || startPixel.b != endPixel.b
+                || startPixel.a != endPixel.a
+        )
+        XCTAssertGreaterThan(startPixel.r, 220)
+        XCTAssertLessThan(startPixel.b, 30)
+
+        XCTAssertLessThan(endPixel.r, 30)
+        XCTAssertGreaterThan(endPixel.b, 220)
+    }
+
     private func pixel(
         from image: CGImage,
         at point: CGPoint
@@ -449,5 +551,47 @@ final class SVGFilterImageRendererTests: XCTestCase {
         let blue: UInt8 = dataPtr[index + 2]
         let alpha: UInt8 = dataPtr[index + 3]
         return (r: red, g: green, b: blue, a: alpha)
+    }
+
+    private func paintColor(_ paint: SVGPaint?) -> Color? {
+        guard let paint else {
+            return nil
+        }
+        switch paint {
+        case .none:
+            return nil
+        case .currentColor:
+            return Color.primary
+        case .color(let value):
+            return Color(
+                .sRGB,
+                red: value.red,
+                green: value.green,
+                blue: value.blue,
+                opacity: value.alpha
+            )
+        }
+    }
+
+    private func renderFilteredImage(
+        fillColor: Color,
+        sourceImageSize: CGSize,
+        primitives: [SVGFilterPrimitive]
+    ) -> CGImage? {
+        return SVGFilterImageRenderer.renderFilteredImage(
+            path: Path(CGRect(origin: .zero, size: sourceImageSize)),
+            fillColor: fillColor,
+            fillStyle: FillStyle(eoFill: false),
+            strokeColor: nil,
+            strokeWidth: 0,
+            lineCap: .round,
+            lineJoin: .miter,
+            miterLimit: 10,
+            dash: [],
+            dashPhase: 0,
+            opacity: 1,
+            size: sourceImageSize,
+            primitives: primitives
+        )
     }
 }

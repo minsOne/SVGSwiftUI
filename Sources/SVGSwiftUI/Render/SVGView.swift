@@ -60,6 +60,9 @@ private struct SVGStaticPlaceholderView: View {
     @State private var parsingFailureMessage: String = ""
     @State private var baseResolvedStyles: [String: SVGResolvedNodeStyle] = [:]
     @State private var animationsByTargetID: [String: [SVGSMILAnimation]] = [:]
+    @State private var animatedNodeIDs: Set<String> = []
+    @State private var animatedTransformNodeIDs: Set<String> = []
+    @State private var staticDrawNodeLookup: [String: SVGDrawNode] = [:]
     @State private var animationStartDate: Date = .init()
 
     private var usesStaticConfiguration: Bool {
@@ -74,6 +77,9 @@ private struct SVGStaticPlaceholderView: View {
     }
 
     private var hasTransformAnimation: Bool {
+        if !animatedTransformNodeIDs.isEmpty {
+            return true
+        }
         for animations in animationsByTargetID.values {
             for animation in animations {
                 if animation.kind == .animateMotion {
@@ -259,6 +265,22 @@ private struct SVGStaticPlaceholderView: View {
             animationsByTargetID: animationsByTargetID,
             at: elapsed
         )
+        if !hasTransformAnimation {
+            if usesStaticConfiguration && canCacheDrawNodesForCurrentDocument && !cachedDrawNodes.isEmpty {
+                if !animatedNodeIDs.isEmpty {
+                    return buildAnimatedTargetedDrawNodes(
+                        from: document.nodes,
+                        resolved: resolvedStyles,
+                        filterDefinitions: document.filterDefinitions,
+                        clipPathCache: clipPathCache,
+                        inheritedTransform: .identity,
+                        inheritedClipPaths: [],
+                        staticNodesByID: staticDrawNodeLookup,
+                        canUsePathCache: shouldUsePathCache
+                    )
+                }
+            }
+        }
         return buildDrawNodes(
             from: document.nodes,
             resolved: resolvedStyles,
@@ -480,6 +502,8 @@ private struct SVGStaticPlaceholderView: View {
                 )
                 baseResolvedStyles = resolved
                 animationsByTargetID = cached.animationsByTargetID
+                animatedNodeIDs = Set(cached.animationsByTargetID.keys)
+                animatedTransformNodeIDs = collectAnimatedTransformNodeIDs(from: cached.animations)
                 animationStartDate = Date()
                 pathCache = canCache.shouldCachePathCache
                     ? buildPathCache(from: cached.nodes)
@@ -509,6 +533,8 @@ private struct SVGStaticPlaceholderView: View {
             )
             baseResolvedStyles = resolved
             animationsByTargetID = parsed.animationsByTargetID
+            animatedNodeIDs = Set(parsed.animationsByTargetID.keys)
+            animatedTransformNodeIDs = collectAnimatedTransformNodeIDs(from: parsed.animations)
             animationStartDate = Date()
             await cache.insert(parsed, for: key, cost: data.count)
             document = parsed
@@ -532,10 +558,13 @@ private struct SVGStaticPlaceholderView: View {
                 document = nil
             baseResolvedStyles = [:]
             animationsByTargetID = [:]
+            animatedNodeIDs = []
+            animatedTransformNodeIDs = []
             pathCache.removeAll()
             clipPathCache.removeAll()
             cachedConfigurationFingerprint = ""
             cachedDrawNodes.removeAll()
+            staticDrawNodeLookup.removeAll()
             await refreshCacheMetrics()
         }
     }
@@ -554,6 +583,7 @@ private struct SVGStaticPlaceholderView: View {
         if !usesStaticConfiguration || !canCache {
             cachedConfigurationFingerprint = ""
             cachedDrawNodes.removeAll()
+            staticDrawNodeLookup.removeAll()
             return
         }
 
@@ -566,7 +596,99 @@ private struct SVGStaticPlaceholderView: View {
             inheritedClipPaths: [],
             canUsePathCache: canCachePathCacheForCurrentDocument
         )
+        staticDrawNodeLookup = buildDrawNodeLookup(from: cachedDrawNodes)
         cachedConfigurationFingerprint = fingerprint
+    }
+
+    private func collectAnimatedTransformNodeIDs(
+        from animations: [SVGSMILAnimation]
+    ) -> Set<String> {
+        var output: Set<String> = []
+        for animation in animations {
+            let targetElementID: String = animation.targetElementID
+            if animation.kind == .animateMotion {
+                output.insert(targetElementID)
+                continue
+            }
+            if let attributeName = animation.attributeName {
+                let normalizedAttributeName: String = attributeName
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased()
+                if normalizedAttributeName == "transform" {
+                    output.insert(targetElementID)
+                }
+            }
+        }
+        return output
+    }
+
+    private func buildAnimatedTargetedDrawNodes(
+        from nodes: [SVGNode],
+        resolved: [String: SVGResolvedNodeStyle],
+        filterDefinitions: [String: SVGFilterDefinition],
+        clipPathCache: [String: CGPath],
+        inheritedTransform: CGAffineTransform,
+        inheritedClipPaths: [CGPath],
+        staticNodesByID: [String: SVGDrawNode],
+        canUsePathCache: Bool
+    ) -> [SVGDrawNode] {
+        var output: [SVGDrawNode] = []
+        for node in nodes {
+            let nodeID: String = node.nodeID
+            let nodeIsAnimated: Bool = animatedNodeIDs.contains(nodeID)
+            let nodeTransform: CGAffineTransform = transformBuilder.concatenate(
+                local: node.base.transform,
+                inherited: inheritedTransform
+            )
+            let maybeClipPath: CGPath? = clipPath(
+                from: node,
+                clipPathCache: clipPathCache
+            )
+            var activeClipPaths: [CGPath] = inheritedClipPaths
+            if let nextClipPath = maybeClipPath {
+                activeClipPaths.append(nextClipPath)
+            }
+
+            if nodeIsAnimated {
+                if let animatedNode = makeDrawNode(
+                    for: node,
+                    resolved: resolved[nodeID],
+                    filterDefinitions: filterDefinitions,
+                    inheritedTransform: nodeTransform,
+                    canUsePathCache: canUsePathCache,
+                    clipPaths: activeClipPaths
+                ) {
+                    output.append(animatedNode)
+                }
+            } else if let staticNode = staticNodesByID[nodeID] {
+                output.append(staticNode)
+            }
+
+            if !node.children.isEmpty {
+                let childNodes: [SVGDrawNode] = buildAnimatedTargetedDrawNodes(
+                    from: node.children,
+                    resolved: resolved,
+                    filterDefinitions: filterDefinitions,
+                    clipPathCache: clipPathCache,
+                    inheritedTransform: nodeTransform,
+                    inheritedClipPaths: activeClipPaths,
+                    staticNodesByID: staticNodesByID,
+                    canUsePathCache: canUsePathCache
+                )
+                output.append(contentsOf: childNodes)
+            }
+        }
+        return output
+    }
+
+    private func buildDrawNodeLookup(
+        from drawNodes: [SVGDrawNode]
+    ) -> [String: SVGDrawNode] {
+        var output: [String: SVGDrawNode] = [:]
+        for drawNode in drawNodes {
+            output[drawNode.id] = drawNode
+        }
+        return output
     }
 
     @MainActor

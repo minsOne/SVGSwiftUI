@@ -2,6 +2,33 @@
 
 ## 2026-02-16
 
+### Session 81
+- 작업: `SMIL 로드맵` Step 5 `TimelineView` 기반 갱신 경로 및 offscreen/필터 통합 완료
+- 완료:
+  - `SVGView`에서 애니메이션 대상 노드만 재빌드하고 비애니메이션 노드는 static 캐시 lookup을 재사용하도록 고도화.
+  - 오프스크린 필터 경로에서 `fill/stroke`가 애니메이션 시 갱신되어 렌더되는지 검증을 위한 회귀 테스트를 추가.
+  - 테스트에서 컬러 애니메이션 + 필터 체인 합성(최종 결과 비교) 통과를 보장.
+- 검증:
+  - `swift test --filter SVGFilterImageRendererTests --no-parallel` (12 tests, 0 failures)
+  - `swift test --filter SVGParserTests --no-parallel` (62 tests, 0 failures)
+  - `swift test --no-parallel` (199 tests, 0 failures)
+- 다음 액션:
+  - Step 5 완료 후 `TASK_BOARD` 상태 동기화 및 UI/데모에서 offscreen+animated 필터 케이스 수동 점검 항목 추가
+
+### Session 80
+- 작업: `SMIL 로드맵` 항목 2 `노드에 애니메이션 참조 연결` 진행
+- 완료:
+  - `SVGBaseNode`에 `animationReferences: [SVGSMILAnimationBinding]`를 추가해 노드-애니메이션 연결 슬롯 보강.
+  - 파서 후처리로 SMIL 애니메이션 인덱스 바인딩을 노드 `nodeID`로 매핑하고, 노드 트리에 주입.
+  - 재배치(embedded image rebase) 시 기존 애니메이션 참조 전달 로직 유지.
+  - `SVGParserTests`에 `testNodeStoresSMILAnimationReferences` 추가.
+  - `docs/SMIL_ROADMAP.md`의 2단계 체크박스 완료 처리.
+- 검증:
+  - `swift test --filter SVGParserTests/testNodeStoresSMILAnimationReferences --no-parallel`
+  - `swift test --filter SVGParserTests --no-parallel`
+- 다음 액션:
+  - 2단계 완료 전환을 기준으로 `M1-4`~`M1-10` 산출물과 API 영향 범위 재검토.
+
 ### Session 79
 - 작업: `D1-5` W3C/WebKit 연계 강화 정합성 자동 점검
 - 완료:

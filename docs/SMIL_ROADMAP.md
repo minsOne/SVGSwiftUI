@@ -41,7 +41,7 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
     - `Sendable`, Equatable 성질 유지.
     - 단일 노드의 다중 애니메이션 묶음 표현 가능.
 
-- [ ] 노드에 애니메이션 참조 연결
+- [x] 노드에 애니메이션 참조 연결
   - `SVGBaseNode` 또는 노드 wrapper에 `animationReferences`/`animations` 필드 추가.
   - `id/targetAttribute` 기반 바인딩 구조 설계.
   - 완료 기준:
@@ -122,12 +122,12 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
 
 ## 5) 렌더/성능 안정화
 
-- [ ] `TimelineView` 기반 갱신 경로 정리
+- [x] `TimelineView` 기반 갱신 경로 정리
   - animation 대상만 업데이트하고 non-animated 경로는 기존 static cache 유지.
   - 완료 기준:
     - static 렌더 성능 baseline 대비 회귀 없음(기존 벤치마크 기준).
 
-- [ ] offscreen/필터 통합
+- [x] offscreen/필터 통합
   - 필터 적용 경로에서 animated fill/stroke/transform가 반영되도록 수정.
   - 완료 기준:
     - 필터+애니메이션 샘플 1종 통합 테스트.

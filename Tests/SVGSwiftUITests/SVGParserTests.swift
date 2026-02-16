@@ -802,6 +802,45 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(document.animationsByTargetID[circleTargetID]?.count, 1)
     }
 
+    func testNodeStoresSMILAnimationReferences() throws {
+        let svg = """
+        <svg width='120' height='120'>
+          <g id='target-group'>
+            <animate attributeName='opacity' from='0' to='1' dur='2s'/>
+          </g>
+          <circle>
+            <animateTransform attributeName='transform' type='rotate' from='0' to='360' dur='4s'/>
+          </circle>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let targetGroup = try XCTUnwrap(groupNode(id: "target-group", in: document))
+        let groupRefs = targetGroup.base.animationReferences
+        XCTAssertEqual(groupRefs.count, 1)
+        guard let groupBinding = groupRefs.first else {
+            return XCTFail("Expected one animation binding on target-group node")
+        }
+        XCTAssertEqual(
+            document.animations[groupBinding.animationIndex].attributeName,
+            "opacity"
+        )
+
+        let allShapes = allNodes(in: document).compactMap { node -> SVGShapeNode? in
+            if case .shape(let shape) = node, shape.kind == .circle {
+                return shape
+            }
+            return nil
+        }
+        let circle = try XCTUnwrap(allShapes.first(where: { $0.base.id == nil }))
+        let circleRefs = circle.base.animationReferences
+        XCTAssertEqual(circleRefs.count, 1)
+        let circleBinding = try XCTUnwrap(circleRefs.first)
+        XCTAssertEqual(document.animations[circleBinding.animationIndex].kind, .animateTransform)
+        XCTAssertEqual(document.animations[circleBinding.animationIndex].attributeName, "transform")
+        XCTAssertEqual(document.animations[circleBinding.animationIndex].type, "rotate")
+    }
+
     func testParseSMILCalcModeAndUnsupportedTimeSyntaxFallsBackToDefaults() throws {
         let svg = """
         <svg>
@@ -1562,6 +1601,15 @@ final class SVGParserTests: XCTestCase {
         for animation in document.animations {
             if animation.targetElementID == targetID && animation.kind == kind {
                 return animation
+            }
+        }
+        return nil
+    }
+
+    private func groupNode(id: String, in document: SVGDocument) -> SVGGroupNode? {
+        for node in allNodes(in: document) {
+            if case .group(let group) = node, group.base.id == id {
+                return group
             }
         }
         return nil

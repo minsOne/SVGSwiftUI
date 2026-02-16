@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (Session 79)
+Last Updated: 2026-02-16 (Session 81)
 
 ## Status Legend
 - `todo`: not started
@@ -126,6 +126,8 @@ Last Updated: 2026-02-16 (Session 79)
 | M1-8 | SMIL | W3C/웹 브라우저 비교 시나리오 연동 | done | `browser-oracle` manifest 정합성 및 SMIL 샘플 대상 baseline 비교 케이스 추가 |
 | M1-9 | SMIL | keyTimes/keySplines 샘플러 정교화 | done | 시간 샘플(`SVGSMILEngineTimelineSample`)으로 segment progress 및 spline 보간 정합화 |
 | M1-10 | SMIL | 애니메이션 해결값 병합기(동일 속성 충돌) | done | 동일 target의 동일 속성/transform 충돌은 마지막 활성 애니메이션을 우선 적용하도록 병합 규칙 구현 및 회귀 테스트 추가 |
+| M1-11 | SMIL | `TimelineView` 갱신 경로 정리 및 캐시 분리 | done | 애니메이션 대상만 재빌드하고 비애니메이션은 static 캐시 lookup 재사용 |
+| M1-12 | SMIL | 오프스크린/필터와 애니메이션 통합 | done | 오프스크린 필터 체인에서 fill/stroke 변형 값 반영 검증 회귀 테스트 추가 |
 
 ## Anti-Duplication Rules
 1. 작업 시작 전 해당 Task ID를 `in_progress`로 먼저 바꾼다.

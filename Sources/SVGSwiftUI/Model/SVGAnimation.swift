@@ -5,6 +5,11 @@ enum SVGSMILAnimationKind: String, Sendable, Equatable {
     case animateMotion = "animatemotion"
 }
 
+struct SVGSMILAnimationBinding: Sendable, Equatable, Hashable {
+    let animationIndex: Int
+    let targetAttribute: String?
+}
+
 enum SVGSMILAnimationValueInterpolation: String, Sendable, Equatable {
     case discrete
     case linear

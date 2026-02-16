@@ -146,16 +146,152 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             state: embeddedImageState,
             unsupportedFeatures: &unsupportedFeatures
         )
+        let animationBindingByTargetID: [String: [SVGSMILAnimationBinding]] = groupAnimationBindingsByTarget(
+            from: parsedDocument.animations
+        )
+        let linkedNodes: [SVGNode] = linkAnimationReferences(
+            in: expandedNodes,
+            using: animationBindingByTargetID
+        )
         return SVGDocument(
             size: parsedDocument.size,
             viewBox: parsedDocument.viewBox,
-            nodes: expandedNodes,
+            nodes: linkedNodes,
             animations: parsedDocument.animations,
             styleRules: parsedDocument.styleRules,
             clipPaths: parsedDocument.clipPaths,
             filterDefinitions: parsedDocument.filterDefinitions,
             unsupportedFeatures: unsupportedFeatures
         )
+    }
+
+    private func groupAnimationBindingsByTarget(
+        from animations: [SVGSMILAnimation]
+    ) -> [String: [SVGSMILAnimationBinding]] {
+        var output: [String: [SVGSMILAnimationBinding]] = [:]
+
+        for (index, animation) in animations.enumerated() {
+            let normalizedAttribute: String? = animation.attributeName?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+
+            let binding = SVGSMILAnimationBinding(
+                animationIndex: index,
+                targetAttribute: normalizedAttribute
+            )
+            append(binding, toTargetID: animation.targetElementID, in: &output)
+
+            if animation.targetSyntheticID != animation.targetElementID {
+                append(binding, toTargetID: animation.targetSyntheticID, in: &output)
+            }
+        }
+        return output
+    }
+
+    private func append(
+        _ binding: SVGSMILAnimationBinding,
+        toTargetID targetID: String,
+        in bindingsByTargetID: inout [String: [SVGSMILAnimationBinding]]
+    ) {
+        var bindings = bindingsByTargetID[targetID, default: []]
+        if !bindings.contains(binding) {
+            bindings.append(binding)
+        }
+        bindingsByTargetID[targetID] = bindings
+    }
+
+    private func linkAnimationReferences(
+        in nodes: [SVGNode],
+        using bindingsByTargetID: [String: [SVGSMILAnimationBinding]]
+    ) -> [SVGNode] {
+        return nodes.map {
+            linkAnimationReferences(in: $0, using: bindingsByTargetID)
+        }
+    }
+
+    private func linkAnimationReferences(
+        in node: SVGNode,
+        using bindingsByTargetID: [String: [SVGSMILAnimationBinding]]
+    ) -> SVGNode {
+        let nodeID: String = node.nodeID
+        let references: [SVGSMILAnimationBinding] = bindingsByTargetID[nodeID] ?? []
+
+        switch node {
+        case .group(let sourceGroup):
+            let linkedChildren = sourceGroup.children.map {
+                linkAnimationReferences(in: $0, using: bindingsByTargetID)
+            }
+            let updatedBase = SVGBaseNode(
+                id: sourceGroup.base.id,
+                syntheticID: sourceGroup.base.syntheticID,
+                style: sourceGroup.base.style,
+                transform: sourceGroup.base.transform,
+                attributes: sourceGroup.base.attributes,
+                animationReferences: references
+            )
+            return .group(.init(base: updatedBase, children: linkedChildren))
+        case .path(let sourcePath):
+            let updatedBase = SVGBaseNode(
+                id: sourcePath.base.id,
+                syntheticID: sourcePath.base.syntheticID,
+                style: sourcePath.base.style,
+                transform: sourcePath.base.transform,
+                attributes: sourcePath.base.attributes,
+                animationReferences: references
+            )
+            return .path(.init(
+                base: updatedBase,
+                pathData: sourcePath.pathData,
+                commands: sourcePath.commands
+            ))
+        case .rasterImage(let sourceImage):
+            let updatedBase = SVGBaseNode(
+                id: sourceImage.base.id,
+                syntheticID: sourceImage.base.syntheticID,
+                style: sourceImage.base.style,
+                transform: sourceImage.base.transform,
+                attributes: sourceImage.base.attributes,
+                animationReferences: references
+            )
+            return .rasterImage(.init(
+                base: updatedBase,
+                x: sourceImage.x,
+                y: sourceImage.y,
+                width: sourceImage.width,
+                height: sourceImage.height,
+                mediaType: sourceImage.mediaType
+            ))
+        case .shape(let sourceShape):
+            let updatedBase = SVGBaseNode(
+                id: sourceShape.base.id,
+                syntheticID: sourceShape.base.syntheticID,
+                style: sourceShape.base.style,
+                transform: sourceShape.base.transform,
+                attributes: sourceShape.base.attributes,
+                animationReferences: references
+            )
+            return .shape(.init(
+                base: updatedBase,
+                kind: sourceShape.kind,
+                values: sourceShape.values,
+                points: sourceShape.points
+            ))
+        case .text(let sourceText):
+            let updatedBase = SVGBaseNode(
+                id: sourceText.base.id,
+                syntheticID: sourceText.base.syntheticID,
+                style: sourceText.base.style,
+                transform: sourceText.base.transform,
+                attributes: sourceText.base.attributes,
+                animationReferences: references
+            )
+            return .text(.init(
+                base: updatedBase,
+                x: sourceText.x,
+                y: sourceText.y,
+                content: sourceText.content
+            ))
+        }
     }
 
     private func decodeSVGText(from data: Data) throws -> String {
@@ -658,7 +794,8 @@ struct SVGParser: SVGDocumentParsing, Sendable {
             syntheticID: rebasedID,
             style: sourceBase.style,
             transform: sourceBase.transform,
-            attributes: sourceBase.attributes
+            attributes: sourceBase.attributes,
+            animationReferences: sourceBase.animationReferences
         )
     }
 
