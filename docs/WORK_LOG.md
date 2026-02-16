@@ -2,6 +2,22 @@
 
 ## 2026-02-16
 
+### Session 82
+- 작업: `SMIL 로드맵` Step 5(에러·미지원 처리) / Step 6(파서 테스트) 마무리
+- 완료:
+  - SMIL 파서 `appendSMILAnimation`에서 `attributeName` 기반 미지원 속성을 추적하도록 정리.
+  - 미지원 SMIL 속성은 `smil:<요소>:attribute:<속성명>` 형식으로 `unsupportedFeatures` 누적.
+  - 기존 렌더/파싱 경로는 중단하지 않고 애니메이션 생성은 유지(폴백 동작).
+  - `Tests/SVGSwiftUITests/SVGParserTests.swift`에 fallback 검증 테스트 2건 추가:
+    - `testParseTracksUnsupportedSMILAttributeAsFallback`
+    - `testParseDoesNotTrackSupportedSMILAttributeAsUnsupported`
+  - `docs/SMIL_ROADMAP.md`에서 Step 5/6 항목 완료 처리.
+- 검증:
+  - `swift test --filter SVGParserTests --no-parallel` (64 tests, 0 failures)
+  - `swift test --filter SVGSMILEngineTests --no-parallel` (17 tests, 0 failures)
+- 다음 액션:
+  - Step 7(문서화/배포 체크) 반영 전, `SVGSMILEngine` 미지원 속성 집계를 사용자 노출/데모 보고 포맷 정합성 검토
+
 ### Session 81
 - 작업: `SMIL 로드맵` Step 5 `TimelineView` 기반 갱신 경로 및 offscreen/필터 통합 완료
 - 완료:

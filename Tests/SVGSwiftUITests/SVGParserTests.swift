@@ -875,6 +875,40 @@ final class SVGParserTests: XCTestCase {
         XCTAssertEqual(document.unsupportedFeatures["element:animatecolor"], 1)
     }
 
+    func testParseTracksUnsupportedSMILAttributeAsFallback() throws {
+        let svg = """
+        <svg>
+          <rect id='target' x='0' y='0' width='10' height='10'>
+            <animate attributeName='stroke-dasharray' values='4;8;2' dur='3s'/>
+          </rect>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let animation = animation(forTargetID: "target", in: document, kind: .animate)
+
+        XCTAssertNotNil(animation)
+        XCTAssertEqual(document.unsupportedFeatures["smil:animate:attribute:stroke-dasharray"], 1)
+        XCTAssertEqual(animation?.attributeName, "stroke-dasharray")
+    }
+
+    func testParseDoesNotTrackSupportedSMILAttributeAsUnsupported() throws {
+        let svg = """
+        <svg>
+          <rect id='target' x='0' y='0' width='10' height='10'>
+            <set attributeName=' transform ' to='1' dur='1s'/>
+          </rect>
+        </svg>
+        """
+
+        let document = try parser.parse(source: .string(svg))
+        let animation = animation(forTargetID: "target", in: document, kind: .set)
+
+        XCTAssertNotNil(animation)
+        XCTAssertNil(document.unsupportedFeatures["smil:set:attribute:transform"])
+        XCTAssertEqual(animation?.attributeName, " transform ")
+    }
+
     func testParseReadsFilterPrimitiveChainInputsAndResults() throws {
         let svg = """
         <svg>

@@ -1129,6 +1129,26 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
     ) {
         let targetElementID = targetFrame.base.id ?? targetFrame.base.syntheticID
         let normalizedAttributes = normalizeAttributes(source.attributes)
+        let normalizedAttributeName: String? = {
+            guard let raw = normalizedAttributes["attributename"] else {
+                return nil
+            }
+            let normalized = raw
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+            if normalized.isEmpty {
+                return nil
+            }
+            return normalized
+        }()
+
+        if let normalizedAttributeName {
+            if !isSupportedSMILAttributeName(normalizedAttributeName, for: kind) {
+                let featureKey: String = "smil:\(kind.rawValue):attribute:\(normalizedAttributeName)"
+                recordUnsupportedFeature(featureKey)
+            }
+        }
+
         let timing = parseSMILAnimationTiming(attributes: normalizedAttributes)
         let valueInterpolation: SVGSMILAnimationValueInterpolation = parseSMILInterpolation(
             from: normalizedAttributes["calcmode"]
@@ -1156,6 +1176,36 @@ private final class SVGXMLDocumentParser: NSObject, XMLParserDelegate {
             byValue: normalizedAttributes["by"]
         )
         smilAnimations.append(animation)
+    }
+
+    private func isSupportedSMILAttributeName(
+        _ attributeName: String,
+        for kind: SVGSMILAnimationKind
+    ) -> Bool {
+        switch kind {
+        case .animate,
+             .set:
+            return isSupportedSVGStyleAnimationAttribute(attributeName)
+        case .animateTransform:
+            return attributeName == "transform"
+        case .animateMotion:
+            return false
+        }
+    }
+
+    private func isSupportedSVGStyleAnimationAttribute(_ raw: String) -> Bool {
+        return SVGSMILStyleAnimationAttribute(rawValue: raw) != nil
+    }
+
+    private enum SVGSMILStyleAnimationAttribute: String {
+        case opacity
+        case fillOpacity = "fill-opacity"
+        case strokeOpacity = "stroke-opacity"
+        case strokeWidth = "stroke-width"
+        case fontSize = "font-size"
+        case fill
+        case stroke
+        case transform
     }
 
     private func parseSMILAnimationTiming(attributes: [String: String]) -> SVGSMILAnimationTiming {
