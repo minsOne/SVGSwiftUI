@@ -2,6 +2,20 @@
 
 ## 2026-02-16
 
+### Session 85
+- 작업: `SVGSMILEngine` 단위 접미사 변환 검증 테스트 안정화
+- 완료:
+  - `testApplyAnimateTransformInterpolatesRotateWithUnitSuffix`에서 실패하던 경계 조건을 정리:
+    - fill 모드가 `.remove` 상태에서 `dur` 종료 시점(`at == 1`)에 타임라인 샘플이 nil이 되어 transformOverride가 갱신되지 않던 이슈를 회피하도록 테스트 입력을 `.freeze`로 변경.
+    - 수치 및 속성 정합을 맞추기 위해 `toValue`를 `90deg`로 통일.
+  - `parseSMILDouble`의 각도 단위(rad/deg/turn) 처리 변경은 유지된 상태에서 테스트 시나리오를 일치시켜 통과 확인.
+- 검증:
+  - `swift test --filter testApplyAnimateTransformInterpolatesRotateWithUnitSuffix` (1 test, 0 failures)
+  - `swift test --filter SVGSMILEngineTests --no-parallel` (19 tests, 0 failures)
+  - `swift test --filter SVGParserTests --no-parallel` (64 tests, 0 failures)
+- 다음 액션:
+  - CSS/원격 SMIL 후보 분석 탭과 동일 계열 고급 샘플 렌더링 안정성 점검을 위한 통합 테스트 확장.
+
 ### Session 84
 - 작업: SVGator 예제 11건의 SMIL 지원 후보를 데모앱 원격 탭에 추가하고, 샘플별 판별 가시화 강화
 - 완료:

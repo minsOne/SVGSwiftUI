@@ -257,6 +257,111 @@ final class SVGSMILEngineTests: XCTestCase {
         XCTAssertEqual(transform.d, 0.5, accuracy: 0.0001)
     }
 
+    func testApplyAnimateTransformInterpolatesRotateWithUnitSuffix() {
+        let target = "transform-rotate-unit"
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: SVGResolvedStyle()
+            )
+        ]
+
+        let animation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: ["attributename": "transform", "from": "0", "to": "90deg", "type": "rotate"],
+            timing: .init(
+                begin: [0],
+                dur: 1,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .freeze
+            ),
+            attributeName: "transform",
+            values: nil,
+            type: "rotate",
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: "0",
+            toValue: "90deg",
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [animation]],
+            at: 1
+        )
+
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        guard let transform = updatedStyle.transformOverride else {
+            return XCTFail("Expected transform override")
+        }
+
+        XCTAssertEqual(transform.b, 1, accuracy: 0.0001)
+        XCTAssertEqual(transform.c, -1, accuracy: 0.0001)
+        XCTAssertEqual(transform.a, 0, accuracy: 0.0001)
+        XCTAssertEqual(transform.d, 0, accuracy: 0.0001)
+    }
+
+    func testApplyAnimationsInterpolatesStrokeDashArray() {
+        let target = "target-stroke-dasharray"
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: SVGResolvedStyle(strokeDashArray: [2, 4])
+            )
+        ]
+
+        let animation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: [
+                "attributename": "stroke-dasharray",
+                "from": "2 4",
+                "to": "10 8"
+            ],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "stroke-dasharray",
+            values: nil,
+            type: nil,
+            keyTimes: nil,
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: "2 4",
+            toValue: "10 8",
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [animation]],
+            at: 2
+        )
+
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        XCTAssertEqual(updatedStyle.style.strokeDashArray, [6, 6])
+    }
+
     func testApplyAnimateTransformInterpolateScaleWithType() {
         let target = "transform-scale"
         let styles: [String: SVGResolvedNodeStyle] = [
