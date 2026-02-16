@@ -648,4 +648,104 @@ final class SVGSMILEngineTests: XCTestCase {
         XCTAssertEqual(transform.c, 1, accuracy: 0.001)
         XCTAssertEqual(transform.d, 0, accuracy: 0.001)
     }
+
+    func testApplyKeyTimesControlsSegmentedInterpolation() {
+        let target = "keyTimes-opacity"
+        let baseStyle = SVGResolvedStyle(opacity: 0)
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: baseStyle
+            )
+        ]
+
+        let animation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: [
+                "attributename": "opacity",
+                "values": "0;100;100"
+            ],
+            timing: .init(
+                begin: [0],
+                dur: 4,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "opacity",
+            values: .init(kind: "values", raw: "0;100;100"),
+            type: nil,
+            keyTimes: "0;0.5;1",
+            keySplines: nil,
+            interpolation: .linear,
+            fromValue: nil,
+            toValue: nil,
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [animation]],
+            at: 1
+        )
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        XCTAssertEqual(updatedStyle.style.opacity, 50, accuracy: 0.01)
+    }
+
+    func testApplyKeySplinesAdjustsSegmentProgress() {
+        let target = "keySpline-opacity"
+        let baseStyle = SVGResolvedStyle(opacity: 0)
+        let styles: [String: SVGResolvedNodeStyle] = [
+            target: SVGResolvedNodeStyle(
+                nodeID: target,
+                element: .rect,
+                style: baseStyle
+            )
+        ]
+
+        let animation = SVGSMILAnimation(
+            id: nil,
+            kind: .animate,
+            targetElementID: target,
+            targetSyntheticID: target,
+            attributes: [
+                "attributename": "opacity",
+                "values": "0;100"
+            ],
+            timing: .init(
+                begin: [0],
+                dur: 2,
+                end: [],
+                repeatCount: nil,
+                repeatDur: nil,
+                fill: .remove
+            ),
+            attributeName: "opacity",
+            values: .init(kind: "values", raw: "0;100"),
+            type: nil,
+            keyTimes: "0;1",
+            keySplines: "0.2 0.5 0.2 1",
+            interpolation: .spline,
+            fromValue: nil,
+            toValue: nil,
+            byValue: nil
+        )
+
+        let animated = SVGSMILEngine.applyAnimations(
+            to: styles,
+            animationsByTargetID: [target: [animation]],
+            at: 0.5
+        )
+        guard let updatedStyle = animated[target] else {
+            return XCTFail("Expected animated target")
+        }
+        XCTAssertEqual(updatedStyle.style.opacity, 64.7551586836, accuracy: 0.01)
+    }
 }

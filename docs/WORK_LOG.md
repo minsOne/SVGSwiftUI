@@ -2,6 +2,26 @@
 
 ## 2026-02-16
 
+### Session 76
+- 작업: `M1-4` 샘플러 보강 및 keyTimes/keySplines 시점 테스트 추가
+- 완료:
+  - `SVGSMILEngine` 시간 계산기를 `SVGSMILEngineTimelineSample` 기반으로 정규화:
+    - 기존 `timelineProgress`에서 `keyTimes`, `keySplines`를 함께 다루는 `timelineSample(...)` 경로 정리
+    - `timelineSample`을 사용해 `values` 보간(숫자/색상/transform)에 segment-level 진행율 적용
+  - `apply`/`sample*` 경로에서 타입 정합 수정:
+    - `timelineProgress` 잘못된 호출 정리 후 `timelineSample` 또는 `sample.timelineProgress` 사용으로 일치화
+    - `parseKeySplines`의 `split(whereSeparator:)` 클로저 파라미터를 명시형으로 수정
+    - `cubicBezierDerivative` 수식을 정식 형태로 정리
+  - 테스트 강화:
+    - `testApplyKeyTimesControlsSegmentedInterpolation` 추가
+    - `testApplyKeySplinesAdjustsSegmentProgress` 추가
+- 검증:
+  - `swift test --filter SVGSMILEngineTests --no-parallel` (14 tests, 0 failures)
+  - `swift test --no-parallel` (193 tests, 0 failures)
+- 다음 액션:
+  - 샘플러/보간기 단계를 다음 단계(M1-5+ 확장 또는 M1-9)로 분리하고
+    animateMotion 반복/이벤트 begin/복합 속성 우선순위 병합 정책 정교화
+
 ### Session 75
 - 작업: `D1-4` 브라우저 기준 비교 확장 마무리
 - 완료:

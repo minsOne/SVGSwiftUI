@@ -90,11 +90,13 @@ W3C/WebKit 수준으로 정합성을 높이되 기본 범위를 명확히 분리
 
 ## 4) 애니메이션 엔진
 
-- [ ] 샘플러(시간 계산기) 구현
-  - 공통 함수 `sample(value: timing: at:) -> SVGAnimationValue`
-  - `duration`, `begin`, `repeat`, `keyTimes`, `keySplines` 처리.
+- [x] 샘플러(시간 계산기) 구현
+  - 공통 `SVGSMILEngineTimelineSample`으로 기본 진행율 + 구간 진행율 분리.
+  - `duration`, `begin`, `repeat`, `keyTimes`, `keySplines`를 단일 경로로 정규화.
   - 완료 기준:
-    - 순수 단위 테스트에서 수치 오차 범위 내 일치.
+    - `testApplyKeyTimesControlsSegmentedInterpolation`
+    - `testApplyKeySplinesAdjustsSegmentProgress`
+    - 193개 전체 테스트 통과.
 
 - [x] 값 보간기 구현 (M1-5)
   - scalar, length, color, point, transform matrix 보간.

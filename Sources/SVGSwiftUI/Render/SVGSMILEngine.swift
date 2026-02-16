@@ -62,6 +62,13 @@ private func parseStaticSMILDouble(_ rawValue: String) -> Double? {
     return Double(normalized)
 }
 
+private struct SVGSMILEngineTimelineSample {
+    let timelineProgress: Double
+    let segmentProgress: Double
+    let segmentIndex: Int
+    let usesKeyTimes: Bool
+}
+
 struct SVGSMILEngine {
     private static let millisecondsPerSecond: Double = 1000
     private static let motionPathParser: SVGPathDataParser = SVGPathDataParser()
@@ -138,9 +145,13 @@ struct SVGSMILEngine {
             return false
         }
 
-        guard let progress = timelineProgress(
+        guard let sample = timelineSample(
             for: animation.timing,
             elapsed: elapsed,
+            valueCount: nil,
+            interpolation: animation.interpolation,
+            keyTimes: animation.keyTimes,
+            keySplines: animation.keySplines,
             fillMode: animation.timing.fill
         ) else {
             return false
@@ -158,7 +169,8 @@ struct SVGSMILEngine {
             if let animatedOpacity = sampleNumericValue(
                 from: currentOpacity,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.opacity = animatedOpacity
                 return true
@@ -181,7 +193,8 @@ struct SVGSMILEngine {
             if let animatedValue = sampleNumericValue(
                 from: currentValue,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.fillOpacity = animatedValue
                 return true
@@ -201,7 +214,8 @@ struct SVGSMILEngine {
             if let animatedValue = sampleNumericValue(
                 from: currentValue,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.strokeOpacity = animatedValue
                 return true
@@ -221,7 +235,8 @@ struct SVGSMILEngine {
             if let animatedValue = sampleNumericValue(
                 from: currentValue,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.strokeWidth = max(animatedValue, 0)
                 return true
@@ -238,7 +253,8 @@ struct SVGSMILEngine {
             if let animatedValue = sampleNumericValue(
                 from: currentValue,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.fontSize = animatedValue
                 return true
@@ -252,7 +268,8 @@ struct SVGSMILEngine {
             if let animatedFill = samplePaintValue(
                 baseValue: style.fill,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.fill = animatedFill
                 return true
@@ -266,7 +283,8 @@ struct SVGSMILEngine {
             if let animatedStroke = samplePaintValue(
                 baseValue: style.stroke,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 style.stroke = animatedStroke
                 return true
@@ -287,7 +305,8 @@ struct SVGSMILEngine {
             if let animatedTransform = sampleTransformValue(
                 baseValue: transformOverride ?? .identity,
                 animation: animation,
-                progress: progress
+                elapsed: elapsed,
+                sample: sample
             ) {
                 transformOverride = animatedTransform
                 return true
@@ -301,9 +320,13 @@ struct SVGSMILEngine {
         transformOverride: inout CGAffineTransform?,
         elapsed: TimeInterval
     ) -> Bool {
-        guard let progress = timelineProgress(
+        guard let sample = timelineSample(
             for: animation.timing,
             elapsed: elapsed,
+            valueCount: nil,
+            interpolation: animation.interpolation,
+            keyTimes: animation.keyTimes,
+            keySplines: animation.keySplines,
             fillMode: animation.timing.fill
         ) else {
             return false
@@ -316,7 +339,7 @@ struct SVGSMILEngine {
 
         if let nextTransform: CGAffineTransform = motionTransform(
             for: animation,
-            progress: progress,
+            progress: sample.timelineProgress,
             rotateMode: rotateMode
         ) {
             transformOverride = nextTransform
@@ -1012,7 +1035,8 @@ struct SVGSMILEngine {
     private static func samplePaintValue(
         baseValue: SVGPaint,
         animation: SVGSMILAnimation,
-        progress: Double
+        elapsed: TimeInterval,
+        sample: SVGSMILEngineTimelineSample
     ) -> SVGPaint? {
         let rawValues: [String] = parseAnimationValues(animation.values?.raw)
         if rawValues.count >= 2 {
@@ -1020,9 +1044,22 @@ struct SVGSMILEngine {
             guard paints.count >= 2 else {
                 return nil
             }
-            return interpolatePaint(paints, progress: progress)
+            let timelineSample = timelineSample(
+                for: animation.timing,
+                elapsed: elapsed,
+                valueCount: paints.count,
+                interpolation: animation.interpolation,
+                keyTimes: animation.keyTimes,
+                keySplines: animation.keySplines,
+                fillMode: animation.timing.fill
+            ) ?? sample
+            return interpolatePaint(
+                paints,
+                sample: timelineSample
+            )
         }
 
+        let progress: Double = sample.timelineProgress
         if let fromColor = parsePaint(animation.fromValue), let toColor = parsePaint(animation.toValue) {
             return interpolatePaint(fromColor, to: toColor, progress: progress)
         }
@@ -1038,15 +1075,29 @@ struct SVGSMILEngine {
     private static func sampleNumericValue(
         from baseValue: Double,
         animation: SVGSMILAnimation,
-        progress: Double
+        elapsed: TimeInterval,
+        sample: SVGSMILEngineTimelineSample
     ) -> Double? {
         let rawValues: [String] = parseAnimationValues(animation.values?.raw)
         if rawValues.count >= 2 {
             let numbers = parseSMILNumbers(rawValues)
             if numbers.count >= 2 {
-                return interpolateNumber(values: numbers, progress: progress)
+                let timelineSample = timelineSample(
+                    for: animation.timing,
+                    elapsed: elapsed,
+                    valueCount: numbers.count,
+                    interpolation: animation.interpolation,
+                    keyTimes: animation.keyTimes,
+                    keySplines: animation.keySplines,
+                    fillMode: animation.timing.fill
+                ) ?? sample
+                return interpolateNumber(
+                    values: numbers,
+                    sample: timelineSample
+                )
             }
         }
+        let progress: Double = sample.timelineProgress
         let fromValue: Double = if let rawFrom = animation.fromValue {
             parseSMILDouble(rawFrom) ?? baseValue
         } else {
@@ -1074,7 +1125,8 @@ struct SVGSMILEngine {
     private static func sampleTransformValue(
         baseValue: CGAffineTransform,
         animation: SVGSMILAnimation,
-        progress: Double
+        elapsed: TimeInterval,
+        sample: SVGSMILEngineTimelineSample
     ) -> CGAffineTransform? {
         let rawValues: [String] = parseAnimationValues(animation.values?.raw)
         if rawValues.count >= 2 {
@@ -1083,10 +1135,23 @@ struct SVGSMILEngine {
                 type: animation.type
             )
             if values.count >= 2 {
-                return interpolateTransform(values, progress: progress)
+                let timelineSample = timelineSample(
+                    for: animation.timing,
+                    elapsed: elapsed,
+                    valueCount: values.count,
+                    interpolation: animation.interpolation,
+                    keyTimes: animation.keyTimes,
+                    keySplines: animation.keySplines,
+                    fillMode: animation.timing.fill
+                ) ?? sample
+                return interpolateTransform(
+                    values,
+                    sample: timelineSample
+                )
             }
         }
 
+        let progress: Double = sample.timelineProgress
         if let from = parseTransformValue(
             animation.fromValue,
             type: animation.type
@@ -1126,6 +1191,29 @@ struct SVGSMILEngine {
         }
 
         return nil
+    }
+
+    private static func interpolateTransform(
+        _ transforms: [CGAffineTransform],
+        sample: SVGSMILEngineTimelineSample
+    ) -> CGAffineTransform {
+        if sample.usesKeyTimes {
+            let segmentIndex: Int = sample.segmentIndex
+            let segmentCount: Int = max(transforms.count - 1, 0)
+            if segmentCount == 0 {
+                return transforms.first ?? .identity
+            }
+            let safeSegment: Int = min(segmentIndex, segmentCount - 1)
+            return interpolateTransform(
+                transforms[safeSegment],
+                to: transforms[safeSegment + 1],
+                progress: sample.segmentProgress
+            )
+        }
+        return interpolateTransform(
+            transforms,
+            progress: sample.timelineProgress
+        )
     }
 
     private static func interpolateTransform(
@@ -1352,6 +1440,46 @@ struct SVGSMILEngine {
         return Swift.min(Swift.max(value, min), max)
     }
 
+    private static func timelineSample(
+        for timing: SVGSMILAnimationTiming,
+        elapsed: TimeInterval,
+        valueCount: Int?,
+        interpolation: SVGSMILAnimationValueInterpolation,
+        keyTimes: String?,
+        keySplines: String?,
+        fillMode: SVGSMILAnimationFill
+    ) -> SVGSMILEngineTimelineSample? {
+        guard let progress = timelineProgress(
+            for: timing,
+            elapsed: elapsed,
+            fillMode: fillMode
+        ) else {
+            return nil
+        }
+
+        guard
+            let targetValueCount: Int = valueCount,
+            targetValueCount >= 2,
+            let keyTimesValue: String = keyTimes,
+            let keyTimesProgress = applyKeyTimes(
+                progress,
+                targetValueCount: targetValueCount,
+                keyTimes: keyTimesValue,
+                interpolation: interpolation,
+                keySplines: keySplines
+            )
+        else {
+            return SVGSMILEngineTimelineSample(
+                timelineProgress: progress,
+                segmentProgress: progress,
+                segmentIndex: 0,
+                usesKeyTimes: false
+            )
+        }
+
+        return keyTimesProgress
+    }
+
     private static func timelineProgress(
         for timing: SVGSMILAnimationTiming,
         elapsed: TimeInterval,
@@ -1396,6 +1524,210 @@ struct SVGSMILEngine {
             return 1
         }
         return progress
+    }
+
+    private static func applyKeyTimes(
+        _ progress: Double,
+        targetValueCount: Int,
+        keyTimes: String,
+        interpolation: SVGSMILAnimationValueInterpolation,
+        keySplines: String?
+    ) -> SVGSMILEngineTimelineSample? {
+        let times: [Double] = parseSMILKeyTimes(keyTimes)
+        if times.count != targetValueCount {
+            return nil
+        }
+        if times.count < 2 {
+            return nil
+        }
+        let firstValue: Double = times.first ?? 0
+        let lastValue: Double = times.last ?? 1
+        if firstValue > 0 || lastValue < 1 {
+            return nil
+        }
+
+        let clampedProgress: Double = clamp(progress, min: 0, max: 1)
+        if clampedProgress <= 0 {
+            return SVGSMILEngineTimelineSample(
+                timelineProgress: clampedProgress,
+                segmentProgress: 0,
+                segmentIndex: 0,
+                usesKeyTimes: true
+            )
+        }
+        if clampedProgress >= 1 {
+            return SVGSMILEngineTimelineSample(
+                timelineProgress: clampedProgress,
+                segmentProgress: 1,
+                segmentIndex: times.count - 2,
+                usesKeyTimes: true
+            )
+        }
+
+        for segmentIndex in 0 ..< (times.count - 1) {
+            let segmentStart: Double = times[segmentIndex]
+            let segmentEnd: Double = times[segmentIndex + 1]
+            if clampedProgress < segmentStart || clampedProgress > segmentEnd {
+                continue
+            }
+
+            let segmentLength: Double = segmentEnd - segmentStart
+            let segmentRange: Double = segmentLength == 0 ? 0 : (clampedProgress - segmentStart) / segmentLength
+            let rawSegmentProgress: Double = clamp(segmentRange, min: 0, max: 1)
+            let adjustedProgress: Double = applyKeySpline(
+                to: rawSegmentProgress,
+                segmentIndex: segmentIndex,
+                interpolation: interpolation,
+                keySplines: keySplines
+            )
+            return SVGSMILEngineTimelineSample(
+                timelineProgress: clampedProgress,
+                segmentProgress: adjustedProgress,
+                segmentIndex: segmentIndex,
+                usesKeyTimes: true
+            )
+        }
+
+        return SVGSMILEngineTimelineSample(
+            timelineProgress: clampedProgress,
+            segmentProgress: clampedProgress,
+            segmentIndex: 0,
+            usesKeyTimes: false
+        )
+    }
+
+    private static func applyKeySpline(
+        to progress: Double,
+        segmentIndex: Int,
+        interpolation: SVGSMILAnimationValueInterpolation,
+        keySplines: String?
+    ) -> Double {
+        let trimmedInterpolation: SVGSMILAnimationValueInterpolation = interpolation
+        if trimmedInterpolation != .spline {
+            return progress
+        }
+        guard let keySplinesValue = keySplines else {
+            return progress
+        }
+        let points: [Double] = parseKeySplines(keySplinesValue)
+        let splineIndex: Int = segmentIndex * 4
+        let splineCount = points.count / 4
+        if splineIndex < 0 || splineIndex + 3 >= points.count || splineCount <= segmentIndex {
+            return progress
+        }
+        let x1: Double = points[splineIndex]
+        let y1: Double = points[splineIndex + 1]
+        let x2: Double = points[splineIndex + 2]
+        let y2: Double = points[splineIndex + 3]
+        let safeProgress: Double = clamp(progress, min: 0, max: 1)
+        return cubicBezier(progress: safeProgress, x1: x1, y1: y1, x2: x2, y2: y2)
+    }
+
+    private static func parseSMILKeyTimes(_ raw: String) -> [Double] {
+        let values: [String] = raw
+            .split(separator: ";")
+            .map { value in
+                value.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            .filter { !$0.isEmpty }
+        return values.compactMap { parseSMILDouble($0) }
+    }
+
+    private static func parseKeySplines(_ raw: String) -> [Double] {
+        let values: [String] = raw
+            .split(separator: ";")
+            .flatMap { segment in
+                segment
+                    .split(whereSeparator: { character in
+                        character == " " || character == "\t" || character == "\n" || character == "\r" || character == ","
+                    })
+                    .map { value in
+                        value.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+            }
+            .filter { !$0.isEmpty }
+        return values.compactMap { parseSMILDouble($0) }
+    }
+
+    private static func cubicBezier(
+        progress: Double,
+        x1: Double,
+        y1: Double,
+        x2: Double,
+        y2: Double
+    ) -> Double {
+        let clampedProgress: Double = clamp(progress, min: 0, max: 1)
+        if clampedProgress <= 0 || clampedProgress >= 1 {
+            return clampedProgress
+        }
+
+        var t: Double = clampedProgress
+        for _ in 0..<8 {
+            let x: Double = cubicBezierPoint(p0: 0, p1: x1, p2: x2, p3: 1, t: t)
+            let derivativeX: Double = cubicBezierDerivative(p0: 0, p1: x1, p2: x2, p3: 1, t: t)
+            if abs(derivativeX) < 1e-6 {
+                break
+            }
+            t = t - (x - clampedProgress) / derivativeX
+            t = clamp(t, min: 0, max: 1)
+        }
+
+        return cubicBezierPoint(p0: 0, p1: y1, p2: y2, p3: 1, t: t)
+    }
+
+    private static func cubicBezierPoint(
+        p0: Double,
+        p1: Double,
+        p2: Double,
+        p3: Double,
+        t: Double
+    ) -> Double {
+        let oneMinusT: Double = 1 - t
+        return
+            p0 * (oneMinusT * oneMinusT * oneMinusT) +
+            3 * p1 * oneMinusT * oneMinusT * t +
+            3 * p2 * oneMinusT * t * t +
+            p3 * t * t * t
+    }
+
+    private static func cubicBezierDerivative(
+        p0: Double,
+        p1: Double,
+        p2: Double,
+        p3: Double,
+        t: Double
+    ) -> Double {
+        let oneMinusT: Double = 1 - t
+        return
+            3 * (p1 - p0) * oneMinusT * oneMinusT +
+            6 * (p2 - p1) * oneMinusT * t +
+            3 * (p3 - p2) * t * t
+    }
+
+    private static func interpolatePaint(
+        _ paints: [SVGPaint],
+        sample: SVGSMILEngineTimelineSample
+    ) -> SVGPaint? {
+        if sample.usesKeyTimes {
+            let segmentIndex: Int = sample.segmentIndex
+            let segmentCount: Int = max(paints.count - 1, 0)
+            if segmentCount == 0 {
+                return paints.first
+            }
+            let safeIndex: Int = min(segmentIndex, segmentCount - 1)
+            guard safeIndex + 1 < paints.count else {
+                return paints.last
+            }
+            guard let fromColor = toColor(paints[safeIndex]),
+                  let toColor = toColor(paints[safeIndex + 1]) else {
+                return paints[safeIndex]
+            }
+            return interpolateColor(fromColor, to: toColor, progress: sample.segmentProgress)
+        }
+        return interpolatePaint(
+            paints,
+            progress: sample.timelineProgress
+        )
     }
 
     private static func interpolatePaint(
@@ -1461,6 +1793,24 @@ struct SVGSMILEngine {
         let blue = from.blue + (to.blue - from.blue) * clampedProgress
         let alpha = from.alpha + (to.alpha - from.alpha) * clampedProgress
         return .color(.init(red: red, green: green, blue: blue, alpha: alpha))
+    }
+
+    private static func interpolateNumber(
+        values: [Double],
+        sample: SVGSMILEngineTimelineSample
+    ) -> Double {
+        if sample.usesKeyTimes {
+            let segmentCount: Int = max(values.count - 1, 0)
+            if segmentCount == 0 {
+                return values.first ?? 0
+            }
+            let safeSegment: Int = min(sample.segmentIndex, segmentCount - 1)
+            let fromValue: Double = values[safeSegment]
+            let toValue: Double = values[min(safeSegment + 1, values.count - 1)]
+            return fromValue + (toValue - fromValue) * sample.segmentProgress
+        }
+
+        return interpolateNumber(values: values, progress: sample.timelineProgress)
     }
 
     private static func interpolateNumber(values: [Double], progress: Double) -> Double {

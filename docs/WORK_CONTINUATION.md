@@ -17,8 +17,21 @@
   - `D1-3` 픽셀 기반 렌더 변경 검증 UITest 초안 추가
   - `A16-2` `arithmetic` 산출을 `CIColorKernel` 의존 없이 CPU 픽셀 경로로 정리, `bytesPerRow` 오차 처리 보강
 - 세션 우선순위:
-  - SMIL 우선순위: M1-1 → M1-2 → M1-3 → M1-4 → M1-5 → M1-6 → M1-7 → M1-8
+  - SMIL 우선순위: M1-1 → M1-2 → M1-3 → M1-4 → M1-5 → M1-6 → M1-7 → M1-8 → M1-9(완료)
   - 기존: D1-3 → D1-4 → D1-5(Conformance 연계)
+
+### 2026-02-16 (Session 76)
+- 작업: `M1-9` `keyTimes`/`keySplines` 샘플러 정교화
+- 완료:
+  - `SVGSMILEngine` 시간 샘플러를 segment 기반 샘플 구조로 정리해 다중 값 보간에 일관 적용.
+  - `keyTimes` 구간 계산, spline 적용 경로 타입 오류를 정리하고 연산자(`split(whereSeparator:)`)를 컴파일 정합형으로 수정.
+  - `cubicBezierDerivative` 수식을 안정화해 spline 보간 계산 정확도 향상.
+  - `SVGSMILEngineTests`에 `keyTimes`, `keySplines` 단위 테스트 추가.
+- 검증:
+  - `swift test --filter SVGSMILEngineTests --no-parallel`
+  - `swift test --no-parallel`
+- 다음 액션:
+  - `D1-5`로 복귀해 Conformance 매니페스트/샘플 매핑과 UI 측면 검증을 병행
 
 ### 2026-02-16 (Session 74)
 - 작업: `M1-8` SMIL W3C/웹 브라우저 비교 시나리오 연동
