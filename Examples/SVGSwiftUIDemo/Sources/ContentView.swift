@@ -854,6 +854,65 @@ struct ContentView: View {
 private struct RemoteSVGValidationView: View {
     let parserOptions: SVGParserOptions
 
+    private struct RemoteSVGPreset: Identifiable {
+        let id: String
+        let title: String
+        let url: String
+        let note: String
+    }
+
+    private struct RemoteSMILAnalysis {
+        enum SupportStatus {
+            case noSMILElements
+            case fullySupported
+            case partialSupported
+            case unsupportedElements
+            case parseFailed(String)
+        }
+
+        let status: SupportStatus
+        let sourceSMILElementCount: Int
+        let sourceCSSAnimationDetected: Bool
+        let sourceJavaScriptDetected: Bool
+        let parsedAnimationCount: Int
+        let unsupportedSmilElementKeys: [String]
+        let unsupportedSmilAttributeKeys: [String]
+        let unsupportedOtherKeys: [String]
+        var statusText: String {
+            switch status {
+            case .noSMILElements where sourceJavaScriptDetected:
+                return "SMIL 없음 / JS 기반 애니메이션"
+            case .noSMILElements where sourceCSSAnimationDetected:
+                return "SMIL 없음 / CSS 기반 애니메이션"
+            case .noSMILElements:
+                return "SMIL 요소 미탐지"
+            case .fullySupported:
+                return "SMIL 파싱됨 / 지원 가능성 높음"
+            case .partialSupported:
+                return "SMIL 일부 폴백 예상"
+            case .unsupportedElements:
+                return "SMIL 요소 있으나 미지원/파싱 실패"
+            case .parseFailed:
+                return "네트워크 또는 파싱 실패"
+            }
+        }
+
+        var statusColor: Color {
+            switch status {
+            case .fullySupported:
+                return .green
+            case .partialSupported:
+                return .orange
+            case .unsupportedElements:
+                return .red
+            case .noSMILElements:
+                return .secondary
+            case .parseFailed:
+                return .red
+            }
+        }
+    }
+
     @State private var urlText: String = "https://"
     @State private var errorMessage: String?
     @State private var fetchedURL: String?
@@ -864,12 +923,136 @@ private struct RemoteSVGValidationView: View {
     @State private var lastLoadedAt: Date?
     @State private var cachedSVG: [String: Data] = [:]
     @State private var cachedSource: [String: String] = [:]
+    @State private var cachedAnalyses: [String: RemoteSMILAnalysis] = [:]
+    @State private var isBatchAnalyzing: Bool = false
+    @State private var activeAnalysis: RemoteSMILAnalysis?
 
     private let loader: URLSession = .shared
+    private let remotePresets: [RemoteSVGPreset] = [
+        RemoteSVGPreset(
+            id: "svg-animated-loaders",
+            title: "SVG Animated Loaders",
+            url: "https://cdn.svgator.com/images/2023/03/svg-animated-loaders.svg",
+            note: "SVGator 샘플. 실제로 SMIL 태그가 거의 없어 CSS 기반으로 판단됨."
+        ),
+        RemoteSVGPreset(
+            id: "simple-svg-animated-loaders",
+            title: "Simple SVG Animated Loaders",
+            url: "https://cdn.svgator.com/images/2023/03/simple-svg-animated-loaders.svg",
+            note: "SVGator 샘플. SMIL 태그 확인이 필요해 추가함."
+        ),
+        RemoteSVGPreset(
+            id: "stopwatch-svg-animation",
+            title: "Stopwatch SVG Animation",
+            url: "https://cdn.svgator.com/images/2023/03/stopwatch-svg-animation.svg",
+            note: "SVGator 샘플. SMIL 사용 여부를 먼저 점검 후 렌더링."
+        ),
+        RemoteSVGPreset(
+            id: "cool-shapes-animated-using-svg",
+            title: "Cool Shapes Animated Using SVG",
+            url: "https://cdn.svgator.com/images/2023/03/cool-shapes-animated-using-svg.svg",
+            note: "지형/도형 애니메이션. CSS 기반일 가능성 큼."
+        ),
+        RemoteSVGPreset(
+            id: "animated-geometric-shapes-background",
+            title: "Animated Geometric Shapes Background",
+            url: "https://cdn.svgator.com/images/2023/03/animated-geometric-shapes-background.svg",
+            note: "배경형 움직임 샘플. SMIL 미탐색 시도 용도."
+        ),
+        RemoteSVGPreset(
+            id: "js-svg-animated-geometric-objects-background",
+            title: "JS SVG Animated Geometric Objects Background",
+            url: "https://cdn.svgator.com/images/2023/03/js-svg-animated-geometric-objects-background.svg",
+            note: "이름상 JS/애니메이션 기반 샘플. SMIL 동작 미포함 가능성이 높음."
+        ),
+        RemoteSVGPreset(
+            id: "animated-skating-girls",
+            title: "Animated Skating Girls",
+            url: "https://cdn.svgator.com/images/2023/03/animated-skating-girls.svg",
+            note: "캐릭터형 샘플. 스타일/키프레임 위주인지 확인."
+        ),
+        RemoteSVGPreset(
+            id: "animated-js-svg-example",
+            title: "Animated JS SVG Example",
+            url: "https://cdn.svgator.com/images/2023/03/animated-js-svg-example.svg",
+            note: "자바스크립트 명시명이지만 SVG 내 애니메이션 태그 중심으로 점검."
+        ),
+        RemoteSVGPreset(
+            id: "animated-parrot-logo",
+            title: "Animated Parrot Logo",
+            url: "https://cdn.svgator.com/images/2023/03/animated-parrot-logo.svg",
+            note: "로고형 애니메이션 샘플."
+        ),
+        RemoteSVGPreset(
+            id: "musicat-animated-logo-example",
+            title: "Musicat Animated Logo",
+            url: "https://cdn.svgator.com/images/2023/03/musicat-animated-logo-example.svg",
+            note: "로고형 애니메이션 샘플."
+        ),
+        RemoteSVGPreset(
+            id: "simple-animated-toggle-buttons",
+            title: "Simple Animated Toggle Buttons",
+            url: "https://cdn.svgator.com/images/2023/03/simple-animated-toggle-buttons.svg",
+            note: "토글형 UI형 샘플. SMIL 태그 존재 여부 먼저 점검."
+        )
+    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             List {
+                Section("추천 SVGator 샘플") {
+                    HStack {
+                        Text("원격 샘플을 내려받기 전에 SMIL 지원을 미리 점검할 수 있습니다.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button(isBatchAnalyzing ? "분석 중..." : "일괄 지원성 분석") {
+                            Task { await analyzeAllRemotePresets() }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .disabled(isBatchAnalyzing)
+                        .accessibilityIdentifier("demo.remote.batchAnalyze")
+                    }
+                    ForEach(remotePresets) { preset in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(preset.title)
+                                        .font(.callout)
+                                        .fontWeight(.medium)
+                                    Text(preset.note)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                    if let analysis = cachedAnalyses[preset.url] {
+                                        Text(analysis.statusText)
+                                            .font(.caption2)
+                                            .foregroundStyle(analysis.statusColor)
+                                    } else if isBatchAnalyzing {
+                                        Text("일괄 분석 대기")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer()
+                                Button("불러오기") {
+                                    urlText = preset.url
+                                    Task { await loadRemoteSVG(using: preset.url) }
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                                .accessibilityIdentifier("demo.remote.presetLoad.\(preset.id)")
+                            }
+                            Text(preset.url)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+
                 Section("운영 URL 입력") {
                     TextField("예: https://example.com/asset.svg", text: $urlText)
                         .textInputAutocapitalization(.never)
@@ -930,6 +1113,73 @@ private struct RemoteSVGValidationView: View {
                         .accessibilityIdentifier("demo.remote.canvas")
                     }
 
+                    Section("SMIL 지원성 분석") {
+                        if let analysis = activeAnalysis {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("SMIL 요소 감지: \(analysis.sourceSMILElementCount)개")
+                                    .font(.caption)
+                                    .foregroundStyle(analysis.sourceSMILElementCount == 0 ? .secondary : .primary)
+
+                                Text("CSS 애니메이션 힌트: \(analysis.sourceCSSAnimationDetected ? "있음" : "없음")")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                Text("JavaScript 힌트: \(analysis.sourceJavaScriptDetected ? "있음" : "없음")")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                Text("파서 수집 애니메이션: \(analysis.parsedAnimationCount)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                switch analysis.status {
+                                case .noSMILElements:
+                                    Text("현재 파일은 SMIL 요소가 없고, CSS/기타 표현 기반 애니메이션으로 추정됩니다.")
+                                        .font(.caption2)
+                                        .foregroundStyle(.orange)
+                                case .fullySupported:
+                                    Text("SMIL 애니메이션이 수집되었고 미지원 요소는 없습니다.")
+                                        .font(.caption2)
+                                        .foregroundStyle(.green)
+                                case .partialSupported:
+                                    Text("SMIL 요소가 있으나 일부 속성/요소는 미지원으로 폴백됩니다.")
+                                        .font(.caption2)
+                                        .foregroundStyle(.orange)
+                                case .unsupportedElements:
+                                    Text("SMIL 요소가 발견되었으나 파싱이 불안정합니다.")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                case .parseFailed(let description):
+                                    Text("파싱 실패: \(description)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+
+                                if !analysis.unsupportedSmilElementKeys.isEmpty {
+                                    Text("미지원 SMIL 요소 키: \(analysis.unsupportedSmilElementKeys.joined(separator: \", \"))")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+
+                                if !analysis.unsupportedSmilAttributeKeys.isEmpty {
+                                    Text("미지원 SMIL 속성 키: \(analysis.unsupportedSmilAttributeKeys.joined(separator: \", \"))")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+
+                                if !analysis.unsupportedOtherKeys.isEmpty {
+                                    Text("기타 미지원 피처: \(analysis.unsupportedOtherKeys.joined(separator: \", \"))")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        } else {
+                            Text("아직 분석되지 않았습니다.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
                     Section("SVG 소스") {
                         DisclosureGroup(
                             "원본 소스 열기/접기",
@@ -957,64 +1207,59 @@ private struct RemoteSVGValidationView: View {
     }
 
     @MainActor
-    private func loadRemoteSVG() async {
-        let trimmedURL = normalizedURLText
-        guard !trimmedURL.isEmpty else {
+    private func loadRemoteSVG(using overrideURL: String? = nil) async {
+        let candidateURL = (overrideURL ?? normalizedURLText).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !candidateURL.isEmpty else {
             errorMessage = "URL을 입력해 주세요."
             svgData = nil
             svgText = ""
             fetchedURL = nil
+            activeAnalysis = nil
             return
         }
-        guard let remoteURL = URL(string: trimmedURL) else {
+        guard let remoteURL = URL(string: candidateURL) else {
             errorMessage = "유효하지 않은 URL 형식입니다."
             svgData = nil
             svgText = ""
             fetchedURL = nil
+            activeAnalysis = nil
             return
         }
+        urlText = candidateURL
 
         isLoading = true
         errorMessage = nil
         sourceExpanded = false
+        activeAnalysis = nil
 
         if let cachedSVGData = cachedSVG[remoteURL.absoluteString],
            let cachedSourceText = cachedSource[remoteURL.absoluteString] {
             svgData = cachedSVGData
             svgText = cachedSourceText
             fetchedURL = remoteURL.absoluteString
+            activeAnalysis = cachedAnalyses[remoteURL.absoluteString]
+            if activeAnalysis == nil {
+                activeAnalysis = runSMILAnalysis(sourceText: cachedSourceText, data: cachedSVGData)
+                if let analysis = activeAnalysis {
+                    cachedAnalyses[remoteURL.absoluteString] = analysis
+                }
+            }
             lastLoadedAt = Date()
             isLoading = false
             return
         }
 
         do {
-            let (data, response) = try await loader.data(from: remoteURL)
-            if let httpResponse = response as? HTTPURLResponse {
-                guard (200...299).contains(httpResponse.statusCode) else {
-                    errorMessage = "HTTP \(httpResponse.statusCode): 응답 상태가 유효하지 않습니다."
-                    svgData = nil
-                    svgText = ""
-                    fetchedURL = nil
-                    isLoading = false
-                    return
-                }
-            }
-            let decodedSource = decodeSVGText(from: data)
-            if decodedSource.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                errorMessage = "SVG 텍스트를 추출할 수 없습니다."
-                svgData = nil
-                svgText = ""
-                fetchedURL = nil
-                isLoading = false
-                return
-            }
+            let (data, decodedSource) = try await loadRemotePayload(from: remoteURL)
 
             cachedSVG[remoteURL.absoluteString] = data
             cachedSource[remoteURL.absoluteString] = decodedSource
             fetchedURL = remoteURL.absoluteString
             svgData = data
             svgText = decodedSource
+            let analysis = runSMILAnalysis(sourceText: decodedSource, data: data)
+            cachedAnalyses[remoteURL.absoluteString] = analysis
+            activeAnalysis = analysis
             lastLoadedAt = Date()
             isLoading = false
         } catch {
@@ -1022,7 +1267,159 @@ private struct RemoteSVGValidationView: View {
             svgData = nil
             svgText = ""
             fetchedURL = nil
+            activeAnalysis = nil
             isLoading = false
+        }
+    }
+
+    @MainActor
+    private func analyzeAllRemotePresets() async {
+        guard !isBatchAnalyzing else {
+            return
+        }
+        isBatchAnalyzing = true
+        defer { isBatchAnalyzing = false }
+
+        for preset in remotePresets {
+            if cachedAnalyses[preset.url] != nil {
+                continue
+            }
+
+            guard let remoteURL = URL(string: preset.url) else {
+                cachedAnalyses[preset.url] = RemoteSMILAnalysis(
+                    status: .parseFailed("잘못된 URL 형식입니다."),
+                    sourceSMILElementCount: 0,
+                    sourceCSSAnimationDetected: false,
+                    sourceJavaScriptDetected: false,
+                    parsedAnimationCount: 0,
+                    unsupportedSmilElementKeys: [],
+                    unsupportedSmilAttributeKeys: [],
+                    unsupportedOtherKeys: []
+                )
+                continue
+            }
+
+            do {
+                let (data, sourceText) = try await loadRemotePayload(from: remoteURL)
+                let analysis = runSMILAnalysis(sourceText: sourceText, data: data)
+                let remoteKey = remoteURL.absoluteString
+                cachedAnalyses[remoteKey] = analysis
+                cachedSVG[remoteKey] = data
+                cachedSource[remoteKey] = sourceText
+            } catch {
+                cachedAnalyses[preset.url] = RemoteSMILAnalysis(
+                    status: .parseFailed(error.localizedDescription),
+                    sourceSMILElementCount: 0,
+                    sourceCSSAnimationDetected: false,
+                    sourceJavaScriptDetected: false,
+                    parsedAnimationCount: 0,
+                    unsupportedSmilElementKeys: [],
+                    unsupportedSmilAttributeKeys: [],
+                    unsupportedOtherKeys: []
+                )
+            }
+        }
+    }
+
+    private func loadRemotePayload(from remoteURL: URL) async throws -> (Data, String) {
+        let (data, response) = try await loader.data(from: remoteURL)
+        if let httpResponse = response as? HTTPURLResponse {
+            guard (200...299).contains(httpResponse.statusCode) else {
+                throw RemoteLoadError.httpStatus(httpResponse.statusCode)
+            }
+        }
+        let decodedSource = decodeSVGText(from: data)
+        if decodedSource.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            throw RemoteLoadError.emptyPayload
+        }
+        return (data, decodedSource)
+    }
+
+    private enum RemoteLoadError: LocalizedError {
+        case httpStatus(Int)
+        case emptyPayload
+
+        var errorDescription: String? {
+            switch self {
+            case let .httpStatus(code):
+                return "HTTP \(code): 응답 상태가 유효하지 않습니다."
+            case .emptyPayload:
+                return "응답 본문이 비어 있어 분석할 수 없습니다."
+            }
+        }
+    }
+
+    private func runSMILAnalysis(sourceText: String, data: Data) -> RemoteSMILAnalysis {
+        do {
+            let parser = SVGParser(options: parserOptions)
+            let document = try parser.parse(data: data)
+            let lowerSource = sourceText.lowercased()
+            let smilElementTags = detectSMILElementTags(from: lowerSource)
+            let hasCSSAnimation = lowerSource.contains("@keyframes") || lowerSource.contains("animation:")
+            let hasJavaScript = lowerSource.contains("<script") || lowerSource.contains("requestanimationframe")
+            let unsupportedKeys = document.unsupportedFeatures.keys.map { $0.lowercased() }
+            let unsupportedSmilElements = unsupportedKeys.filter { key in
+                key.hasPrefix("element:animate") || key == "element:animatetransform" || key == "element:animatemotion"
+            }
+            let unsupportedSmilAttributes = unsupportedKeys.filter { $0.hasPrefix("smil:") && !$0.hasPrefix("smil:unsupported") }
+            let unsupportedOther = unsupportedKeys.filter { key in
+                let isSmilSpecific = key.hasPrefix("element:animate")
+                    || key == "element:animatetransform"
+                    || key == "element:animatemotion"
+                    || key.hasPrefix("smil:")
+                return !isSmilSpecific
+            }
+
+            let status: RemoteSMILAnalysis.SupportStatus = {
+                if smilElementTags == 0 {
+                    return .noSMILElements
+                }
+                if document.animations.isEmpty {
+                    return .unsupportedElements
+                }
+                if unsupportedSmilElements.isEmpty && unsupportedSmilAttributes.isEmpty {
+                    return .fullySupported
+                }
+                return .partialSupported
+            }()
+
+            return RemoteSMILAnalysis(
+                status: status,
+                sourceSMILElementCount: smilElementTags,
+                sourceCSSAnimationDetected: hasCSSAnimation,
+                sourceJavaScriptDetected: hasJavaScript,
+                parsedAnimationCount: document.animations.count,
+                unsupportedSmilElementKeys: unsupportedSmilElements.sorted(),
+                unsupportedSmilAttributeKeys: unsupportedSmilAttributes.sorted(),
+                unsupportedOtherKeys: unsupportedOther.sorted()
+            )
+        } catch {
+            return RemoteSMILAnalysis(
+                status: .parseFailed(error.localizedDescription),
+                sourceSMILElementCount: 0,
+                sourceCSSAnimationDetected: false,
+                sourceJavaScriptDetected: false,
+                parsedAnimationCount: 0,
+                unsupportedSmilElementKeys: [],
+                unsupportedSmilAttributeKeys: [],
+                unsupportedOtherKeys: []
+            )
+        }
+    }
+
+    private func detectSMILElementTags(from normalizedSource: String) -> Int {
+        let candidates: [String] = [
+            "<animate ",
+            "<set ",
+            "<animatetransform",
+            "<animatemotion",
+            "<animatecolor",
+            "<animateTransform",
+            "<animateMotion"
+        ]
+        return candidates.reduce(0) { total, token in
+            let lowerToken = token.lowercased()
+            return total + normalizedSource.components(separatedBy: lowerToken).count - 1
         }
     }
 

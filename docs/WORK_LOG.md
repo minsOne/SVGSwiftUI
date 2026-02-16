@@ -2,6 +2,34 @@
 
 ## 2026-02-16
 
+### Session 84
+- 작업: SVGator 예제 11건의 SMIL 지원 후보를 데모앱 원격 탭에 추가하고, 샘플별 판별 가시화 강화
+- 완료:
+  - `원격 SVG` 탭에 일괄 지원성 분석 버튼을 추가.
+  - 원격 URL 로드/분석 결과를 캐시(`cachedAnalyses`)에 저장하여 재로딩시 즉시 재표시.
+  - `RemoteSMILAnalysis`에 JS 힌트(`requestAnimationFrame`, `<script`) 탐지 항목을 추가해 `SMIL 없음`의 실패 모드를 구분.
+  - 각 프리셋 행에 현재 분석 상태 라벨(`SMIL 없음/JS 기반`, `SMIL 없음/CSS 기반`, `지원 가능성 높음` 등) 표시.
+- 검증:
+  - `swift build`
+- 다음 액션:
+  - 샘플 URL들의 실제 렌더링 결과 스냅샷을 기준으로 "지원 불가/파싱 실패" 샘플은 상태 메시지와 별도 경고 플로우로 정리.
+
+### Session 83
+- 작업: 원격 SMIL 후보 SVG 추가 및 지원성 자동 점검
+- 완료:
+  - `원격 SVG` 탭에 사용자 제공 SVGator URL 11건을 빠른 로드 프리셋으로 추가.
+  - 각 URL 로드 시 `SVGParser`로 파싱한 결과를 기반으로 SMIL 분석 상태를 노출:
+    - 원본 텍스트의 SMIL 태그 탐지(`animate`, `set`, `animateTransform`, `animateMotion`)
+    - `document.animations.count`
+    - `unsupportedFeatures` 중 SMIL 요소/속성 미지원 키 분리 표시
+    - CSS 애니메이션 힌트(`@keyframes`, `animation:`) 표시
+  - 캐시된 URL 재로드 시 재분석 없이 캐시 결과 재사용.
+- 검증:
+  - `swift build`
+  - 원격 11건은 `SMIL 요소 미탐지 / CSS 기반일 가능성` 메시지로 정렬되는 경향 확인
+- 다음 액션:
+  - 원격 URL의 SMIL 분석 결과를 기반으로 SMIL 탭 샘플 분류 자동 반영 검토.
+
 ### Session 82
 - 작업: `SMIL 로드맵` Step 5(에러·미지원 처리) / Step 6(파서 테스트) 마무리
 - 완료:
