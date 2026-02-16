@@ -2,6 +2,28 @@
 
 ## 2026-02-16
 
+### Session 89
+- 작업: 원격 SVG 탭에서 프리셋 바로 렌더링 동작으로 정리
+- 완료:
+  - `예시 원격 SVG` 목록에서 각 프리셋 항목이 미리보기 토글이 아니라
+    탭 동작으로 즉시 렌더링 영역을 갱신하도록 변경.
+  - 프리셋 행에 다음 상태를 표시:
+    - 분석 결과 상태 (`cachedAnalyses` 기반)
+    - 다운로드 중/완료/실패 상태
+    - 선택된 항목 하이라이트
+  - 상태 갱신을 위해 `RemotePresetRenderState` 캐시 추가:
+    - `isLoading`, `isDownloadComplete`, `data`, `analysis`, `error`, `lastLoadedAt` 추적
+  - 프리셋 선택용 동기화 함수 추가:
+    - `applyRemotePreset(_:)`
+    - `preloadRemotePreset(_:)`
+    - `preloadAllRemotePresetsIfNeeded()`
+  - `downloadRemotePreset` 버튼 의존성을 제거하고, 프리셋 탭 즉시 로드 흐름으로 통합.
+- 검증:
+  - `swift test --no-parallel` (206 tests, 0 failures)
+  - `xcodebuild -project Examples/SVGSwiftUIDemo/SVGSwiftUIDemo.xcodeproj -scheme SVGSwiftUIDemo -destination 'platform=iOS Simulator,name=iPhone 17' build CODE_SIGNING_ALLOWED=NO` (빌드 성공)
+- 다음 액션:
+  - 원격 프리셋의 렌더링 화면이 선택 즉시 갱신되는지 직접 시연 확인.
+
 ### Session 88
 - 작업: 데모앱 원격 SVG의 외부 CSS 스타일시트 인라인 처리 추가
 - 완료:

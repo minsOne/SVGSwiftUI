@@ -861,6 +861,16 @@ private struct RemoteSVGValidationView: View {
         let note: String
     }
 
+    private struct RemotePresetRenderState {
+        var isLoading: Bool = false
+        var isDownloadComplete: Bool = false
+        var sourceText: String = ""
+        var data: Data?
+        var analysis: RemoteSMILAnalysis?
+        var lastLoadedAt: Date?
+        var error: String?
+    }
+
     private struct RemoteSMILAnalysis {
         enum SupportStatus {
             case noSMILElements
@@ -926,6 +936,9 @@ private struct RemoteSVGValidationView: View {
     @State private var cachedAnalyses: [String: RemoteSMILAnalysis] = [:]
     @State private var isBatchAnalyzing: Bool = false
     @State private var activeAnalysis: RemoteSMILAnalysis?
+    @State private var presetRenderStates: [String: RemotePresetRenderState] = [:]
+    @State private var isBatchDownloading: Bool = false
+    @State private var selectedPresetID: String? = nil
 
     private let loader: URLSession = .shared
     private let remotePresets: [RemoteSVGPreset] = [
@@ -1002,7 +1015,7 @@ private struct RemoteSVGValidationView: View {
             List {
                 Section("추천 SVGator 샘플") {
                     HStack {
-                        Text("원격 샘플을 내려받기 전에 SMIL 지원을 미리 점검할 수 있습니다.")
+                        Text("원격 샘플을 탭하면 즉시 렌더링됩니다.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -1015,41 +1028,89 @@ private struct RemoteSVGValidationView: View {
                         .accessibilityIdentifier("demo.remote.batchAnalyze")
                     }
                     ForEach(remotePresets) { preset in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(alignment: .top) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(preset.title)
-                                        .font(.callout)
-                                        .fontWeight(.medium)
-                                    Text(preset.note)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                    if let analysis = cachedAnalyses[preset.url] {
-                                        Text(analysis.statusText)
-                                            .font(.caption2)
-                                            .foregroundStyle(analysis.statusColor)
-                                    } else if isBatchAnalyzing {
-                                        Text("일괄 분석 대기")
+                        let state = presetRenderStates[preset.url]
+                        let isSelected = selectedPresetID == preset.id
+                        let isPresetLoading = state?.isLoading == true
+
+                        Button {
+                            Task { await applyRemotePreset(preset) }
+                        } label: {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .top, spacing: 8) {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(preset.title)
+                                            .font(.callout)
+                                            .fontWeight(.medium)
+                                        Text(preset.note)
                                             .font(.caption2)
                                             .foregroundStyle(.secondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                        if let analysis = cachedAnalyses[preset.url] {
+                                            Text(analysis.statusText)
+                                                .font(.caption2)
+                                                .foregroundStyle(analysis.statusColor)
+                                        } else if isBatchAnalyzing {
+                                            Text("일괄 분석 대기")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                        } else if let message = state?.error {
+                                            Text("다운로드 실패: \(message)")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
+                                        } else if state?.isDownloadComplete == true {
+                                            Text("다운로드 완료")
+                                                .font(.caption2)
+                                                .foregroundStyle(.green)
+                                        } else if isPresetLoading || isBatchDownloading {
+                                            Text("다운로드 중...")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                        } else {
+                                            Text("탭해서 렌더링")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    if isPresetLoading || (isSelected && isLoading) {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                            .tint(.blue)
+                                    } else if state?.isDownloadComplete == true {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
+                                            .font(.caption)
+                                    } else {
+                                        Image(systemName: "arrow.down.circle")
+                                            .foregroundStyle(.blue)
+                                            .font(.caption)
                                     }
                                 }
-                                Spacer()
-                                Button("불러오기") {
-                                    urlText = preset.url
-                                    Task { await loadRemoteSVG(using: preset.url) }
-                                }
-                                .buttonStyle(.bordered)
-                                .controlSize(.small)
-                                .accessibilityIdentifier("demo.remote.presetLoad.\(preset.id)")
+
+                                Text(preset.url)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
                             }
-                            Text(preset.url)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
                         }
-                        .padding(.vertical, 2)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.primary)
+                        .accessibilityIdentifier("demo.remote.presetRow.\(preset.id)")
+                        .accessibilityHint("원격 SVG를 내려받아 렌더링 영역에 표시")
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 2)
+                        .background(
+                            isSelected
+                                ? Color.accentColor.opacity(0.08)
+                                : Color.clear
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .onAppear {
+                            Task { await preloadRemotePreset(preset) }
+                        }
                     }
                 }
 
@@ -1201,6 +1262,9 @@ private struct RemoteSVGValidationView: View {
             .listStyle(.insetGrouped)
             .navigationTitle("원격 SVG")
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                await preloadAllRemotePresetsIfNeeded()
+            }
         }
         .padding(.top, 2)
     }
@@ -1321,6 +1385,94 @@ private struct RemoteSVGValidationView: View {
                     unsupportedOtherKeys: []
                 )
             }
+        }
+    }
+
+    @MainActor
+    private func applyRemotePreset(_ preset: RemoteSVGPreset) async {
+        selectedPresetID = preset.id
+        await loadRemoteSVG(using: preset.url)
+        if let cachedSourceText = cachedSource[preset.url],
+           let cachedAnalysis = cachedAnalyses[preset.url] {
+            svgText = cachedSourceText
+            activeAnalysis = cachedAnalysis
+        }
+    }
+
+    @MainActor
+    private func preloadRemotePreset(_ preset: RemoteSVGPreset) async {
+        guard let remoteURL = URL(string: preset.url) else {
+            var state = presetRenderStates[preset.url] ?? RemotePresetRenderState()
+            state.error = "유효하지 않은 URL 형식입니다."
+            presetRenderStates[preset.url] = state
+            return
+        }
+
+        let remoteKey = remoteURL.absoluteString
+        if let cachedAnalysis = cachedAnalyses[remoteKey],
+           let cachedSourceText = cachedSource[remoteKey],
+           let cachedSVGData = cachedSVG[remoteKey],
+           presetRenderStates[remoteKey]?.isDownloadComplete != false {
+            let existing = presetRenderStates[remoteKey]
+            if existing?.isDownloadComplete != true {
+                presetRenderStates[remoteKey] = RemotePresetRenderState(
+                    isLoading: false,
+                    isDownloadComplete: true,
+                    sourceText: cachedSourceText,
+                    data: cachedSVGData,
+                    analysis: cachedAnalysis,
+                    lastLoadedAt: existing?.lastLoadedAt,
+                    error: nil
+                )
+            }
+            return
+        }
+
+        if presetRenderStates[remoteKey]?.isLoading == true || presetRenderStates[remoteKey]?.isDownloadComplete == true {
+            return
+        }
+
+        var state = presetRenderStates[remoteKey] ?? RemotePresetRenderState()
+        state.isLoading = true
+        state.error = nil
+        presetRenderStates[remoteKey] = state
+
+        do {
+            let (data, sourceText) = try await loadRemotePayload(from: remoteURL)
+            let analysis = runSMILAnalysis(sourceText: sourceText, data: data)
+            cachedAnalyses[remoteKey] = analysis
+            cachedSource[remoteKey] = sourceText
+            cachedSVG[remoteKey] = data
+
+            let finishedState = RemotePresetRenderState(
+                isLoading: false,
+                isDownloadComplete: true,
+                sourceText: sourceText,
+                data: data,
+                analysis: analysis,
+                lastLoadedAt: Date(),
+                error: nil
+            )
+            presetRenderStates[remoteKey] = finishedState
+        } catch {
+            var failedState = presetRenderStates[remoteKey] ?? RemotePresetRenderState()
+            failedState.isLoading = false
+            failedState.isDownloadComplete = false
+            failedState.error = error.localizedDescription
+            presetRenderStates[remoteKey] = failedState
+        }
+    }
+
+    @MainActor
+    private func preloadAllRemotePresetsIfNeeded() async {
+        guard !isBatchDownloading else {
+            return
+        }
+        isBatchDownloading = true
+        defer { isBatchDownloading = false }
+
+        for preset in remotePresets {
+            await preloadRemotePreset(preset)
         }
     }
 
