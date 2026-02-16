@@ -1,6 +1,6 @@
 # SVGSwiftUI Task Board
 
-Last Updated: 2026-02-16 (Session 77)
+Last Updated: 2026-02-16 (Session 79)
 
 ## Status Legend
 - `todo`: not started
@@ -109,7 +109,7 @@ Last Updated: 2026-02-16 (Session 77)
 | D1-2 | D1 | Demo 노드 제어 UI 확장 | done | 색상/크기/offset/opacity 제어 및 접근성 ID 정리 완료 |
 | D1-3 | D1 | Demo UITest 오버라이드 검증 시나리오 추가 | done | 항목별 애니메이션/노드 제어 on/off 및 렌더 반영 검증까지 추가 |
 | D1-4 | D1 | 브라우저 기준 비교 확장 | done | TopN/priority 로드, tolerance/env 제어, 비교 아티팩트 저장 및 CI 업로드, 타입 안전성 보강 완료 |
-| D1-5 | D1 | W3C/WebKit 연계 강화 | todo | 신규 샘플 대응 fixture/manifest/coverage strict 정합 |
+| D1-5 | D1 | W3C/WebKit 연계 강화 | done | `ConformanceManifestAlignmentTests` 추가로 W3C/WebKit 매니페스트 정합성 및 Demo 샘플 정합 검증 자동화 |
 
 
 

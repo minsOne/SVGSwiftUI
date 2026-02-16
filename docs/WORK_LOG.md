@@ -2,6 +2,20 @@
 
 ## 2026-02-16
 
+### Session 79
+- 작업: `D1-5` W3C/WebKit 연계 강화 정합성 자동 점검
+- 완료:
+  - `Tests/SVGSwiftUITests/ConformanceManifestAlignmentTests.swift` 생성.
+  - W3C/WebKit 매니페스트(`id/svg/mode/expected/reference/중복`) 정합성 및 리소스 존재성 점검.
+  - 테스트 번들 매니페스트 경로와 Demo W3C/WebKit fixture 정합성(누락/불필요)을 점검.
+  - 문서 상태 동기화:
+    - `docs/TASK_BOARD.md` D1-5를 `done` 전환.
+- 검증:
+  - `swift test --filter ConformanceManifestAlignmentTests --no-parallel` (1 test, 0 failures)
+  - `swift test --no-parallel` (197 tests, 0 failures)
+- 다음 액션:
+  - `D1-5` 완료 전환을 반영하고 차기 마일스톤(운영 안정화/SMIL 확장)을 우선순위 반영
+
 ### Session 77
 - 작업: `M1-10` SMIL 애니메이션 병합 정책 구현
 - 완료:

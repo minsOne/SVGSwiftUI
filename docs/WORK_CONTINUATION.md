@@ -5,7 +5,7 @@
 - 계획 문서: `/Users/minsone/Developer/SVGSwiftUI/docs/STEP_BY_STEP_PLAN.md`
 - 구현 상태: P0/P1/P2/P3/P4/P5/P6/P7-1 완료, P8 파이프라인/회귀 검증 완료, P9-1 문서 정리 완료, A10-3 완료, A11-2 완료, A12 완료, A13-1 완료, A13-2 완료, A14-1/A14-2/A14-3 완료, A15-1/A15-2 완료, A16-1/A16-2/A16-3/A16-4 완료
 - 추가 진행: Demo UITest 브라우저 기준 비교 파이프라인 추가
-- 다음 단계: `D1-5` W3C/WebKit 연계 강화
+- 다음 단계: `D1-5` 완료 반영 후 다음 마일스톤 전환
 - API 상태: 공개 표면 최소화 적용 완료(파서/AST/캐시/렌더 내부 엔진은 `internal`)
 - 안정화 상태: v2 고급 기능(A1~A9) 동작 검증 및 CI/문서 정합성 동기화 완료(운영 단계로 이동), `S2-2` 완료, `S3-1` 완료, `A11-2` 완료
 - 최근 진행 반영:
@@ -15,10 +15,23 @@
   - `D1-1` 샘플 메타 확장 완료(오버라이드 타깃 메타 등록)
   - `D1-2` 노드 제어 UI 확장(색상/scale/offset/opacity) 완료
   - `D1-3` 픽셀 기반 렌더 변경 검증 UITest 초안 추가
+  - `D1-5` 매니페스트/fixture 정합성 자동 검증 테스트 추가
   - `A16-2` `arithmetic` 산출을 `CIColorKernel` 의존 없이 CPU 픽셀 경로로 정리, `bytesPerRow` 오차 처리 보강
 - 세션 우선순위:
   - SMIL 우선순위: M1-1 → M1-2 → M1-3 → M1-4 → M1-5 → M1-6 → M1-7 → M1-8 → M1-9 → M1-10(완료)
   - 기존: D1-3 → D1-4 → D1-5(Conformance 연계)
+
+### 2026-02-16 (Session 79)
+- 작업: `D1-5` W3C/WebKit 연계 강화 정합성 점검 강화
+- 완료:
+  - `Tests/SVGSwiftUITests/ConformanceManifestAlignmentTests.swift` 추가.
+  - 매니페스트 항목(`id`, `svg`, `mode`, `expected`, 참조/중복/누락/과잉) 정합성, 테스트 번들 리소스 존재성, 데모 fixture 정렬을 자동 검증하도록 구현.
+  - D1-5 문서 상태 반영(`TASK_BOARD`).
+- 검증:
+  - `swift test --filter ConformanceManifestAlignmentTests --no-parallel`
+  - `swift test --no-parallel` (197 tests, 0 failures)
+- 다음 액션:
+  - D1-5 완료 정리 후 다음 단계(차기 마일스톤 우선순위) 결정
 
 ### 2026-02-16 (Session 77)
 - 작업: `M1-10` SMIL 애니메이션 병합 정책 구현
