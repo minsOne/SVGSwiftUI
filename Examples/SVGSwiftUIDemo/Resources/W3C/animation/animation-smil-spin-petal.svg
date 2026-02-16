@@ -1,0 +1,23 @@
+<svg width="340" height="220" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-petal-bg" x="0" y="0" width="340" height="220" fill="#111827" />
+    <g id="smil-petal-stage">
+        <g id="smil-petal-wheel" transform="translate(170,110)">
+            <ellipse id="smil-petal-center" cx="0" cy="0" rx="28" ry="20" fill="#f59e0b">
+                <animate attributeName="rx" values="20;35;20" dur="3s" repeatCount="indefinite" />
+            </ellipse>
+            <g id="smil-petal-arm-group">
+                <ellipse id="smil-petal-arm-1" cx="-72" cy="0" rx="22" ry="8" fill="#34d399" />
+                <ellipse id="smil-petal-arm-2" cx="0" cy="-72" rx="22" ry="8" fill="#22d3ee" transform="rotate(90)" />
+                <ellipse id="smil-petal-arm-3" cx="72" cy="0" rx="22" ry="8" fill="#a78bfa" transform="rotate(180)" />
+                <ellipse id="smil-petal-arm-4" cx="0" cy="72" rx="22" ry="8" fill="#f87171" transform="rotate(270)" />
+            </g>
+            <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 0 0"
+                to="360 0 0"
+                dur="5s"
+                repeatCount="indefinite" />
+        </g>
+    </g>
+</svg>

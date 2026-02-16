@@ -1,0 +1,21 @@
+<svg width="360" height="220" viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-lattice-bg" x="0" y="0" width="360" height="220" fill="#0f172a" />
+    <g id="smil-lattice-grid" transform="translate(30,30)">
+        <rect id="smil-lattice-square-1" x="0" y="0" width="70" height="70" rx="8" fill="#f97316" />
+        <rect id="smil-lattice-square-2" x="80" y="0" width="70" height="70" rx="8" fill="#0ea5e9" />
+        <rect id="smil-lattice-square-3" x="160" y="0" width="70" height="70" rx="8" fill="#a78bfa" />
+        <rect id="smil-lattice-square-4" x="240" y="0" width="70" height="70" rx="8" fill="#10b981" />
+        <rect id="smil-lattice-square-5" x="0" y="90" width="70" height="70" rx="8" fill="#22c55e" />
+        <rect id="smil-lattice-square-6" x="80" y="90" width="70" height="70" rx="8" fill="#14b8a6" />
+        <rect id="smil-lattice-square-7" x="160" y="90" width="70" height="70" rx="8" fill="#ef4444" />
+        <rect id="smil-lattice-square-8" x="240" y="90" width="70" height="70" rx="8" fill="#3b82f6" />
+        <rect id="smil-lattice-square-9" x="80" y="160" width="70" height="50" rx="8" fill="#f59e0b" />
+        <rect id="smil-lattice-square-10" x="160" y="160" width="70" height="50" rx="8" fill="#a855f7" />
+        <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="30 30;30 32;30 30"
+            dur="2s"
+            repeatCount="indefinite" />
+    </g>
+</svg>

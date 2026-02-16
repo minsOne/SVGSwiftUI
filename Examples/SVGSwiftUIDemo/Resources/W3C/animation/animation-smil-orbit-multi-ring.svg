@@ -1,0 +1,35 @@
+<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-orbit-multi-bg" x="0" y="0" width="320" height="220" fill="#0b1020" />
+    <g id="smil-orbit-multi-center" transform="translate(160 110)">
+        <circle id="smil-orbit-multi-core" cx="0" cy="0" r="20" fill="#22c55e" />
+        <g id="smil-orbit-multi-ring-a" transform="rotate(0)">
+            <circle id="smil-orbit-multi-ring-a-1" cx="0" cy="-62" r="10" fill="#f59e0b" />
+            <circle id="smil-orbit-multi-ring-a-2" cx="46" cy="-38" r="9" fill="#38bdf8" />
+            <circle id="smil-orbit-multi-ring-a-3" cx="58" cy="18" r="9" fill="#a78bfa" />
+            <circle id="smil-orbit-multi-ring-a-4" cx="16" cy="58" r="8" fill="#34d399" />
+            <circle id="smil-orbit-multi-ring-a-5" cx="-42" cy="38" r="9" fill="#f472b6" />
+            <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 0 0"
+                to="360 0 0"
+                dur="6s"
+                repeatCount="indefinite" />
+        </g>
+        <g id="smil-orbit-multi-ring-b" transform="rotate(120)">
+            <circle id="smil-orbit-multi-ring-b-1" cx="0" cy="-95" r="10" fill="#0ea5e9" />
+            <circle id="smil-orbit-multi-ring-b-2" cx="82" cy="-47" r="9" fill="#22d3ee" />
+            <circle id="smil-orbit-multi-ring-b-3" cx="82" cy="47" r="9" fill="#a855f7" />
+            <circle id="smil-orbit-multi-ring-b-4" cx="0" cy="95" r="10" fill="#14b8a6" />
+            <circle id="smil-orbit-multi-ring-b-5" cx="-82" cy="47" r="9" fill="#facc15" />
+            <circle id="smil-orbit-multi-ring-b-6" cx="-82" cy="-47" r="9" fill="#fb7185" />
+            <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="120 0 0"
+                to="-240 0 0"
+                dur="8s"
+                repeatCount="indefinite" />
+        </g>
+    </g>
+</svg>

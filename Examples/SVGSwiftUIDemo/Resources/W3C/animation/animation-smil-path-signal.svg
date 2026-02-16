@@ -1,0 +1,10 @@
+<svg width="360" height="180" viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-path-shell" x="0" y="0" width="360" height="180" fill="#0a0f1a"/>
+    <path id="smil-path-track" d="M20 150 C60 20, 140 20, 180 150 S300 20, 340 150" fill="none" stroke="#334155" stroke-width="8"/>
+    <circle id="smil-path-node-a" cx="20" cy="150" r="9" fill="#38bdf8"/>
+    <circle id="smil-path-node-b" cx="180" cy="150" r="9" fill="#a78bfa"/>
+    <circle id="smil-path-node-c" cx="340" cy="150" r="9" fill="#34d399"/>
+    <circle id="smil-path-marker" cx="20" cy="150" r="12" fill="#f97316">
+        <animate attributeName="cx" values="20;180;340;20" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+</svg>

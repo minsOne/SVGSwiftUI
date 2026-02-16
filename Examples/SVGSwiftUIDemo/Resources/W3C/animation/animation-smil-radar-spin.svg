@@ -1,0 +1,19 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-radar-shell" x="0" y="0" width="240" height="240" fill="#0f172a"/>
+    <circle id="smil-radar-core" cx="120" cy="120" r="24" fill="#38bdf8"/>
+    <g id="smil-radar-sweep">
+        <line id="smil-radar-line" x1="120" y1="120" x2="120" y2="20" stroke="#67e8f9" stroke-width="3" stroke-linecap="round"/>
+        <polygon id="smil-radar-sector" points="120,120 120,20 130,20" fill="#22d3ee" opacity="0.2"/>
+        <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="rotate"
+            from="0 120 120"
+            to="360 120 120"
+            dur="5s"
+            repeatCount="indefinite"/>
+    </g>
+    <circle id="smil-radar-dot-a" cx="120" cy="40" r="8" fill="#facc15"/>
+    <circle id="smil-radar-dot-b" cx="40" cy="120" r="8" fill="#34d399"/>
+    <circle id="smil-radar-dot-c" cx="200" cy="120" r="8" fill="#f97316"/>
+</svg>

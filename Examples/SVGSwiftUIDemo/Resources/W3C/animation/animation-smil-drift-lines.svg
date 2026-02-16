@@ -1,0 +1,11 @@
+<svg width="360" height="200" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-drift-bg" x="0" y="0" width="360" height="200" fill="#111827"/>
+    <g id="smil-drift-track">
+        <line id="smil-drift-line-1" x1="30" y1="60" x2="330" y2="60" stroke="#22d3ee" stroke-width="6" stroke-linecap="round"/>
+        <line id="smil-drift-line-2" x1="30" y1="100" x2="330" y2="100" stroke="#a78bfa" stroke-width="6" stroke-linecap="round"/>
+        <line id="smil-drift-line-3" x1="30" y1="140" x2="330" y2="140" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+        <circle id="smil-drift-ball" cx="40" cy="100" r="14" fill="#38bdf8">
+            <animate attributeName="cx" values="40;320;40" dur="3s" repeatCount="indefinite"/>
+        </circle>
+    </g>
+</svg>

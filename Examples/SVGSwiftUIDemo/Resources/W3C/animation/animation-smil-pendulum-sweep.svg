@@ -1,0 +1,16 @@
+<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-pendulum-bg" x="0" y="0" width="320" height="220" fill="#050f21" />
+    <g id="smil-pendulum-pivot" transform="translate(160 30)">
+        <line id="smil-pendulum-rod" x1="0" y1="0" x2="0" y2="112" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" />
+        <g id="smil-pendulum-bob-group" transform="translate(0 112)">
+            <circle id="smil-pendulum-bob" cx="0" cy="0" r="16" fill="#f59e0b" />
+            <circle id="smil-pendulum-glow" cx="0" cy="0" r="26" fill="none" stroke="#f59e0b" stroke-width="4" opacity="0.45" />
+            <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values="-45 0 0;45 0 0;-45 0 0"
+                dur="2.2s"
+                repeatCount="indefinite" />
+        </g>
+    </g>
+</svg>

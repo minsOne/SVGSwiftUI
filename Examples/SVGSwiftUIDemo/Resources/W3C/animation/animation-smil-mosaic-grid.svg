@@ -1,0 +1,18 @@
+<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-mosaic-bg" x="0" y="0" width="320" height="220" fill="#111827"/>
+    <g id="smil-mosaic-grid">
+        <style>
+            .tile-a { fill: #60a5fa; }
+            .tile-b { fill: #34d399; }
+            .tile-c { fill: #f59e0b; }
+            .tile-d { fill: #c084fc; }
+            .tile-e { fill: #f87171; }
+        </style>
+        <rect id="smil-mosaic-a" x="24" y="30" width="120" height="70" class="tile-a"/>
+        <rect id="smil-mosaic-b" x="176" y="30" width="120" height="70" class="tile-b"/>
+        <rect id="smil-mosaic-c" x="24" y="118" width="70" height="72" class="tile-c"/>
+        <rect id="smil-mosaic-d" x="106" y="118" width="70" height="72" class="tile-d"/>
+        <rect id="smil-mosaic-e" x="188" y="118" width="108" height="72" class="tile-e"/>
+        <circle id="smil-mosaic-center" cx="160" cy="110" r="14" fill="#22d3ee"/>
+    </g>
+</svg>

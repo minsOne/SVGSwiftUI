@@ -1,0 +1,21 @@
+<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-orbit-shell" x="0" y="0" width="320" height="220" fill="#0f1224"/>
+    <g id="smil-orbit-core-group">
+        <circle id="smil-orbit-halo" cx="160" cy="110" r="102" fill="none" stroke="#334155" stroke-width="2" opacity="0.45"/>
+        <circle id="smil-orbit-ring" cx="160" cy="110" r="74" fill="none" stroke="#5fa2ff" stroke-width="8"/>
+        <circle id="smil-orbit-core" cx="160" cy="110" r="24" fill="#60a5fa"/>
+        <circle id="smil-orbit-satellite" cx="236" cy="110" r="12" fill="#f97316">
+            <animateTransform
+                attributeName="transform"
+                attributeType="XML"
+                type="rotate"
+                from="0 160 110"
+                to="360 160 110"
+                dur="4s"
+                repeatCount="indefinite"/>
+        </circle>
+    </g>
+    <circle id="smil-orbit-dot-a" cx="160" cy="8" r="6" fill="#f9a8d4"/>
+    <circle id="smil-orbit-dot-b" cx="312" cy="110" r="6" fill="#a7f3d0"/>
+    <circle id="smil-orbit-dot-c" cx="160" cy="212" r="6" fill="#fde68a"/>
+</svg>

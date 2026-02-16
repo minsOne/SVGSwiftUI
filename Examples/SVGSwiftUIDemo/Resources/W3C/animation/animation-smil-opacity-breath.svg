@@ -1,0 +1,11 @@
+<svg width="280" height="220" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+    <rect id="smil-breath-bg" x="0" y="0" width="280" height="220" fill="#0c1020"/>
+    <g id="smil-breath-layer">
+        <ellipse id="smil-breath-rim" cx="140" cy="110" rx="105" ry="86" fill="none" stroke="#94a3b8" stroke-width="4"/>
+        <ellipse id="smil-breath-core" cx="140" cy="110" rx="62" ry="48" fill="#22d3ee"/>
+        <ellipse id="smil-breath-haze" cx="140" cy="110" rx="82" ry="66" fill="#0ea5e9" opacity="0.35">
+            <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2.8s" repeatCount="indefinite"/>
+        </ellipse>
+        <line id="smil-breath-beam" x1="40" y1="110" x2="240" y2="110" stroke="#f59e0b" stroke-width="4"/>
+    </g>
+</svg>
